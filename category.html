@@ -149,73 +149,72 @@
 
     .top__brand {
       min-width: 0;
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
-    .top__mark {
-      width: 42px;
-      height: 42px;
+    .top__mark { display: none; }
+    .top__home {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
       flex-shrink: 0;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 6px 16px rgba(139, 0, 232, 0.14);
-    }
-    .top__mark img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .top__loc {
-      width: auto;
-      height: 32px;
-      max-width: 118px;
-      padding: 0 8px 0 7px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      flex-shrink: 1;
-      min-width: 0;
-      background: #F3EEFF;
-      color: var(--violet);
-      border: 0;
-      box-shadow: none;
+      display: grid;
+      place-items: center;
+      background: rgba(36, 24, 40, 0.88);
+      color: #fff;
       text-decoration: none;
-      transition: background 0.15s;
-      overflow: hidden;
+      box-shadow: 0 6px 16px rgba(36, 24, 40, 0.16);
     }
-    .top__loc:hover,
-    .top__loc:focus-visible { background: #EDE4FF; }
-    .top__loc:active { transform: none; }
-    .top__loc svg {
-      width: 15px;
-      height: 15px;
-      display: block;
-      flex-shrink: 0;
+    .top__home svg { width: 18px; height: 18px; display: block; }
+    .top__meta {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
     }
-    .top__loc-badge {
-      position: static;
-      display: inline-block;
-      max-width: 4.8em;
-      padding: 0;
-      border-radius: 0;
-      background: none;
-      color: var(--violet);
+    .top__cat {
+      margin: 0;
       font-family: Outfit, 'DM Sans', sans-serif;
-      font-size: 0.68rem;
+      font-size: 1.05rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--ink);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      box-shadow: none;
-      pointer-events: none;
-      transform: none;
+    }
+    .top__loc {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      max-width: 100%;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .top__loc-badge {
+      min-width: 0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .top__loc svg {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+      color: var(--muted);
     }
 
     .top__actions {
@@ -394,53 +393,7 @@
       padding-top: 4px;
     }
 
-    .sub__head {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-    .sub__back {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      border: 1px solid rgba(237, 228, 236, 0.95);
-      background: rgba(255, 255, 255, 0.85);
-      color: var(--ink);
-      display: grid;
-      place-items: center;
-      flex-shrink: 0;
-      text-decoration: none;
-      box-shadow: 0 6px 16px rgba(36, 24, 40, 0.05);
-      transition: background 0.15s, transform 0.15s;
-    }
-    .sub__back:active { transform: scale(0.96); background: #F6F0F7; }
-    .sub__back svg { width: 18px; height: 18px; }
-    .sub__titles { min-width: 0; flex: 1; padding-top: 2px; }
-    .sub__eyebrow {
-      margin: 0 0 2px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--violet);
-    }
-    .sub__title {
-      margin: 0;
-      font-family: Outfit, 'DM Sans', sans-serif;
-      font-size: 1.45rem;
-      font-weight: 800;
-      letter-spacing: -0.035em;
-      line-height: 1.15;
-      color: var(--ink);
-    }
-    .sub__sub {
-      margin: 4px 0 0;
-      font-size: 0.86rem;
-      font-weight: 500;
-      color: var(--muted);
-      line-height: 1.35;
-    }
+    .sub__head { display: none; }
 
     .chips {
       display: flex;
@@ -907,10 +860,16 @@
         <header class="top">
           <div class="brand-row">
             <div class="top__brand">
-              <a class="top__loc" id="loc-open" href="location.html" title="Change location" aria-label="Change location">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-                <span class="top__loc-badge" id="loc-badge">Indiranagar</span>
+              <a class="top__home" href="home.html" title="Home" aria-label="Back to home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"/></svg>
               </a>
+              <div class="top__meta">
+                <h1 class="top__cat" id="cat-title">Salon</h1>
+                <a class="top__loc" id="loc-open" href="location.html" title="Change location" aria-label="Change location">
+                  <span class="top__loc-badge" id="loc-badge">Indiranagar</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </a>
+              </div>
             </div>
             <div class="top__actions">
               <button type="button" class="icon-btn icon-btn--wallet" id="wallet-open" aria-label="Wallet balance ₹500 — add money" title="Wallet">
@@ -931,17 +890,6 @@
 
         <div class="body">
           <section class="sub" aria-label="Subcategories">
-            <div class="sub__head">
-              <a class="sub__back" href="home.html" title="Back" aria-label="Back to categories">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
-              </a>
-              <div class="sub__titles">
-                <p class="sub__eyebrow" id="cat-eyebrow">Category</p>
-                <h1 class="sub__title" id="cat-title">Salon</h1>
-                <p class="sub__sub" id="cat-sub">Pick a service to continue</p>
-              </div>
-            </div>
-
             <div class="chips" id="chips" role="tablist" aria-label="Filters"></div>
 
             <div class="popular">
@@ -1119,9 +1067,7 @@
       var activeChip = "All";
 
       document.title = "GlowTap Customer — " + cat.title;
-      document.getElementById("cat-eyebrow").textContent = cat.eyebrow;
       document.getElementById("cat-title").textContent = cat.title;
-      document.getElementById("cat-sub").textContent = cat.sub;
 
       function inr(n) {
         return "₹" + Number(n).toLocaleString("en-IN");
