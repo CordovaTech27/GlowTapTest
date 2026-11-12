@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GlowTap Customer — Wireframe Index</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      margin: 0;
+      padding: 40px 24px;
+      background: linear-gradient(165deg, #fff, #F8F5FF);
+      color: #1E2A32;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    h1 { font-family: Outfit, sans-serif; font-size: 1.75rem; margin: 0 0 8px; }
+    .sub { color: #7A6E78; margin-bottom: 28px; line-height: 1.5; }
+    .card {
+      background: #fff;
+      border: 1px solid rgba(139, 0, 232, 0.1);
+      border-radius: 18px;
+      padding: 20px 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(139, 0, 232, 0.06);
+    }
+    h2 { font-size: 1rem; margin: 0 0 12px; }
+    ul { margin: 0; padding-left: 18px; }
+    li { margin: 6px 0; }
+    a { color: #8B00E8; font-weight: 600; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-size: 0.85em; background: #F3EEFF; padding: 1px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Customer App Wireframes</h1>
+    <p class="sub">
+      End Customer mobile app · <code>Customer-Functional-Spec.md</code> §4.1 ·
+      Phone frame ~390×844 · Auth required (no guest mode)
+    </p>
+
+    <div class="card">
+      <h2>§4.1 Authentication</h2>
+      <ul>
+        <li><a href="splash.html">Splash</a> — app launch: logo, name, loading bar → Sign in after ~2.7 s (tap to skip) · <a href="splash.html?stay=1">hold on splash</a></li>
+        <li><a href="login.html">Sign in / Welcome</a> — Password (email + password) or OTP (email or mobile, then the code) → <a href="home.html">Home</a>. Google: first account → <a href="complete-profile.html?google=1&amp;name=Ananya%20Sharma&amp;email=ananya.sharma@gmail.com">Your details</a>, second account → Home</li>
+        <li><a href="login.html?error=1">Sign in — bad credentials</a></li>
+        <li><a href="login.html?disabled=1">Sign in — account disabled</a></li>
+        <li><a href="login.html?expired=1">Sign in — session expired</a></li>
+        <li>Forgot password: <a href="forgot-password.html">Email or mobile</a> → <a href="forgot-password.html?step=code&amp;via=mobile">6-digit code</a> (expires in 2 min, resend after 30 s · <a href="forgot-password.html?step=code&amp;expired=1">expired</a> · type 000000 for wrong code) → <a href="forgot-password.html?step=pass">New + confirm password</a> → <a href="forgot-password.html?step=done">Done</a></li>
+        <li>Create account (mobile): <a href="signup.html">Mobile number</a> → <a href="verify-otp.html">Phone OTP</a> → <a href="complete-profile.html">Your details</a> (name, email + inline Verify → 6-digit code, password + confirm — 8+ chars, 1 uppercase, 1 number, 1 symbol, DOB, gender, Terms ✓, marketing ✓; type 000000 for wrong code) → Home</li>
+        <li>Create account (Google): <a href="complete-profile.html?google=1&amp;name=Ananya%20Sharma&amp;email=ananya.sharma@gmail.com">Your details</a> (email auto-verified, add mobile) → <a href="verify-otp.html?google=1">Phone OTP</a> → Home</li>
+        <li>Legal (demo): <a href="terms.html">Terms &amp; Conditions</a> · <a href="privacy.html">Privacy Policy</a> — opened from the sign-up tick and Profile → More options</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>§4.2 Home — Nearby</h2>
+      <ul>
+        <li><a href="home.html">Home</a> — location, wallet, favourites, <b>cart icon</b> (badge = count), categories, promo, salon cards, floating tabs · <a href="favorites.html">Favorites</a></li>
+        <li><a href="location.html">Select location</a> — search, use current location, map pin, selected address + Confirm → Home header</li>
+        <li><a href="search.html">Search</a> — full page from Home's search bar: recent / popular / categories, results with Sort by + filters · <a href="search.html?q=Hair">example: “Hair”</a></li>
+        <li><a href="rating-colors.html">Rating colours</a> — 5 colour bands (0–1 … 4–5) used on every rating</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>§4.6 My Bookings</h2>
+      <ul>
+        <li><a href="bookings.html">Bookings</a> — Upcoming / Past / All; Past: tap salon row (›) for details; completed unrated shows <b>Book again</b> + <b>Rate &amp; review</b> on one row (no Details button)</li>
+        <li><a href="booking-detail.html?id=GT-48291">Booking detail</a> — timeline, payment, cancel / reschedule</li>
+        <li><a href="book.html?reschedule=GT-48291&amp;salon=luxe&amp;svc=Haircut%20%26%20Style&amp;spec=Priya%20S.&amp;from=Tomorrow%2C%2027%20Aug%20%C2%B7%2011%3A30%20AM&amp;amt=%E2%82%B9899&amp;pay=Paid%20online">Reschedule</a> — new date &amp; time only (no payment) → <a href="book.html?reschedule=GT-48291&amp;salon=luxe&amp;svc=Haircut%20%26%20Style&amp;spec=Priya%20S.&amp;from=Tomorrow%2C%2027%20Aug%20%C2%B7%2011%3A30%20AM&amp;amt=%E2%82%B9899&amp;pay=Paid%20online&amp;day=2&amp;time=2%3A00%20PM&amp;done=1">Appointment rescheduled</a> → <a href="booking-detail.html?id=GT-48291&amp;rescheduled=1&amp;date=Wed%2C%2014%20Oct&amp;time=2%3A00%20PM&amp;from=Tomorrow%2C%2027%20Aug%20%C2%B7%2011%3A30%20AM">booking after reschedule</a></li>
+        <li>Cancel a <b>Confirmed</b> booking: <a href="booking-detail.html?id=GT-48291&amp;cancel=1">cancel sheet</a> → <a href="booking-detail.html?id=GT-48291&amp;cancelled=1&amp;done=1&amp;reason=Change%20of%20plans">Cancellation initiated</a> → <a href="booking-detail.html?id=GT-48291&amp;cancelled=1">booking · Cancellation initiated</a> → salon confirms → <a href="booking-detail.html?id=GT-48291&amp;cancelled=1&amp;approved=1">booking · Cancelled (confirmed by salon)</a></li>
+        <li>Cancel a <b>Booked</b> booking (instant): <a href="booking-detail.html?id=GT-48310&amp;cancel=1">cancel sheet</a> → <a href="booking-detail.html?id=GT-48310&amp;cancelled=1&amp;done=1">Cancellation confirmed</a> → <a href="booking-detail.html?id=GT-48310&amp;cancelled=1">cancelled booking</a></li>
+        <li><a href="rate.html?id=GT-48110&amp;stylist=Priya%20S.&amp;svc=Blow%20Dry">Rate &amp; review</a> — only after a completed booking (My bookings / booking detail / rating alert); overall + stylist rating, salon aspects, written review, photos → shown on the salon’s Reviews tab with a “Verified visit” badge</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>§4.9 Notifications</h2>
+      <ul>
+        <li><a href="notifications.html">Alerts</a> — All / Bookings; booking alerts clear once opened, offers stay (<a href="notifications.html?reset=1">reset demo alerts</a>)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>§4.7 Profile &amp; account</h2>
+      <ul>
+        <li><a href="profile.html">Profile</a> — edit (header button) · Account: password · <a href="profile.html?billing=1">billing address</a> (list + edit) · <a href="profile.html?billing=new">add address</a> (line 1, line 2, city, PIN, state) · my reviews · <a href="settings.html">More options</a> (deactivate with OTP · delete; 000000 = wrong code)</li>
+        <li><a href="favorites.html">Favorites</a> — saved salons + liked stylists</li>
+        <li><a href="edit-profile.html">Edit profile</a> — opens in view mode · <a href="edit-profile.html?edit=1">edit mode</a> (DOB, gender, marketing on by default) · <a href="edit-profile.html?avatar=1">change avatar</a> (6 options)</li>
+        <li><a href="change-password.html">Change password</a></li>
+        <li><a href="subscription.html">Subscription</a> — GlowTap Plus plans</li>
+        <li><a href="wallet.html">My wallet</a> — balance, Add money (<a href="wallet.html?add=1">sheet open</a>), transactions</li>
+        <li>Add money (Home wallet pill and My wallet, same sheet) — <a href="home.html?wallet=add">amount</a> → <a href="home.html?wallet=method">UPI or card</a> → <a href="home.html?wallet=upi">UPI ID</a> (verify → approve in app → <a href="home.html?wallet=ok">money added</a>) · <a href="home.html?wallet=card">card details</a> (bank OTP → <a href="home.html?wallet=err">payment failed</a>)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>§4.8 Help &amp; support</h2>
+      <ul>
+        <li><a href="support.html">Help hub</a> — FAQ · Contact · My tickets</li>
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="contact.html">Contact support</a> — customer care number, email, WhatsApp</li>
+        <li><a href="new-ticket.html">New ticket</a> (from My tickets → New) · same reason is allowed; the booking that already has that reason is blurred: <a href="new-ticket.html?reason=Payment%20%2F%20refund&amp;pick=booking">Payment / refund</a></li>
+        <li><a href="tickets.html">My tickets</a> — service, last reply, who it's waiting on · Ticket conversation: <a href="ticket-detail.html?id=TK-2041">reply needed</a> · <a href="ticket-detail.html?id=TK-1988">waiting for GlowTap Care</a> · <a href="ticket-detail.html?id=TK-1902">resolved (reopen)</a></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>§4.3 Salon detail &amp; §4.5 Booking</h2>
+      <ul>
+        <li><a href="salon-detail.html">Salon detail</a> — back + <b>cart icon</b> (badge), hours, tabs: Overview · <a href="salon-detail.html?id=luxe&amp;tab=services">Services</a> (Add → sticky <b>Continue</b> to cart) · <a href="salon-detail.html?id=luxe&amp;tab=stylists">Stylists</a> · <a href="salon-detail.html?id=luxe&amp;tab=reviews">Ratings &amp; reviews</a> (Rate only with a completed visit · <a href="salon-detail.html?id=nord&amp;tab=reviews">already reviewed</a>)</li>
+        <li><a href="cart.html">Cart</a> — services + appointment; footer <b>Review &amp; pay ›</b> opens booking Review with the saved slot (not Pay now). No time yet → Pick time &amp; pay. If the held slot is taken while you wait: <a href="cart.html?taken=1">slot taken</a> banner + <b>Reschedule</b></li>
+        <li>Cart (Zomato-style): selecting services auto-saves; Home card shows View cart · Review &amp; pay. One salon only; another salon replaces the cart</li>
+        <li><a href="book.html?salon=luxe">Book flow</a> — services → date + slots (2+ services: <b>service tabs</b>) → specialist → review → pay. From a stylist (<a href="book.html?salon=luxe&amp;spec=Priya%20S.">Book with Priya</a> / favourites / Stylists tab): <b>Service → time → Review</b> only — specialist step skipped</li>
+        <li><a href="book.html?salon=luxe&amp;service=haircut">Book from a service</a> — skips the service step, starts at specialist</li>
+        <li><a href="booking-confirm.html">Booking confirmation</a> · <a href="booking-confirm.html?status=failed&amp;method=GlowTap%20wallet&amp;total=719">Payment failed</a></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Next (planned)</h2>
+      <ul>
+        <li>Sign up · OTP · Forgot password</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

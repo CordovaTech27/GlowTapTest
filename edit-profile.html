@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Profile details</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    [hidden] { display: none !important; }
+    .studio { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: #ffffff; }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 4px 14px 10px; background: #fff; }
+    .back { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; color: var(--ink); text-decoration: none; background: #fff; cursor: pointer; }
+    .back svg { width: 18px; height: 18px; }
+    .nav h1 { flex: 1; margin: 0; font-family: Outfit, sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .edit-btn {
+      display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 999px;
+      border: 1.5px solid rgba(139,0,232,.25); background: #F3EEFF; color: var(--violet);
+      font-family: inherit; font-size: .82rem; font-weight: 700; cursor: pointer;
+    }
+    .edit-btn svg { width: 15px; height: 15px; }
+    .mode-tag { font-size: .72rem; font-weight: 700; color: var(--violet); background: #F3EEFF; padding: 5px 10px; border-radius: 999px; }
+    .body { flex: 1; overflow-y: auto; padding: 16px 16px 110px; scrollbar-width: none; }
+    .body::-webkit-scrollbar { display: none; }
+
+    .avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .avatar {
+      position: relative; width: 96px; height: 96px; border-radius: 28px; background: #fff; padding: 0;
+      box-shadow: 0 10px 24px rgba(139,0,232,.2); border: 3px solid #fff; cursor: pointer;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 25px; }
+    .avatar__cam {
+      position: absolute; right: -6px; bottom: -6px; width: 30px; height: 30px; border-radius: 50%;
+      background: var(--grad); color: #fff; display: grid; place-items: center; border: 2.5px solid #fff;
+    }
+    .avatar__cam svg { width: 14px; height: 14px; }
+    .change-photo { border: none; background: transparent; color: var(--violet); font-family: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; }
+
+    .card { background: #fff; border-radius: 18px; padding: 4px 14px; border: 1px solid rgba(139,0,232,.06); box-shadow: 0 6px 18px rgba(30,42,50,.04); margin-bottom: 14px; }
+    .vrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 0; border-bottom: 1px solid #F1F5F9; }
+    .vrow:last-child { border-bottom: 0; }
+    .vrow__label { font-size: .74rem; font-weight: 600; color: var(--muted); }
+    .vrow__value { display: flex; align-items: center; gap: 6px; font-size: .9rem; font-weight: 700; text-align: right; min-width: 0; }
+    .vrow__value span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .vrow__value .is-off { color: var(--muted); font-weight: 600; }
+    .vrow__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .vrow__title { font-size: .9rem; font-weight: 700; }
+    .vrow__hint { font-size: .74rem; font-weight: 600; color: #047857; }
+    .vrow__hint.is-off { color: var(--muted); }
+    .switch {
+      position: relative; width: 48px; height: 28px; flex-shrink: 0; padding: 0; border: none; border-radius: 99px;
+      background: #D5DCE4; cursor: pointer; transition: background .2s;
+    }
+    .switch[aria-checked="true"] { background: var(--grad); }
+    .switch__knob {
+      position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: transform .2s;
+    }
+    .switch[aria-checked="true"] .switch__knob { transform: translateX(20px); }
+
+    label.lbl { display: block; font-size: .72rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin: 0 0 6px; }
+    .field { margin-bottom: 14px; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="date"] {
+      width: 100%; border: 1.5px solid #E8E4EF; border-radius: 14px; padding: 12px 14px; min-height: 48px;
+      font-family: inherit; font-size: .9rem; font-weight: 500; background: #fff; color: var(--ink); outline: none;
+    }
+    input[type="date"] { appearance: none; -webkit-appearance: none; }
+    input:focus { border-color: rgba(139,0,232,.4); box-shadow: 0 0 0 3px rgba(139,0,232,.08); }
+    input:disabled { background: #F3F4F6; color: var(--muted); }
+    .hint { margin: 6px 0 0; font-size: .72rem; color: var(--muted); }
+    .err { display: none; margin: 6px 2px 0; font-size: .74rem; font-weight: 600; color: #B91C1C; }
+    .field.is-invalid .err { display: block; }
+    .field.is-invalid input { border-color: #FCA5A5; background: #FEF2F2; }
+
+    .email-row { display: flex; gap: 8px; align-items: stretch; }
+    .email-row input { flex: 1; min-width: 0; }
+    .verify-btn {
+      flex-shrink: 0; min-width: 92px; padding: 0 12px; border-radius: 14px; border: 1.5px solid rgba(139,0,232,.35);
+      background: #F5EEFF; color: var(--violet); font-family: inherit; font-size: .84rem; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .verify-btn:disabled { opacity: .55; cursor: default; }
+    .verify-btn svg { width: 14px; height: 14px; }
+    .verify-btn.is-verified { background: #ECFDF5; border-color: #A7F3D0; color: #047857; opacity: 1; }
+    .field.is-verified input { border-color: #A7F3D0; }
+    .email-otp { margin-top: 10px; padding: 12px; border-radius: 14px; background: #FAF7FD; border: 1px solid #EDE4F7; }
+    .email-otp__sub { margin: 0 0 10px; font-size: .78rem; color: var(--muted); line-height: 1.4; }
+    .email-otp__sub b { color: var(--ink); word-break: break-all; }
+    .otp { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 10px; }
+    .otp input {
+      width: 100%; height: 46px; padding: 0; text-align: center; font-family: inherit; font-size: 1.1rem; font-weight: 700;
+      color: var(--ink); border: 1.5px solid var(--line); border-radius: 12px; background: #fff; outline: none;
+    }
+    .otp input:focus { border-color: rgba(139,0,232,.5); box-shadow: 0 0 0 3px rgba(139,0,232,.1); }
+    .otp.is-wrong input { border-color: #FCA5A5; background: #FEF2F2; }
+    .otp-err { display: none; margin: -4px 0 8px; font-size: .74rem; font-weight: 600; color: #B91C1C; }
+    .otp-err.is-on { display: block; }
+    .resend { display: flex; align-items: center; justify-content: space-between; font-size: .78rem; color: var(--muted); font-weight: 500; }
+    .resend button { padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: var(--violet); cursor: pointer; }
+    .resend button:disabled { color: #A0AEC0; cursor: default; }
+
+    .gender { display: flex; flex-wrap: wrap; gap: 8px; }
+    .gender button {
+      padding: 10px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff;
+      font-family: inherit; font-size: .84rem; font-weight: 600; color: var(--ink); cursor: pointer;
+    }
+    .gender button[aria-checked="true"] { border-color: rgba(139,0,232,.5); background: #F3EEFF; color: var(--violet); box-shadow: 0 0 0 3px rgba(139,0,232,.08); }
+    .field.is-invalid .gender button { border-color: #FCA5A5; }
+
+    .check { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 8px; font-size: .8rem; line-height: 1.4; color: var(--ink); cursor: pointer; }
+    .check input { position: absolute; opacity: 0; pointer-events: none; }
+    .check__box {
+      width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; border-radius: 6px; border: 1.5px solid #CBD5E1; background: #fff;
+      display: grid; place-items: center;
+    }
+    .check input:checked + .check__box { background-image: var(--grad); border-color: transparent; }
+    .check input:checked + .check__box::after {
+      content: ""; width: 10px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px, -1px);
+    }
+
+    .footer {
+      position: absolute; left: 14px; right: 14px; bottom: 18px; z-index: 30;
+      display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px;
+    }
+    .btn {
+      display: grid; place-items: center; height: 48px; border-radius: 14px; border: none; width: 100%;
+      font-family: inherit; font-weight: 700; font-size: .9rem; cursor: pointer; text-decoration: none;
+    }
+    .btn--ghost { background: #fff; border: 1.5px solid var(--line); color: var(--ink); }
+    .btn--primary { background: var(--grad); color: #fff; box-shadow: 0 8px 20px rgba(139,0,232,.28); }
+
+    .sheet { position: absolute; inset: 0; z-index: 50; display: none; align-items: flex-end; background: rgba(16,8,24,.45); }
+    .sheet.is-open { display: flex; }
+    .sheet__panel { width: 100%; background: #fff; border-radius: 22px 22px 0 0; padding: 14px 16px 22px; box-shadow: 0 -12px 40px rgba(0,0,0,.18); animation: up .28s ease; }
+    @keyframes up { from { transform: translateY(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+    .sheet__handle { width: 40px; height: 4px; border-radius: 99px; background: #EDE4EC; margin: 0 auto 12px; }
+    .sheet__title { margin: 0 0 4px; font-family: Outfit, sans-serif; font-size: 1.1rem; font-weight: 700; }
+    .sheet__sub { margin: 0 0 14px; font-size: .8rem; color: var(--muted); font-weight: 600; }
+    .av-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    .av-opt {
+      display: flex; align-items: center; justify-content: center; padding: 10px 6px; border-radius: 18px;
+      border: 2px solid transparent; background: #F8F6FB; font-family: inherit; cursor: pointer;
+      position: relative;
+    }
+    .av-opt img { width: 72px; height: 72px; border-radius: 20px; display: block; }
+    .av-opt[aria-checked="true"] { border-color: var(--violet); background: #F3EEFF; }
+    .av-opt[aria-checked="true"]::after {
+      content: "✓"; position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--grad); color: #fff; font-size: .7rem; display: grid; place-items: center;
+    }
+    .sheet__actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
+
+    .toast {
+      position: absolute; left: 50%; bottom: 84px; transform: translate(-50%, 20px); z-index: 60;
+      padding: 10px 16px; border-radius: 12px; background: #047857; color: #fff; font-size: .82rem; font-weight: 700;
+      opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; white-space: nowrap;
+    }
+    .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+      .footer { bottom: max(14px, env(safe-area-inset-bottom)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="nav">
+          <a class="back" id="btn-back" href="profile.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+          <div class="nav__meta">
+            <p class="eyebrow">Account</p>
+            <h1 id="page-title">Profile details</h1>
+          </div>
+          <button type="button" class="edit-btn" id="btn-edit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3 2.1 2.1 0 0 1 0 3L8 18l-4 1 1-4 11.5-11.5Z"/></svg>
+            Edit
+          </button>
+          <span class="mode-tag" id="mode-tag" hidden>Editing</span>
+        </div>
+
+        <div class="body">
+          <div class="avatar-wrap">
+            <button type="button" class="avatar" id="avatar-btn" aria-label="Change avatar">
+              <img id="avatar-img" src="assets/avatars/naruto.svg" alt="" />
+              <span class="avatar__cam" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
+            </button>
+            <button type="button" class="change-photo" id="avatar-open">Change avatar</button>
+          </div>
+
+          <section id="view">
+            <div class="card">
+              <div class="vrow"><span class="vrow__label">Full name</span><span class="vrow__value"><span id="v-name">ABCD</span></span></div>
+              <div class="vrow"><span class="vrow__label">Email</span><span class="vrow__value"><span id="v-email">abcd@gmail.com</span></span></div>
+              <div class="vrow"><span class="vrow__label">Phone</span><span class="vrow__value"><span id="v-phone">+91 98765 43210</span></span></div>
+              <div class="vrow"><span class="vrow__label">Date of birth</span><span class="vrow__value"><span id="v-dob">14 Mar 1998</span></span></div>
+              <div class="vrow"><span class="vrow__label">Gender</span><span class="vrow__value"><span id="v-gender">Female</span></span></div>
+            </div>
+            <div class="card">
+              <div class="vrow vrow--switch">
+                <span class="vrow__text">
+                  <span class="vrow__title" id="mk-label">Offers &amp; updates</span>
+                  <span class="vrow__hint" id="v-marketing">On · email, SMS, WhatsApp</span>
+                </span>
+                <button type="button" class="switch" id="mk-switch" role="switch" aria-checked="true" aria-labelledby="mk-label"><span class="switch__knob"></span></button>
+              </div>
+            </div>
+          </section>
+
+          <form id="edit" novalidate hidden>
+            <div class="field">
+              <label class="lbl" for="name">Full name</label>
+              <input id="name" type="text" autocomplete="name" />
+              <p class="err">Enter your full name</p>
+            </div>
+            <div class="field" id="email-field">
+              <label class="lbl" for="email">Email</label>
+              <div class="email-row">
+                <input id="email" type="email" autocomplete="email" />
+                <button type="button" class="verify-btn" id="email-verify">Verify</button>
+              </div>
+              <p class="err" id="email-err">Verify your new email to save</p>
+              <div class="email-otp" id="email-otp" hidden>
+                <p class="email-otp__sub">Enter the 6-digit code sent to <b id="email-sent">you@email.com</b>. It expires in 2 minutes.</p>
+                <div class="otp" role="group" aria-label="Email verification code" id="email-code">
+                  <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" autocomplete="one-time-code" />
+                  <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+                  <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+                  <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+                  <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+                  <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+                </div>
+                <p class="otp-err" id="email-code-err" role="alert">Incorrect code. Try again.</p>
+                <div class="resend">
+                  <span id="email-timer">Resend code in 0:30</span>
+                  <button type="button" id="email-resend" disabled>Resend</button>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="lbl" for="phone">Phone</label>
+              <input id="phone" type="tel" disabled />
+              <p class="hint">Changing phone requires OTP verification.</p>
+            </div>
+            <div class="field" id="dob-field">
+              <label class="lbl" for="dob">Date of birth</label>
+              <input id="dob" type="date" autocomplete="bday" />
+              <p class="err">You must be at least 13 years old</p>
+            </div>
+            <div class="field" id="gender-field">
+              <label class="lbl" id="gender-label">Gender</label>
+              <div class="gender" role="radiogroup" aria-labelledby="gender-label" id="gender">
+                <button type="button" role="radio" aria-checked="false" data-v="Female">Female</button>
+                <button type="button" role="radio" aria-checked="false" data-v="Male">Male</button>
+                <button type="button" role="radio" aria-checked="false" data-v="Other">Other</button>
+                <button type="button" role="radio" aria-checked="false" data-v="Prefer not to say">Prefer not to say</button>
+              </div>
+              <p class="err">Select an option</p>
+            </div>
+            <label class="check">
+              <input type="checkbox" id="marketing" checked />
+              <span class="check__box" aria-hidden="true"></span>
+              <span>Send me offers &amp; updates by email, SMS and WhatsApp.</span>
+            </label>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer" id="footer" hidden>
+        <button type="button" class="btn btn--ghost" id="btn-cancel">Cancel</button>
+        <button type="button" class="btn btn--primary" id="btn-save">Save changes</button>
+      </div>
+
+      <div class="sheet" id="av-sheet" aria-hidden="true">
+        <div class="sheet__panel" role="dialog" aria-labelledby="av-title">
+          <div class="sheet__handle"></div>
+          <h2 class="sheet__title" id="av-title">Choose your avatar</h2>
+          <p class="sheet__sub">Pick a character for your profile</p>
+          <div class="av-grid" role="radiogroup" aria-labelledby="av-title" id="av-grid"></div>
+          <div class="sheet__actions">
+            <button type="button" class="btn btn--ghost" id="av-cancel">Cancel</button>
+            <button type="button" class="btn btn--primary" id="av-save">Use this avatar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      function $(id) { return document.getElementById(id); }
+      var KEY = 'gt-profile';
+      var AVATARS = [
+        { id: 'naruto', name: 'Naruto' },
+        { id: 'sasuke', name: 'Sasuke' },
+        { id: 'sakura', name: 'Sakura' },
+        { id: 'kakashi', name: 'Kakashi' },
+        { id: 'hinata', name: 'Hinata' },
+        { id: 'gaara', name: 'Gaara' }
+      ];
+      var DEFAULTS = {
+        name: 'ABCD', email: 'abcd@gmail.com', phone: '+91 98765 43210',
+        dob: '1998-03-14', gender: 'Female', marketing: true, avatar: 'naruto'
+      };
+      var profile;
+      try { profile = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { profile = Object.assign({}, DEFAULTS); }
+      function persist() { localStorage.setItem(KEY, JSON.stringify(profile)); }
+
+      var toastT;
+      function toast(msg) {
+        var t = $('toast');
+        t.textContent = msg;
+        t.classList.add('is-on');
+        clearTimeout(toastT);
+        toastT = setTimeout(function () { t.classList.remove('is-on'); }, 2000);
+      }
+
+      function fmtDob(v) {
+        if (!v) return 'Not added';
+        var d = new Date(v + 'T00:00:00');
+        return d.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()] + ' ' + d.getFullYear();
+      }
+      function avatarSrc(id) { return 'assets/avatars/' + id + '.svg'; }
+
+      function renderView() {
+        $('v-name').textContent = profile.name;
+        $('v-email').textContent = profile.email;
+        $('v-phone').textContent = profile.phone;
+        $('v-dob').textContent = fmtDob(profile.dob);
+        $('v-gender').textContent = profile.gender || 'Not added';
+        $('v-marketing').textContent = profile.marketing ? 'On · email, SMS, WhatsApp' : 'Off · booking alerts only';
+        $('v-marketing').classList.toggle('is-off', !profile.marketing);
+        $('mk-switch').setAttribute('aria-checked', String(!!profile.marketing));
+        $('avatar-img').src = avatarSrc(profile.avatar);
+      }
+
+      $('mk-switch').addEventListener('click', function () {
+        profile.marketing = !profile.marketing;
+        persist();
+        renderView();
+        toast(profile.marketing ? 'Offers & updates turned on' : 'Offers & updates turned off');
+      });
+
+      var latest = new Date();
+      latest.setFullYear(latest.getFullYear() - 13);
+      $('dob').max = latest.toISOString().slice(0, 10);
+      $('dob').min = '1920-01-01';
+
+      var gender = '';
+      function setGender(v) {
+        gender = v;
+        document.querySelectorAll('#gender button').forEach(function (b) {
+          b.setAttribute('aria-checked', b.getAttribute('data-v') === v ? 'true' : 'false');
+        });
+      }
+      document.querySelectorAll('#gender button').forEach(function (b) {
+        b.addEventListener('click', function () { setGender(b.getAttribute('data-v')); $('gender-field').classList.remove('is-invalid'); });
+      });
+
+      var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m5 12 5 5L20 7"/></svg>';
+      var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      var verifiedEmail = profile.email;
+      var resendTick;
+      var codeBoxes = Array.prototype.slice.call(document.querySelectorAll('#email-code input'));
+
+      function setVerifyState(state) {
+        var btn = $('email-verify');
+        btn.classList.toggle('is-verified', state === 'verified');
+        $('email-field').classList.toggle('is-verified', state === 'verified');
+        btn.disabled = state !== 'idle';
+        btn.innerHTML = state === 'verified' ? CHECK + 'Verified' : state === 'sent' ? 'Sent' : 'Verify';
+        $('email-otp').hidden = state !== 'sent';
+      }
+      function emailErr(msg) {
+        $('email-err').textContent = msg;
+        $('email-field').classList.toggle('is-invalid', !!msg);
+      }
+      function clearCode() {
+        codeBoxes.forEach(function (b) { b.value = ''; });
+        $('email-code').classList.remove('is-wrong');
+        $('email-code-err').classList.remove('is-on');
+      }
+      function startResendTimer() {
+        var left = 30;
+        $('email-resend').disabled = true;
+        $('email-timer').textContent = 'Resend code in 0:30';
+        clearInterval(resendTick);
+        resendTick = setInterval(function () {
+          left -= 1;
+          if (left <= 0) { clearInterval(resendTick); $('email-timer').textContent = 'Didn’t get the code?'; $('email-resend').disabled = false; return; }
+          $('email-timer').textContent = 'Resend code in 0:' + String(left).padStart(2, '0');
+        }, 1000);
+      }
+      function sendCode() {
+        var em = $('email').value.trim();
+        if (!EMAIL_RE.test(em)) { emailErr('Enter a valid email address'); return; }
+        emailErr('');
+        $('email-sent').textContent = em;
+        clearCode();
+        setVerifyState('sent');
+        startResendTimer();
+        $('email-otp').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        codeBoxes[0].focus();
+      }
+      $('email-verify').addEventListener('click', sendCode);
+      $('email-resend').addEventListener('click', sendCode);
+      $('email').addEventListener('input', function () {
+        clearInterval(resendTick);
+        emailErr('');
+        setVerifyState($('email').value.trim() === verifiedEmail ? 'verified' : 'idle');
+      });
+      codeBoxes.forEach(function (b, i) {
+        b.addEventListener('input', function () {
+          b.value = b.value.replace(/\D/g, '').slice(0, 1);
+          $('email-code').classList.remove('is-wrong');
+          $('email-code-err').classList.remove('is-on');
+          if (b.value && codeBoxes[i + 1]) codeBoxes[i + 1].focus();
+          var code = codeBoxes.map(function (x) { return x.value; }).join('');
+          if (code.length < 6) return;
+          if (code === '000000') {
+            $('email-code').classList.add('is-wrong');
+            $('email-code-err').classList.add('is-on');
+            return;
+          }
+          verifiedEmail = $('email').value.trim();
+          clearInterval(resendTick);
+          setVerifyState('verified');
+        });
+        b.addEventListener('keydown', function (e) {
+          if (e.key === 'Backspace' && !b.value && codeBoxes[i - 1]) codeBoxes[i - 1].focus();
+        });
+      });
+      $('name').addEventListener('input', function () { $('name').closest('.field').classList.remove('is-invalid'); });
+      $('dob').addEventListener('input', function () { $('dob-field').classList.remove('is-invalid'); });
+
+      function setMode(edit) {
+        $('view').hidden = edit;
+        $('edit').hidden = !edit;
+        $('footer').hidden = !edit;
+        $('btn-edit').hidden = edit;
+        $('mode-tag').hidden = !edit;
+        $('page-title').textContent = edit ? 'Edit profile' : 'Profile details';
+        if (edit) {
+          $('name').value = profile.name;
+          $('email').value = profile.email;
+          $('phone').value = profile.phone;
+          $('dob').value = profile.dob;
+          $('marketing').checked = !!profile.marketing;
+          setGender(profile.gender);
+          verifiedEmail = profile.email;
+          clearInterval(resendTick);
+          clearCode();
+          setVerifyState('verified');
+          document.querySelectorAll('#edit .field').forEach(function (f) { f.classList.remove('is-invalid'); });
+        }
+      }
+
+      $('btn-edit').addEventListener('click', function () { setMode(true); });
+      $('btn-cancel').addEventListener('click', function () { setMode(false); });
+      $('btn-back').addEventListener('click', function (e) {
+        if (!$('edit').hidden) { e.preventDefault(); setMode(false); }
+      });
+
+      $('btn-save').addEventListener('click', function () {
+        var ok = true;
+        var name = $('name').value.trim();
+        if (!name) { $('name').closest('.field').classList.add('is-invalid'); ok = false; }
+        var em = $('email').value.trim();
+        if (!EMAIL_RE.test(em)) { emailErr('Enter a valid email address'); ok = false; }
+        else if (em !== verifiedEmail) { emailErr('Verify your new email to save'); ok = false; }
+        var dob = $('dob').value;
+        if (!dob || dob > $('dob').max || dob < $('dob').min) { $('dob-field').classList.add('is-invalid'); ok = false; }
+        if (!gender) { $('gender-field').classList.add('is-invalid'); ok = false; }
+        if (!ok) {
+          var first = document.querySelector('#edit .is-invalid');
+          if (first) first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          return;
+        }
+        profile.name = name;
+        profile.email = em;
+        profile.dob = dob;
+        profile.gender = gender;
+        profile.marketing = $('marketing').checked;
+        persist();
+        renderView();
+        setMode(false);
+        toast('Profile updated');
+      });
+
+      var sheet = $('av-sheet');
+      var picked = profile.avatar;
+      $('av-grid').innerHTML = AVATARS.map(function (a) {
+        return '<button type="button" class="av-opt" role="radio" aria-checked="false" aria-label="' + a.name + '" data-id="' + a.id + '">' +
+          '<img src="' + avatarSrc(a.id) + '" alt="" /></button>';
+      }).join('');
+      var opts = Array.prototype.slice.call(document.querySelectorAll('.av-opt'));
+      function paintPick() {
+        opts.forEach(function (o) { o.setAttribute('aria-checked', o.getAttribute('data-id') === picked ? 'true' : 'false'); });
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () { picked = o.getAttribute('data-id'); paintPick(); });
+      });
+      function openSheet() {
+        picked = profile.avatar;
+        paintPick();
+        sheet.classList.add('is-open');
+        sheet.setAttribute('aria-hidden', 'false');
+      }
+      function closeSheet() {
+        sheet.classList.remove('is-open');
+        sheet.setAttribute('aria-hidden', 'true');
+      }
+      $('avatar-btn').addEventListener('click', openSheet);
+      $('avatar-open').addEventListener('click', openSheet);
+      $('av-cancel').addEventListener('click', closeSheet);
+      sheet.addEventListener('click', function (e) { if (e.target === sheet) closeSheet(); });
+      $('av-save').addEventListener('click', function () {
+        profile.avatar = picked;
+        persist();
+        renderView();
+        closeSheet();
+        toast('Avatar updated');
+      });
+
+      renderView();
+      var p = new URLSearchParams(location.search);
+      if (p.get('edit') === '1') setMode(true);
+      if (p.get('avatar') === '1') openSheet();
+    })();
+  </script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Category</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Outfit:wght@500;600;700;800&display=swap" />
+  <style>
+    :root {
+      --ink: #241828;
+      --muted: #7A6E78;
+      --line: #EDE4EC;
+      --violet: #8B00E8;
+      --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA;
+      --phone-w: 390px;
+      --phone-h: 844px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    .visually-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0);
+      white-space: nowrap; border: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #ffffff;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
+      min-height: 100dvh;
+      padding: 24px 16px;
+      overflow: auto;
+    }
+
+    .studio {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: #ffffff;
+    }
+
+    .stage {
+      position: relative;
+      z-index: 1;
+      width: var(--phone-w);
+      height: var(--phone-h);
+      flex-shrink: 0;
+      animation: in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 42px;
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow:
+        0 0 0 9px #171022,
+        0 0 0 11px #2c1a42,
+        0 36px 70px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .island {
+      position: absolute;
+      top: 11px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 32px;
+      background: #050308;
+      border-radius: 20px;
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    .status {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      z-index: 35;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 28px 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink);
+      pointer-events: none;
+    }
+    .status__right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink);
+    }
+    .status__right svg {
+      display: block;
+      width: 16px;
+      height: 11px;
+      color: inherit;
+    }
+    .status__right .status-battery { width: 25px; height: 12px; }
+
+    .screen {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding-top: 0;
+    }
+
+    /* —— Top bar (same as home) —— */
+    .top {
+      flex-shrink: 0;
+      background: transparent;
+      min-height: 0 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: visible;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: var(--nav-row, 56px);
+      overflow: visible;
+    }
+
+    .top__brand {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .top__mark {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 6px 16px rgba(139, 0, 232, 0.14);
+    }
+    .top__mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .top__loc {
+      width: auto;
+      height: 32px;
+      max-width: 118px;
+      padding: 0 8px 0 7px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex-shrink: 1;
+      min-width: 0;
+      background: #F3EEFF;
+      color: var(--violet);
+      border: 0;
+      box-shadow: none;
+      text-decoration: none;
+      transition: background 0.15s;
+      overflow: hidden;
+    }
+    .top__loc:hover,
+    .top__loc:focus-visible { background: #EDE4FF; }
+    .top__loc:active { transform: none; }
+    .top__loc svg {
+      width: 15px;
+      height: 15px;
+      display: block;
+      flex-shrink: 0;
+    }
+    .top__loc-badge {
+      position: static;
+      display: inline-block;
+      max-width: 4.8em;
+      padding: 0;
+      border-radius: 0;
+      background: none;
+      color: var(--violet);
+      font-family: Outfit, 'DM Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: none;
+      pointer-events: none;
+      transform: none;
+    }
+
+    .top__actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(237, 228, 236, 0.9);
+      box-shadow: 0 8px 22px rgba(36, 24, 40, 0.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow: visible;
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 0;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: var(--ink);
+      flex-shrink: 0;
+      text-decoration: none;
+      transition: background 0.15s;
+      overflow: visible;
+      position: relative;
+    }
+    .icon-btn:hover,
+    .icon-btn:focus-visible { background: #F6F0F7; }
+    .icon-btn svg { width: 18px; height: 18px; }
+    .icon-btn--fav { color: var(--violet); }
+    .icon-btn--cart { color: var(--violet); }
+    .icon-btn--wallet {
+      width: auto;
+      min-width: 36px;
+      height: 32px;
+      padding: 0 8px 0 7px;
+      border-radius: 999px;
+      gap: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--violet);
+      background: #F3EEFF;
+    }
+    .icon-btn--wallet:hover,
+    .icon-btn--wallet:focus-visible { background: #EDE4FF; }
+    .icon-btn--wallet svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .icon-btn__amt {
+      display: inline-block;
+      max-width: 4.6em;
+      color: var(--violet);
+      font-family: Outfit, 'DM Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+    .icon-btn__n {
+      position: absolute;
+      top: -2px;
+      right: -4px;
+      z-index: 2;
+      min-width: 15px;
+      height: 15px;
+      padding: 0 4px;
+      border-radius: 99px;
+      background: var(--pink);
+      color: #fff;
+      font-family: Outfit, 'DM Sans', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 800;
+      line-height: 15px;
+      text-align: center;
+      display: grid;
+      place-items: center;
+      border: 1.5px solid #fff;
+      pointer-events: none;
+    }
+    .icon-btn__n[hidden] { display: none; }
+
+    .loc { margin: 2px 0 0; }
+    .loc__btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-width: 0;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(237, 228, 236, 0.95);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 6px 18px rgba(36, 24, 40, 0.05);
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      color: inherit;
+      text-decoration: none;
+    }
+    .loc__pin {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      background: #F3EEFF;
+      color: var(--violet);
+    }
+    .loc__pin svg { width: 15px; height: 15px; }
+    .loc__meta { min-width: 0; flex: 1; }
+    .loc__label {
+      display: block;
+      font-family: Outfit, sans-serif;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 2px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .loc__place {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      font-size: 0.78rem;
+      line-height: 1.25;
+      color: var(--muted);
+      min-width: 0;
+    }
+    .loc__place-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .loc__chev {
+      width: 16px;
+      height: 16px;
+      color: #B0A6AE;
+      flex-shrink: 0;
+    }
+
+    /* —— Scroll body —— */
+    .body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 8px 16px 110px;
+      scrollbar-width: none;
+      background:
+        radial-gradient(120% 70% at 100% -10%, rgba(255, 3, 200, 0.1), transparent 55%),
+        radial-gradient(90% 55% at -15% 20%, rgba(139, 0, 232, 0.12), transparent 50%),
+        var(--surface);
+    }
+    .body::-webkit-scrollbar { display: none; }
+
+    /* —— Subcategory —— */
+    .sub {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 4px;
+    }
+
+    .sub__head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .sub__back {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid rgba(237, 228, 236, 0.95);
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      text-decoration: none;
+      box-shadow: 0 6px 16px rgba(36, 24, 40, 0.05);
+      transition: background 0.15s, transform 0.15s;
+    }
+    .sub__back:active { transform: scale(0.96); background: #F6F0F7; }
+    .sub__back svg { width: 18px; height: 18px; }
+    .sub__titles { min-width: 0; flex: 1; padding-top: 2px; }
+    .sub__eyebrow {
+      margin: 0 0 2px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--violet);
+    }
+    .sub__title {
+      margin: 0;
+      font-family: Outfit, 'DM Sans', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+    .sub__sub {
+      margin: 4px 0 0;
+      font-size: 0.86rem;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin: -2px 0 2px;
+      padding-bottom: 2px;
+      animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 650;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .chip.is-on {
+      border-color: transparent;
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .popular {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+    }
+    .sec-label {
+      margin: 0;
+      font-family: Outfit, sans-serif;
+      font-size: 0.92rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .popular__rail {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      margin: 0;
+      padding: 2px 4px 6px 2px;
+    }
+    .popular__rail::-webkit-scrollbar { display: none; }
+
+    a.pop {
+      position: relative;
+      flex: 0 0 210px;
+      height: 148px;
+      border-radius: 20px;
+      overflow: hidden;
+      text-decoration: none;
+      color: #fff;
+      background: transparent;
+      scroll-snap-align: start;
+      isolation: isolate;
+      box-shadow: none;
+      border: 0;
+      transition: transform 0.18s ease;
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
+    }
+    a.pop:active { transform: scale(0.985); }
+    .pop__media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: transparent;
+    }
+    .pop__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: scale(1.04);
+    }
+    .pop__scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(180deg, transparent 42%, rgba(0, 0, 0, 0.28) 100%);
+      pointer-events: none;
+    }
+    .pop__body {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 4px;
+      padding: 14px;
+    }
+    .pop__tag {
+      align-self: flex-start;
+      margin-bottom: auto;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pop__shop {
+      font-size: 0.7rem;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.88);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pop__name {
+      font-family: Outfit, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 750;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .pop__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.82);
+    }
+    .pop__off {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .promo {
+      margin: 2px 0 2px;
+      background: transparent;
+      animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+    }
+    .promo__stage {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-padding-left: 2px;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 2px 2px 6px;
+      background: transparent;
+    }
+    .promo__stage::-webkit-scrollbar { display: none; }
+    .banner {
+      position: relative;
+      flex: 0 0 calc(100% - 28px);
+      height: 148px;
+      border-radius: 20px;
+      overflow: hidden;
+      text-decoration: none;
+      color: #fff;
+      display: flex;
+      align-items: stretch;
+      background: transparent;
+      box-shadow: none;
+      border: 0;
+      outline: 0;
+      scroll-snap-align: start;
+      isolation: isolate;
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
+    }
+    .banner__art {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: inherit;
+      overflow: hidden;
+      background-color: transparent;
+    }
+    .banner__art::before { display: none; content: none; }
+    .banner__art::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 0;
+      background: linear-gradient(90deg, rgba(0, 0, 0, 0.38) 0%, rgba(0, 0, 0, 0.12) 58%, transparent 100%);
+      pointer-events: none;
+    }
+    .banner__wm { display: none; }
+    .banner--pay .banner__art {
+      background: url("assets/photos/promo-pay.jpg") center/cover no-repeat;
+    }
+    .banner--new .banner__art {
+      background: url("assets/photos/salon-interior.jpg") center/cover no-repeat;
+    }
+    .banner--peak .banner__art {
+      background: url("assets/photos/salon-nails.jpg") center/cover no-repeat;
+    }
+    .banner__content {
+      position: relative;
+      z-index: 1;
+      box-sizing: border-box;
+      width: 100%;
+      padding: 14px 14px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .banner__eyebrow {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+    .banner__title {
+      margin: 0 0 10px;
+      font-family: Outfit, 'DM Sans', sans-serif;
+      font-size: 1.02rem;
+      font-weight: 750;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .banner__title em {
+      font-style: italic;
+      font-weight: 800;
+      color: #FCE7F3;
+    }
+    .banner__cta {
+      display: inline-flex;
+      align-items: center;
+      align-self: flex-start;
+      gap: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .promo__dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .promo__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 99px;
+      border: none;
+      padding: 0;
+      background: #D8CCE8;
+      cursor: pointer;
+      transition: width 0.2s, background 0.2s;
+    }
+    .promo__dot.is-active {
+      width: 18px;
+      background-image: var(--grad);
+      background-color: #8B00E8;
+    }
+
+    .shops {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
+    }
+    .shops__head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .shops__count {
+      font-size: 0.74rem;
+      font-weight: 650;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .shops__list { display: flex; flex-direction: column; gap: 10px; }
+    a.place {
+      display: block;
+      padding: 10px;
+      border-radius: 18px;
+      background: transparent;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid rgba(237, 228, 236, 0.85);
+      box-shadow: none;
+      transition: transform 0.15s ease;
+    }
+    a.place:active { transform: scale(0.99); }
+    .place__row { display: flex; gap: 12px; }
+    .place__photo {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      flex-shrink: 0;
+    }
+    .place__photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+      display: block;
+    }
+    .badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      max-width: calc(100% - 12px);
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: #15803D;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .place__rate {
+      margin: 3px 0 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #15803D;
+    }
+    .place__rate span {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .place__name {
+      margin: 2px 0 0;
+      font-family: Outfit, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+    .place__addr {
+      margin: 3px 0 0;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .place__kind {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin: 6px 0 0;
+      font-family: Outfit, sans-serif;
+      font-size: 0.84rem;
+      color: var(--violet);
+      font-weight: 750;
+    }
+    .place__deal {
+      display: inline-flex;
+      margin: 0;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #F3EEF8;
+      color: var(--violet);
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .place__book {
+      margin: 10px 0 0;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .place__book.is-closed { color: var(--muted); }
+    .shops__empty {
+      margin: 0;
+      padding: 18px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px dashed var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .home-ind {
+      position: absolute;
+      bottom: 7px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
+      background: rgba(30, 42, 50, 0.15);
+      border-radius: 99px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status, .home-ind { display: none; }
+      .stage { width: 100%; height: 100dvh; animation: none; }
+      .phone {
+        width: 100%;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+      .dock { bottom: max(16px, env(safe-area-inset-bottom)); }
+      .body { padding-bottom: 100px; }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/app-shell.css" />
+  <link rel="stylesheet" href="assets/layout.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+
+  <div class="stage">
+    <div class="phone" role="application" aria-label="GlowTap — Category">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true">
+        <span>9:41</span>
+        <span class="status__right">
+          <svg viewBox="0 0 17 12"><rect x="0" y="8" width="3" height="4" rx="0.6" fill="currentColor"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="0.6" fill="currentColor"/><rect x="9" y="3" width="3" height="9" rx="0.6" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="0.6" fill="currentColor" opacity="0.35"/></svg>
+          <svg viewBox="0 0 16 12"><path fill="currentColor" d="M8 9.6a1.35 1.35 0 1 1 0 2.7 1.35 1.35 0 0 1 0-2.7Zm0-3.55c1.5 0 2.88.55 3.95 1.47l-1.2 1.2A3.9 3.9 0 0 0 8 7.85c-.95 0-1.82.34-2.5.9L4.3 7.55A5.55 5.55 0 0 1 8 6.05Zm0-3.5c2.45 0 4.68.9 6.42 2.4L13.2 6.15A7.35 7.35 0 0 0 8 4.35c-2.1 0-4.02.78-5.5 2.06L1.3 5.2A9.55 9.55 0 0 1 8 2.55Z"/></svg>
+          <svg class="status-battery" viewBox="0 0 28 13"><rect x="0.75" y="0.75" width="23.5" height="11.5" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"/><rect x="2.4" y="2.5" width="18" height="8" rx="1.2" fill="currentColor"/><path fill="currentColor" opacity="0.9" d="M25.2 4.2h1.4c.7 0 1.2.5 1.2 1.15v2.3c0 .65-.5 1.15-1.2 1.15h-1.4V4.2Z"/></svg>
+        </span>
+      </div>
+
+      <div class="screen">
+        <header class="top">
+          <div class="brand-row">
+            <div class="top__brand">
+              <a class="top__loc" id="loc-open" href="location.html" title="Change location" aria-label="Change location">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+                <span class="top__loc-badge" id="loc-badge">Indiranagar</span>
+              </a>
+            </div>
+            <div class="top__actions">
+              <button type="button" class="icon-btn icon-btn--wallet" id="wallet-open" aria-label="Wallet balance ₹500 — add money" title="Wallet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M16 13.5h2"/></svg>
+                <span class="icon-btn__amt" id="wallet-amt">₹500</span>
+              </button>
+              <a class="icon-btn icon-btn--fav" id="btn-favorites" href="favorites.html" title="Favourites" aria-label="Favourites, 0">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12.6 12 20l-7.5-7.4a5 5 0 0 1 7.1-7.1l.4.4.4-.4a5 5 0 0 1 7.1 7.1Z"/></svg>
+                <span class="icon-btn__n" id="fav-n">0</span>
+              </a>
+              <a class="icon-btn icon-btn--cart" id="btn-cart" href="cart.html" title="Cart" aria-label="Cart, 0">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 3.5h2.3l2.3 11a1.7 1.7 0 0 0 1.7 1.4h8.3a1.7 1.7 0 0 0 1.7-1.3L20.6 8H5.9"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>
+                <span class="icon-btn__n" id="cart-n">0</span>
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <div class="body">
+          <section class="sub" aria-label="Subcategories">
+            <div class="sub__head">
+              <a class="sub__back" href="home.html" title="Back" aria-label="Back to categories">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+              </a>
+              <div class="sub__titles">
+                <p class="sub__eyebrow" id="cat-eyebrow">Category</p>
+                <h1 class="sub__title" id="cat-title">Salon</h1>
+                <p class="sub__sub" id="cat-sub">Pick a service to continue</p>
+              </div>
+            </div>
+
+            <div class="chips" id="chips" role="tablist" aria-label="Filters"></div>
+
+            <div class="popular">
+              <h2 class="sec-label">Popular right now</h2>
+              <div class="popular__rail" id="popular-rail" role="list"></div>
+            </div>
+
+            <section class="promo" aria-label="Offers">
+              <div class="promo__stage" id="promo-stage">
+                <a class="banner banner--pay" href="wallet.html">
+                  <span class="banner__art" aria-hidden="true"></span>
+                  <span class="banner__content">
+                    <span class="banner__eyebrow">Wallet offer</span>
+                    <h2 class="banner__title">Get <em>10% cashback</em> on your next top-up</h2>
+                    <span class="banner__cta">Add money <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 6 6 6-6 6"/></svg></span>
+                  </span>
+                </a>
+                <a class="banner banner--new" href="#shops">
+                  <span class="banner__art" aria-hidden="true"></span>
+                  <span class="banner__content">
+                    <span class="banner__eyebrow">Near you</span>
+                    <h2 class="banner__title">Fresh studios nearby — <em>book first</em></h2>
+                    <span class="banner__cta">See shops <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 6 6 6-6 6"/></svg></span>
+                  </span>
+                </a>
+                <a class="banner banner--peak" href="discounts.html">
+                  <span class="banner__art" aria-hidden="true"></span>
+                  <span class="banner__content">
+                    <span class="banner__eyebrow">Tonight</span>
+                    <h2 class="banner__title">Peak-hour slots still open — <em>grab one</em></h2>
+                    <span class="banner__cta">See deals <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 6 6 6-6 6"/></svg></span>
+                  </span>
+                </a>
+              </div>
+              <div class="promo__dots" id="promo-dots" aria-hidden="true"></div>
+            </section>
+
+            <div class="shops" id="shops">
+              <div class="shops__head">
+                <h2 class="sec-label">Shops Near you</h2>
+                <span class="shops__count" id="shops-count"></span>
+              </div>
+              <div class="shops__list" id="shops-list" role="list"></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="dock">
+          <nav class="tabbar" aria-label="Primary">
+            <a class="tab is-active" href="home.html" title="Home" aria-label="Home" aria-current="page">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 4 10v10a1 1 0 0 0 1 1h5v-6h4v6h5a1 1 0 0 0 1-1V10l-8-6.8Z"/></svg>
+            </a>
+            <a class="tab" href="bookings.html" title="Bookings" aria-label="Bookings">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3.5V7M16 3.5V7"/></svg>
+            </a>
+            <a class="tab" href="notifications.html" title="Alerts" aria-label="Alerts">
+              <span class="dot" aria-hidden="true"></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.5 9a5.5 5.5 0 0 1 11 0c0 6.5 2.5 6.5 2.5 8.5H4c0-2 2.5-2 2.5-8.5"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+            </a>
+            <a class="tab" href="profile.html" title="Profile" aria-label="Profile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5a7 7 0 0 1 14 0"/></svg>
+            </a>
+          </nav>
+          <a class="dock-search" href="search.html" title="Search" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          </a>
+        </div>
+
+        <div class="home-ind" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/topup.js"></script>
+  <script src="assets/app-shell.js"></script>
+  <script src="assets/cart.js"></script>
+  <script>
+    (function () {
+      var CATALOG = {
+        salon: {
+          key: "salon",
+          title: "Salon",
+          eyebrow: "Hair & style",
+          sub: "Choose a salon service to explore",
+          chips: ["All", "Hair", "Colour", "Quick"],
+          items: [
+            { id: "cut", name: "Haircut & Styling", shop: "Luxe Curls", meta: "45–60 min", price: 499, discount: "20% OFF", tag: "Popular", chip: "Hair", img: "assets/photos/salon-hair.jpg", popular: true },
+            { id: "colour", name: "Hair Colour", shop: "Velvet Color Bar", meta: "90–120 min", price: 1499, discount: "15% OFF", tag: "Trending", chip: "Colour", img: "assets/photos/salon-color.jpg", popular: true },
+            { id: "blowdry", name: "Blow Dry", shop: "Bloom & Brow", meta: "30–40 min", price: 399, tag: "Quick", chip: "Quick", img: "assets/photos/salon-hair.jpg" },
+            { id: "keratin", name: "Keratin Smooth", shop: "Nord Hair Lab", meta: "2–3 hrs", price: 2999, discount: "Flat ₹500 OFF", tag: "Premium", chip: "Hair", img: "assets/photos/salon-interior.jpg", popular: true },
+            { id: "hairspa", name: "Hair Spa", shop: "Luxe Curls", meta: "60 min", price: 899, discount: "10% OFF", chip: "Hair", img: "assets/photos/salon-spa.jpg" },
+            { id: "beard", name: "Beard Grooming", shop: "Nord Hair Lab", meta: "30 min", price: 299, chip: "Quick", img: "assets/photos/salon-mens.jpg" }
+          ]
+        },
+        spa: {
+          key: "spa",
+          title: "Spa",
+          eyebrow: "Relax",
+          sub: "Unwind with a spa experience",
+          chips: ["All", "Massage", "Body", "Couple"],
+          items: [
+            { id: "fullbody", name: "Full Body Massage", shop: "Aura Spa", meta: "60–90 min", price: 1799, discount: "30% OFF", tag: "Popular", chip: "Massage", img: "assets/photos/salon-spa.jpg", popular: true },
+            { id: "aroma", name: "Aromatherapy", shop: "Calm Waters", meta: "75 min", price: 2199, discount: "15% OFF", tag: "Calm", chip: "Massage", img: "assets/photos/salon-facial.jpg", popular: true },
+            { id: "steam", name: "Steam Therapy", shop: "Aura Spa", meta: "30 min", price: 699, chip: "Body", img: "assets/photos/salon-interior.jpg" },
+            { id: "scrub", name: "Body Scrub", shop: "Calm Waters", meta: "45 min", price: 1299, discount: "10% OFF", chip: "Body", img: "assets/photos/salon-spa.jpg" },
+            { id: "hotstone", name: "Hot Stone", shop: "Aura Spa", meta: "90 min", price: 2499, discount: "20% OFF", tag: "Premium", chip: "Massage", img: "assets/photos/salon-facial.jpg", popular: true },
+            { id: "couple", name: "Couples Spa", shop: "Calm Waters", meta: "90 min", price: 3999, discount: "Couple deal", chip: "Couple", img: "assets/photos/salon-spa.jpg" }
+          ]
+        },
+        nail: {
+          key: "nail",
+          title: "Nail Art",
+          eyebrow: "Colour & art",
+          sub: "Pick a nail service to explore",
+          chips: ["All", "Hands", "Feet", "Art"],
+          items: [
+            { id: "mani", name: "Classic Manicure", shop: "Tip & Toe", meta: "40 min", price: 499, discount: "15% OFF", tag: "Popular", chip: "Hands", img: "assets/photos/salon-nails.jpg", popular: true },
+            { id: "pedi", name: "Classic Pedicure", shop: "Tip & Toe", meta: "50 min", price: 699, chip: "Feet", img: "assets/photos/salon-nails.jpg" },
+            { id: "gel", name: "Gel Nails", shop: "Gloss", meta: "60 min", price: 999, discount: "Buy 1 Get 1", tag: "Trending", chip: "Hands", img: "assets/photos/salon-nails.jpg", popular: true },
+            { id: "art", name: "Custom Nail Art", shop: "Gloss", meta: "75 min", price: 1299, discount: "10% OFF", tag: "Art", chip: "Art", img: "assets/photos/salon-makeup.jpg", popular: true },
+            { id: "ext", name: "Nail Extensions", shop: "Tip & Toe", meta: "90 min", price: 1599, chip: "Hands", img: "assets/photos/salon-nails.jpg" },
+            { id: "nailspa", name: "Nail Spa Ritual", shop: "Gloss", meta: "55 min", price: 899, discount: "Combo OFF", chip: "Feet", img: "assets/photos/salon-spa.jpg" }
+          ]
+        },
+        makeup: {
+          key: "makeup",
+          title: "Makeup",
+          eyebrow: "Looks",
+          sub: "Find the look you need",
+          chips: ["All", "Party", "Bridal", "Everyday"],
+          items: [
+            { id: "party", name: "Party Makeup", shop: "Muse", meta: "60 min", price: 1499, discount: "Flat ₹200 OFF", tag: "Popular", chip: "Party", img: "assets/photos/salon-makeup.jpg", popular: true },
+            { id: "bridal", name: "Bridal Makeup", shop: "Muse", meta: "120 min", price: 5999, discount: "Bridal pack", tag: "Premium", chip: "Bridal", img: "assets/photos/salon-makeup.jpg", popular: true },
+            { id: "natural", name: "Natural Glow", shop: "Bloom & Brow", meta: "45 min", price: 999, chip: "Everyday", img: "assets/photos/salon-facial.jpg" },
+            { id: "hd", name: "HD Makeup", shop: "Muse", meta: "75 min", price: 2199, discount: "15% OFF", tag: "Camera", chip: "Party", img: "assets/photos/salon-makeup.jpg", popular: true },
+            { id: "eyes", name: "Eye Makeup", shop: "Bloom & Brow", meta: "30 min", price: 699, chip: "Everyday", img: "assets/photos/salon-makeup.jpg" },
+            { id: "contour", name: "Contour & Highlight", shop: "Muse", meta: "40 min", price: 899, discount: "10% OFF", chip: "Party", img: "assets/photos/salon-color.jpg" }
+          ]
+        },
+        waxing: {
+          key: "waxing",
+          title: "Waxing",
+          eyebrow: "Smooth",
+          sub: "Choose a waxing service",
+          chips: ["All", "Body", "Face", "Quick"],
+          items: [
+            { id: "arms", name: "Full Arms", shop: "Silk & Smooth", meta: "30 min", price: 399, discount: "Combo OFF", tag: "Popular", chip: "Body", img: "assets/photos/salon-facial.jpg", popular: true },
+            { id: "legs", name: "Full Legs", shop: "Petal", meta: "45 min", price: 699, discount: "15% OFF", chip: "Body", img: "assets/photos/salon-spa.jpg", popular: true },
+            { id: "underarms", name: "Underarms", shop: "Silk & Smooth", meta: "15 min", price: 199, tag: "Quick", chip: "Quick", img: "assets/photos/salon-facial.jpg" },
+            { id: "face", name: "Face Wax", shop: "Petal", meta: "25 min", price: 299, chip: "Face", img: "assets/photos/salon-facial.jpg" },
+            { id: "bikini", name: "Bikini Line", shop: "Silk & Smooth", meta: "30 min", price: 599, discount: "10% OFF", chip: "Body", img: "assets/photos/salon-spa.jpg" },
+            { id: "chocolate", name: "Chocolate Wax", shop: "Petal", meta: "40 min", price: 799, discount: "Combo OFF", tag: "Soft", chip: "Body", img: "assets/photos/salon-facial.jpg", popular: true }
+          ]
+        }
+      };
+
+      var PLACES = [
+        { href: "salon-detail.html?id=bandra-glow", name: "Luxe Curls — Indiranagar", short: "Luxe Curls", area: "Indiranagar", dist: "0.8 km", distN: 0.8, rating: "4.8", reviews: 214, price: "From ₹499", deal: "20% OFF", photo: "assets/photos/salon-interior.jpg", kind: "Hair & color", open: true, slot: "10:00 AM", mains: "salon,waxing" },
+        { href: "salon-detail.html?id=bloom", name: "Bloom & Brow", short: "Bloom & Brow", area: "Indiranagar", dist: "1.4 km", distN: 1.4, rating: "4.6", reviews: 128, price: "From ₹349", deal: "Flat ₹200 OFF", photo: "assets/photos/salon-facial.jpg", kind: "Color & styling", open: true, slot: "11:30 AM", mains: "salon,makeup" },
+        { href: "salon-detail.html?id=nord", name: "Nord Hair Lab", short: "Nord Hair Lab", area: "Koramangala", dist: "2.1 km", distN: 2.1, rating: "4.9", reviews: 96, price: "From ₹699", deal: "", photo: "assets/photos/salon-mens.jpg", kind: "Haircut & beard", open: false, slot: "10:00 AM", mains: "salon" },
+        { href: "salon-detail.html?id=aura", name: "Aura Spa Retreat", short: "Aura Spa", area: "HSR Layout", dist: "2.8 km", distN: 2.8, rating: "4.7", reviews: 187, price: "From ₹899", deal: "30% OFF", photo: "assets/photos/salon-spa.jpg", kind: "Spa & therapy", open: true, slot: "9:30 AM", mains: "spa" },
+        { href: "salon-detail.html?id=calm", name: "Calm Waters Spa", short: "Calm Waters", area: "Indiranagar", dist: "1.1 km", distN: 1.1, rating: "4.5", reviews: 74, price: "From ₹999", deal: "15% OFF", photo: "assets/photos/salon-spa.jpg", kind: "Massage", open: true, slot: "12:00 PM", mains: "spa" },
+        { href: "salon-detail.html?id=tip", name: "Tip & Toe Nails", short: "Tip & Toe", area: "Indiranagar", dist: "0.5 km", distN: 0.5, rating: "4.3", reviews: 312, price: "From ₹299", deal: "", photo: "assets/photos/salon-nails.jpg", kind: "Nails", open: true, slot: "12:00 PM", mains: "nail" },
+        { href: "salon-detail.html?id=gloss", name: "Gloss Nail Atelier", short: "Gloss", area: "Koramangala", dist: "2.4 km", distN: 2.4, rating: "4.7", reviews: 156, price: "From ₹449", deal: "Buy 1 Get 1", photo: "assets/photos/salon-nails.jpg", kind: "Gel & art", open: true, slot: "1:00 PM", mains: "nail" },
+        { href: "salon-detail.html?id=velvet", name: "Velvet Color Bar", short: "Velvet Color Bar", area: "Koramangala", dist: "3.2 km", distN: 3.2, rating: "4.5", reviews: 89, price: "From ₹1,299", deal: "15% OFF", photo: "assets/photos/salon-color.jpg", kind: "Hair color", open: false, slot: "4:00 PM", mains: "salon" },
+        { href: "salon-detail.html?id=muse", name: "Muse Makeup Studio", short: "Muse", area: "Indiranagar", dist: "0.9 km", distN: 0.9, rating: "4.8", reviews: 203, price: "From ₹1,499", deal: "Bridal pack", photo: "assets/photos/salon-makeup.jpg", kind: "Party & bridal", open: true, slot: "10:30 AM", mains: "makeup" },
+        { href: "salon-detail.html?id=silk", name: "Silk & Smooth", short: "Silk & Smooth", area: "HSR Layout", dist: "2.0 km", distN: 2.0, rating: "4.4", reviews: 141, price: "From ₹249", deal: "Combo OFF", photo: "assets/photos/salon-facial.jpg", kind: "Waxing", open: true, slot: "11:00 AM", mains: "waxing" },
+        { href: "salon-detail.html?id=petal", name: "Petal Wax Studio", short: "Petal", area: "Indiranagar", dist: "1.6 km", distN: 1.6, rating: "4.6", reviews: 67, price: "From ₹199", deal: "", photo: "assets/photos/salon-facial.jpg", kind: "Face & body", open: true, slot: "2:00 PM", mains: "waxing" }
+      ];
+
+      var params = new URLSearchParams(location.search);
+      var catKey = (params.get("cat") || sessionStorage.getItem("gt-home-cat") || "salon").toLowerCase();
+      if (catKey === "nails") catKey = "nail";
+      var cat = CATALOG[catKey] || CATALOG.salon;
+      var activeChip = "All";
+
+      document.title = "GlowTap Customer — " + cat.title;
+      document.getElementById("cat-eyebrow").textContent = cat.eyebrow;
+      document.getElementById("cat-title").textContent = cat.title;
+      document.getElementById("cat-sub").textContent = cat.sub;
+
+      function inr(n) {
+        return "₹" + Number(n).toLocaleString("en-IN");
+      }
+
+      function hrefFor(item) {
+        return (
+          "service.html?main=" +
+          encodeURIComponent(cat.key) +
+          "&sub=" +
+          encodeURIComponent(item.id)
+        );
+      }
+
+      function paintChips() {
+        var el = document.getElementById("chips");
+        el.innerHTML = cat.chips
+          .map(function (c) {
+            return (
+              '<button type="button" class="chip' +
+              (c === activeChip ? " is-on" : "") +
+              '" data-chip="' +
+              c +
+              '" role="tab" aria-selected="' +
+              (c === activeChip) +
+              '">' +
+              c +
+              "</button>"
+            );
+          })
+          .join("");
+      }
+
+      function filtered() {
+        if (activeChip === "All") return cat.items.slice();
+        return cat.items.filter(function (it) {
+          return it.chip === activeChip;
+        });
+      }
+
+      function paintPopular() {
+        var rail = document.getElementById("popular-rail");
+        var pops = cat.items.filter(function (it) {
+          return it.popular;
+        });
+        if (activeChip !== "All") {
+          pops = filtered().filter(function (it) {
+            return it.popular;
+          });
+          if (!pops.length) pops = filtered().slice(0, 3);
+        }
+        rail.innerHTML = pops
+          .map(function (it) {
+            return (
+              '<a class="pop" href="' +
+              hrefFor(it) +
+              '" role="listitem">' +
+              '<span class="pop__media" aria-hidden="true"><img src="' +
+              it.img +
+              '" alt="" /></span>' +
+              '<span class="pop__scrim" aria-hidden="true"></span>' +
+              '<span class="pop__body">' +
+              (it.tag
+                ? '<span class="pop__tag">' + it.tag + "</span>"
+                : '<span class="pop__tag">Featured</span>') +
+              (it.shop
+                ? '<span class="pop__shop">' + it.shop + "</span>"
+                : "") +
+              '<span class="pop__name">' +
+              it.name +
+              "</span>" +
+              '<span class="pop__meta">' +
+              "<span>" +
+              inr(it.price) +
+              "</span>" +
+              (it.discount
+                ? '<span class="pop__off">' + it.discount + "</span>"
+                : "") +
+              "<span>· " +
+              it.meta +
+              "</span>" +
+              "</span>" +
+              "</span></a>"
+            );
+          })
+          .join("");
+      }
+
+      function placeCard(p) {
+        return (
+          '<a class="place" href="' +
+          p.href +
+          '" role="listitem">' +
+          '<div class="place__row">' +
+          '<span class="place__photo"><img src="' +
+          p.photo +
+          '" alt="" /><span class="badge">' +
+          p.rating +
+          " ★</span></span>" +
+          "<span><h3 class=\"place__name\">" +
+          p.name +
+          "</h3>" +
+          '<p class="place__rate">' +
+          p.rating +
+          " ★ <span>(" +
+          Number(p.reviews || 0).toLocaleString("en-IN") +
+          " ratings)</span></p>" +
+          '<p class="place__addr">' +
+          p.dist +
+          " · " +
+          p.area +
+          "</p>" +
+          '<p class="place__kind">' +
+          "<span>" +
+          String(p.price || "").replace(/^From\s+/i, "") +
+          "</span>" +
+          (p.deal ? '<span class="place__deal">' + p.deal + "</span>" : "") +
+          "</p>" +
+          "</span></div>" +
+          (p.open
+            ? ""
+            : '<p class="place__book is-closed">Closed · Opens at ' +
+              p.slot +
+              "</p>") +
+          "</a>"
+        );
+      }
+
+      function paintShops() {
+        var rows = PLACES.filter(function (p) {
+          return p.mains.split(",").indexOf(cat.key) !== -1;
+        }).sort(function (a, b) {
+          return a.distN - b.distN;
+        });
+        document.getElementById("shops-count").textContent = rows.length
+          ? rows.length + " nearby"
+          : "";
+        document.getElementById("shops-list").innerHTML = rows.length
+          ? rows.map(placeCard).join("")
+          : '<p class="shops__empty">No shops for this category nearby yet.</p>';
+      }
+
+      function paintAll() {
+        paintChips();
+        paintPopular();
+        paintShops();
+      }
+
+      document.getElementById("chips").addEventListener("click", function (e) {
+        var btn = e.target.closest(".chip");
+        if (!btn) return;
+        activeChip = btn.getAttribute("data-chip") || "All";
+        paintAll();
+      });
+
+      paintAll();
+
+      (function () {
+        var stage = document.getElementById("promo-stage");
+        var dotsWrap = document.getElementById("promo-dots");
+        if (!stage || !dotsWrap) return;
+        var slides = Array.prototype.slice.call(stage.querySelectorAll(".banner"));
+        if (!slides.length) return;
+        var index = 0;
+        var timer = null;
+        dotsWrap.innerHTML = slides
+          .map(function (_, i) {
+            return (
+              '<button type="button" class="promo__dot' +
+              (i === 0 ? " is-active" : "") +
+              '" data-i="' +
+              i +
+              '" aria-label="Ad ' +
+              (i + 1) +
+              '"></button>'
+            );
+          })
+          .join("");
+        var dots = Array.prototype.slice.call(dotsWrap.querySelectorAll(".promo__dot"));
+        function go(i, smooth) {
+          index = (i + slides.length) % slides.length;
+          stage.scrollTo({
+            left: Math.max(0, slides[index].offsetLeft - 2),
+            behavior: smooth ? "smooth" : "auto",
+          });
+          dots.forEach(function (d, di) {
+            d.classList.toggle("is-active", di === index);
+          });
+        }
+        function restart() {
+          clearInterval(timer);
+          timer = setInterval(function () {
+            go(index + 1, true);
+          }, 4200);
+        }
+        dotsWrap.addEventListener("click", function (e) {
+          var btn = e.target.closest(".promo__dot");
+          if (!btn) return;
+          go(Number(btn.getAttribute("data-i")) || 0, true);
+          restart();
+        });
+        stage.addEventListener(
+          "scroll",
+          function () {
+            var mid = stage.scrollLeft + stage.clientWidth * 0.4;
+            var nearest = 0;
+            var best = Infinity;
+            slides.forEach(function (s, i) {
+              var d = Math.abs(s.offsetLeft - mid + s.offsetWidth / 2);
+              if (d < best) {
+                best = d;
+                nearest = i;
+              }
+            });
+            if (nearest !== index) {
+              index = nearest;
+              dots.forEach(function (d, di) {
+                d.classList.toggle("is-active", di === index);
+              });
+            }
+          },
+          { passive: true }
+        );
+        go(0, false);
+        restart();
+      })();
+
+      (function () {
+        var locBtn = document.getElementById("loc-open");
+        var badge = document.getElementById("loc-badge");
+        var backTo =
+          "category.html?cat=" + encodeURIComponent(cat.key);
+        locBtn.href =
+          "location.html?from=" + encodeURIComponent(backTo);
+        try {
+          var saved = JSON.parse(localStorage.getItem("gt-location") || "null");
+          var area =
+            (saved && (saved.name || saved.area)) || "Indiranagar";
+          badge.textContent = area;
+          badge.title = area;
+          locBtn.setAttribute(
+            "aria-label",
+            "Change location — " + area
+          );
+          locBtn.title = "Location: " + area;
+        } catch (e) {}
+      })();
+
+      function paintBalance() {
+        var bal = GTTopup.balance();
+        document.getElementById("wallet-amt").textContent = inr(bal);
+        document
+          .getElementById("wallet-open")
+          .setAttribute("aria-label", "Wallet balance " + inr(bal) + " — add money");
+      }
+      document.getElementById("wallet-open").addEventListener("click", function () {
+        GTTopup.open({ onSuccess: paintBalance });
+      });
+      paintBalance();
+
+      function favCount() {
+        try {
+          var raw = JSON.parse(localStorage.getItem("gt-favorites") || "null");
+          if (Array.isArray(raw)) return raw.length;
+          if (raw && typeof raw === "object") {
+            var n = 0;
+            if (Array.isArray(raw.salons)) n += raw.salons.length;
+            if (Array.isArray(raw.stylists)) n += raw.stylists.length;
+            if (Array.isArray(raw.items)) n += raw.items.length;
+            return n;
+          }
+        } catch (err) {}
+        return 0;
+      }
+
+      var cartN = window.GTCart ? GTCart.count() : 0;
+      var cartBadge = document.getElementById("cart-n");
+      cartBadge.hidden = false;
+      cartBadge.textContent = String(cartN);
+      document
+        .getElementById("btn-cart")
+        .setAttribute(
+          "aria-label",
+          "Cart, " + cartN + " service" + (cartN === 1 ? "" : "s")
+        );
+
+      var likedN = favCount();
+      var favBadge = document.getElementById("fav-n");
+      favBadge.hidden = false;
+      favBadge.textContent = String(likedN);
+      document
+        .getElementById("btn-favorites")
+        .setAttribute("aria-label", "Favourites, " + likedN);
+    })();
+  </script>
+</body>
+</html>

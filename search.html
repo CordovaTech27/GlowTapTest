@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Search</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: #ffffff; }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: var(--safe-top, 59px); z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 0; }
+
+    .top {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 14px 12px;
+      /* padding-top comes from layout.css safe-top */
+      background: #fff; flex-shrink: 0; border-bottom: 1px solid var(--line);
+    }
+    .back { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; color: var(--ink); text-decoration: none; background: #fff; flex-shrink: 0; }
+    .back svg { width: 18px; height: 18px; }
+    .field {
+      flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 12px;
+      border: 1.5px solid rgba(139,0,232,.4); border-radius: 14px; background: #fff;
+      box-shadow: 0 0 0 3px rgba(139,0,232,.08);
+    }
+    .field svg { width: 17px; height: 17px; color: var(--violet); flex-shrink: 0; }
+    .field input {
+      flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+      font-family: inherit; font-size: .88rem; font-weight: 500; color: var(--ink);
+    }
+    .field input::placeholder { color: var(--muted); }
+    .field input::-webkit-search-cancel-button { display: none; }
+    .field__clear {
+      width: 26px; height: 26px; border-radius: 50%; border: none; background: #F1EEF6; color: var(--muted);
+      display: grid; place-items: center; cursor: pointer; padding: 0; flex-shrink: 0;
+    }
+    .field__clear svg { width: 13px; height: 13px; color: inherit; }
+
+    .body { flex: 1; overflow-y: auto; padding: 14px 16px 28px; scrollbar-width: none; }
+    .body::-webkit-scrollbar { display: none; }
+    [hidden] { display: none !important; }
+
+    .block { margin-bottom: 20px; }
+    .block__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .block__title {
+      margin: 0; font-family: Outfit, sans-serif; font-size: .8rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .04em;
+    }
+    .link-btn { border: none; background: none; padding: 0; font-family: inherit; font-size: .78rem; font-weight: 700; color: var(--violet); cursor: pointer; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px;
+      border: 1.5px solid var(--line); background: #fff; font-family: inherit; font-size: .8rem; font-weight: 600;
+      color: var(--ink); cursor: pointer; white-space: nowrap;
+    }
+    .chip svg { width: 14px; height: 14px; color: var(--muted); }
+    .chip.is-on { background: var(--grad); color: #fff; border-color: transparent; }
+    .list { background: #fff; border-radius: 16px; border: 1px solid rgba(139,0,232,.08); overflow: hidden; }
+    .list__item {
+      display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border: none; background: none;
+      font-family: inherit; font-size: .88rem; font-weight: 600; color: var(--ink); text-align: left; cursor: pointer;
+    }
+    .list__item + .list__item { border-top: 1px solid var(--line); }
+    .list__item svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
+    .list__item span { flex: 1; }
+    .list__item small { font-size: .72rem; font-weight: 600; color: var(--muted); }
+
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .toolbar__count { margin: 0; font-size: .82rem; font-weight: 600; color: var(--muted); }
+    .toolbar__count strong { color: var(--ink); }
+    .sort-btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px;
+      border: 1.5px solid var(--line); background: #fff; font-family: inherit; font-size: .78rem; font-weight: 700;
+      color: var(--ink); cursor: pointer; white-space: nowrap;
+    }
+    .sort-btn svg { width: 15px; height: 15px; color: var(--violet); }
+    .sort-btn em { font-style: normal; color: var(--violet); }
+    .filters { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 12px; padding: 0 16px; }
+    .filters::-webkit-scrollbar { display: none; }
+
+    .hit {
+      display: flex; gap: 12px; padding: 10px; margin-bottom: 10px; background: #fff; border-radius: 16px;
+      border: 1px solid rgba(139,0,232,.08); box-shadow: 0 6px 18px rgba(30,42,50,.05);
+      text-decoration: none; color: inherit;
+    }
+    .hit__media { position: relative; width: 96px; height: 96px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+    .hit__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hit.is-closed .hit__media img { filter: grayscale(1); }
+    .hit__deal {
+      position: absolute; left: 6px; bottom: 6px; padding: 3px 7px; border-radius: 999px;
+      background: #059669; color: #fff; font-size: .62rem; font-weight: 800;
+    }
+    .hit__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .hit__name { font-family: Outfit, sans-serif; font-size: .98rem; font-weight: 700; letter-spacing: -.02em; }
+    .hit__sub { font-size: .74rem; font-weight: 500; color: var(--muted); }
+    .hit__meta { display: flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600; }
+    .hit__meta .stars { font-weight: 700; }
+    .hit__meta .muted { color: var(--muted); font-weight: 500; }
+    .hit__foot { display: flex; align-items: center; gap: 8px; margin-top: auto; font-size: .74rem; font-weight: 700; }
+    .hit__status { color: #15803D; }
+    .hit.is-closed .hit__status { color: #B91C1C; }
+    .hit__price { color: var(--ink); }
+    .hit__dist { margin-left: auto; color: var(--violet); }
+    .empty { text-align: center; padding: 40px 12px; color: var(--muted); font-size: .85rem; }
+    .empty strong { display: block; color: var(--ink); font-family: Outfit, sans-serif; font-size: 1.05rem; margin-bottom: 6px; }
+
+    .sheet-backdrop {
+      position: absolute; inset: 0; z-index: 40; background: rgba(18,12,28,.42);
+      opacity: 0; transition: opacity .22s ease;
+    }
+    .sheet-backdrop.is-open { opacity: 1; }
+    .sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 45; background: #fff;
+      border-radius: 24px 24px 0 0; padding: 10px 18px 28px;
+      transform: translateY(110%); transition: transform .28s cubic-bezier(.22,1,.36,1);
+      box-shadow: 0 -12px 40px rgba(30,42,50,.18);
+    }
+    .sheet.is-open { transform: translateY(0); }
+    .sheet__handle { width: 40px; height: 4px; border-radius: 999px; background: #EDE4EC; margin: 4px auto 14px; }
+    .sheet__title { margin: 0 0 8px; font-family: Outfit, sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .sort-opt {
+      display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 13px 4px;
+      border: none; border-bottom: 1px solid var(--line); background: none; font-family: inherit;
+      font-size: .9rem; font-weight: 600; color: var(--ink); cursor: pointer; text-align: left;
+    }
+    .sort-opt:last-child { border-bottom: none; }
+    .sort-opt__radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line); flex-shrink: 0; }
+    .sort-opt.is-on { color: var(--violet); }
+    .sort-opt.is-on .sort-opt__radio { border: 6px solid var(--violet); }
+
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      /* safe-top comes from layout.css on .top — don't double it on .screen */
+    }
+  </style>
+  <link rel="stylesheet" href="assets/app-shell.css" />
+  <link rel="stylesheet" href="assets/layout.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <header class="top">
+          <a class="back" href="home.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+          <form class="field" id="search-form" role="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" id="q" placeholder="Search salon, service or area" aria-label="Search salons" autocomplete="off" autofocus />
+            <button type="button" class="field__clear" id="clear" aria-label="Clear search" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+          </form>
+        </header>
+
+        <div class="body" id="body">
+          <div id="start">
+            <section class="block" id="recent-block">
+              <div class="block__head">
+                <h2 class="block__title">Recent searches</h2>
+                <button type="button" class="link-btn" id="clear-recent">Clear</button>
+              </div>
+              <div class="chips">
+                <button type="button" class="chip" data-q="Haircut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Haircut</button>
+                <button type="button" class="chip" data-q="Bloom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Bloom &amp; Brow</button>
+                <button type="button" class="chip" data-q="Spa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Spa</button>
+              </div>
+            </section>
+
+            <section class="block">
+              <div class="block__head"><h2 class="block__title">Popular searches</h2></div>
+              <div class="list">
+                <button type="button" class="list__item" data-q="Haircut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span>Haircut near me</span><small></small></button>
+                <button type="button" class="list__item" data-q="Facial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span>Facial · Indiranagar</span><small></small></button>
+                <button type="button" class="list__item" data-q="Spa" data-sort="price"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span>Spa under ₹999</span><small></small></button>
+                <button type="button" class="list__item" data-q="Color"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span>Hair colour &amp; balayage</span><small></small></button>
+              </div>
+            </section>
+
+            <section class="block">
+              <div class="block__head"><h2 class="block__title">Browse by category</h2></div>
+              <div class="chips">
+                <button type="button" class="chip" data-q="Hair">Hair</button>
+                <button type="button" class="chip" data-q="Spa">Spa</button>
+                <button type="button" class="chip" data-q="Facial">Facial</button>
+                <button type="button" class="chip" data-q="Nails">Nails</button>
+                <button type="button" class="chip" data-q="Makeup">Makeup</button>
+                <button type="button" class="chip" data-q="Men">Men’s</button>
+                <button type="button" class="chip" data-q="Color">Colour</button>
+              </div>
+            </section>
+          </div>
+
+          <div id="results" hidden>
+            <div class="toolbar">
+              <p class="toolbar__count" id="count"></p>
+              <button type="button" class="sort-btn" id="sort-open" aria-haspopup="dialog" aria-controls="sort-sheet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg>
+                Sort: <em id="sort-label">Relevance</em>
+              </button>
+            </div>
+            <div class="filters" role="group" aria-label="Filters">
+              <button type="button" class="chip" data-filter="open">Open</button>
+              <button type="button" class="chip" data-filter="deal">Discount</button>
+              <button type="button" class="chip" data-filter="online">Online pay</button>
+              <button type="button" class="chip" data-filter="rated">4★+</button>
+            </div>
+            <div id="hits"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet-backdrop" id="sort-backdrop" data-overlay hidden></div>
+      <div class="sheet" id="sort-sheet" role="dialog" aria-modal="true" aria-labelledby="sort-title" data-overlay hidden>
+        <div class="sheet__handle" aria-hidden="true"></div>
+        <h2 class="sheet__title" id="sort-title">Sort by</h2>
+        <button type="button" class="sort-opt" data-sort="relevance">Relevance<span class="sort-opt__radio"></span></button>
+        <button type="button" class="sort-opt" data-sort="rating">Rating: high to low<span class="sort-opt__radio"></span></button>
+        <button type="button" class="sort-opt" data-sort="distance">Distance: nearest first<span class="sort-opt__radio"></span></button>
+        <button type="button" class="sort-opt" data-sort="price">Price: low to high<span class="sort-opt__radio"></span></button>
+        <button type="button" class="sort-opt" data-sort="price-desc">Price: high to low<span class="sort-opt__radio"></span></button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var SALONS = [
+        { id: 'bandra-glow', name: 'Luxe Curls — Indiranagar', brand: 'Luxe Curls Studio', photo: 'salon-interior.jpg', pos: '50% 30%', rating: 4.8, reviews: 214, dist: 0.8, price: 499, open: true, status: 'Open', deal: '20% OFF', online: true, keys: 'hair haircut color colour blow dry indiranagar' },
+        { id: 'bloom', name: 'Bloom & Brow', brand: 'Bloom Beauty Co.', photo: 'salon-makeup.jpg', pos: '50% 50%', rating: 4.6, reviews: 98, dist: 1.4, price: 349, open: true, status: 'Open', deal: 'Flat ₹200 OFF', online: true, keys: 'facial makeup brow threading indiranagar' },
+        { id: 'nord', name: 'Nord Hair Lab', brand: 'Nord Collective', photo: 'salon-mens.jpg', pos: '50% 50%', rating: 4.9, reviews: 312, dist: 2.1, price: 699, open: false, status: 'Closed', deal: '', online: false, keys: 'hair haircut styling unisex men mens beard keratin koramangala' },
+        { id: 'aura', name: 'Aura Spa Retreat', brand: 'Aura Wellness', photo: 'salon-spa.jpg', pos: '50% 50%', rating: 4.7, reviews: 156, dist: 2.8, price: 899, open: true, status: 'Open', deal: '30% OFF', online: true, keys: 'spa facial massage hsr layout' },
+        { id: 'bloom', name: 'Tip & Toe Nails', brand: 'Near Metro · Indiranagar', photo: 'salon-nails.jpg', pos: '50% 30%', rating: 4.3, reviews: 67, dist: 0.5, price: 299, open: true, status: 'Open', deal: '', online: true, keys: 'nails manicure pedicure gel indiranagar' },
+        { id: 'nord', name: 'Velvet Color Bar', brand: 'Koramangala', photo: 'salon-color.jpg', pos: '50% 40%', rating: 4.5, reviews: 141, dist: 3.2, price: 1299, open: false, status: 'Opens 4 PM', deal: '15% OFF', online: false, keys: 'hair color colour balayage highlights koramangala' }
+      ];
+      var SORTS = {
+        relevance: 'Relevance',
+        rating: 'Rating',
+        distance: 'Distance',
+        price: 'Price ↑',
+        'price-desc': 'Price ↓'
+      };
+
+      var input = document.getElementById('q');
+      var clear = document.getElementById('clear');
+      var start = document.getElementById('start');
+      var results = document.getElementById('results');
+      var hitsEl = document.getElementById('hits');
+      var countEl = document.getElementById('count');
+      var sortLabel = document.getElementById('sort-label');
+      var body = document.getElementById('body');
+      var params = new URLSearchParams(location.search);
+      var sort = SORTS[params.get('sort')] ? params.get('sort') : 'relevance';
+      var filters = {};
+      (params.get('f') || '').split(',').forEach(function (f) { if (f) filters[f] = true; });
+      input.value = params.get('q') || '';
+
+      function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+      }
+
+      function matches(s, q) {
+        var hay = (s.name + ' ' + s.brand + ' ' + s.keys).toLowerCase();
+        return q.split(/\s+/).every(function (w) { return hay.indexOf(w) !== -1; });
+      }
+
+      function render() {
+        var raw = input.value.trim();
+        var q = raw.toLowerCase();
+        clear.hidden = !raw;
+        start.hidden = !!q;
+        results.hidden = !q;
+        sortLabel.textContent = SORTS[sort];
+        document.querySelectorAll('.sort-opt').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-sort') === sort); });
+        document.querySelectorAll('[data-filter]').forEach(function (b) { b.classList.toggle('is-on', !!filters[b.getAttribute('data-filter')]); });
+
+        var url = new URLSearchParams();
+        if (raw) url.set('q', raw);
+        if (sort !== 'relevance') url.set('sort', sort);
+        var fl = Object.keys(filters).filter(function (k) { return filters[k]; });
+        if (fl.length) url.set('f', fl.join(','));
+        history.replaceState(null, '', 'search.html' + (url.toString() ? '?' + url : ''));
+        if (!q) return;
+
+        var hits = SALONS.filter(function (s) {
+          if (!matches(s, q)) return false;
+          if (filters.open && !s.open) return false;
+          if (filters.deal && !s.deal) return false;
+          if (filters.online && !s.online) return false;
+          if (filters.rated && s.rating < 4) return false;
+          return true;
+        });
+        hits.sort(function (a, b) {
+          if (sort === 'rating') return b.rating - a.rating;
+          if (sort === 'distance') return a.dist - b.dist;
+          if (sort === 'price') return a.price - b.price;
+          if (sort === 'price-desc') return b.price - a.price;
+          return (b.open - a.open) || (a.dist - b.dist);
+        });
+
+        countEl.innerHTML = '<strong>' + hits.length + '</strong> result' + (hits.length === 1 ? '' : 's') + ' for “' + esc(raw) + '”';
+        hitsEl.innerHTML = hits.length ? hits.map(function (s) {
+          return '<a class="hit' + (s.open ? '' : ' is-closed') + '" href="salon-detail.html?id=' + esc(s.id) + '">' +
+            '<span class="hit__media"><img src="assets/photos/' + esc(s.photo) + '" alt="" style="object-position:' + esc(s.pos) + ';" />' +
+              (s.deal ? '<span class="hit__deal">' + esc(s.deal) + '</span>' : '') + '</span>' +
+            '<span class="hit__info">' +
+              '<span class="hit__name">' + esc(s.name) + '</span>' +
+              '<span class="hit__sub">' + esc(s.brand) + '</span>' +
+              '<span class="hit__meta"><span class="stars">★ ' + s.rating.toFixed(1) + '</span><span class="muted">(' + s.reviews + ')</span></span>' +
+              '<span class="hit__foot"><span class="hit__status">' + esc(s.status) + '</span>' +
+                '<span class="hit__price">From ₹' + s.price.toLocaleString('en-IN') + '</span>' +
+                '<span class="hit__dist">' + s.dist + ' km</span></span>' +
+            '</span></a>';
+        }).join('') : '<div class="empty"><strong>No salons found</strong>Try “haircut”, “spa” or an area like “Indiranagar”' + (fl.length ? ', or clear the filters.' : '.') + '</div>';
+      }
+
+      document.querySelectorAll('.list__item[data-q] small').forEach(function (el) {
+        var q = el.parentNode.getAttribute('data-q').toLowerCase();
+        var n = SALONS.filter(function (s) { return matches(s, q); }).length;
+        el.textContent = n + ' salon' + (n === 1 ? '' : 's');
+      });
+
+      input.addEventListener('input', render);
+      document.getElementById('search-form').addEventListener('submit', function (e) { e.preventDefault(); input.blur(); });
+      clear.addEventListener('click', function () { input.value = ''; render(); input.focus(); });
+      document.querySelectorAll('[data-q]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          input.value = b.getAttribute('data-q');
+          if (b.getAttribute('data-sort')) sort = b.getAttribute('data-sort');
+          render();
+        });
+      });
+      document.getElementById('clear-recent').addEventListener('click', function () {
+        document.getElementById('recent-block').hidden = true;
+      });
+      document.querySelectorAll('[data-filter]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var k = b.getAttribute('data-filter');
+          filters[k] = !filters[k];
+          render();
+        });
+      });
+      body.addEventListener('scroll', function () { if (document.activeElement === input) input.blur(); }, { passive: true });
+
+      var backdrop = document.getElementById('sort-backdrop');
+      var sheet = document.getElementById('sort-sheet');
+      function openSort() {
+        backdrop.hidden = false;
+        sheet.hidden = false;
+        requestAnimationFrame(function () { backdrop.classList.add('is-open'); sheet.classList.add('is-open'); });
+      }
+      function closeSort() {
+        backdrop.classList.remove('is-open');
+        sheet.classList.remove('is-open');
+        setTimeout(function () { backdrop.hidden = true; sheet.hidden = true; }, 280);
+      }
+      document.getElementById('sort-open').addEventListener('click', openSort);
+      backdrop.addEventListener('click', closeSort);
+      backdrop.addEventListener('wheel', closeSort, { passive: true });
+      backdrop.addEventListener('touchmove', closeSort, { passive: true });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !sheet.hidden) closeSort(); });
+      document.querySelectorAll('.sort-opt').forEach(function (b) {
+        b.addEventListener('click', function () { sort = b.getAttribute('data-sort'); render(); closeSort(); });
+      });
+
+      render();
+      if (!input.value) input.focus();
+    })();
+  </script>
+  <script src="assets/rating.js"></script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

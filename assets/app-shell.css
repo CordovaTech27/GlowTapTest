@@ -1,0 +1,325 @@
+/* Shared shell: floating primary dock on every in-app screen. */
+
+:root {
+  /* Dock height (~50) + bottom inset + tight gap under sticky CTAs */
+  --dock-space: 74px;
+  --footer-above-dock: calc(var(--dock-space) + 6px);
+}
+
+.phone .dock {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) !important;
+  bottom: 22px;
+  /* Always above sheets / sticky CTAs — never auto-hide on scroll */
+  z-index: 70;
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  width: max-content;
+  max-width: calc(100% - 28px);
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+/* Scroll-hide disabled — keep nav available on every screen */
+.phone.is-dock-hidden .dock {
+  transform: translateX(-50%) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+.phone .tabbar {
+  position: relative;
+  left: auto;
+  transform: none;
+  bottom: auto;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: max-content;
+  max-width: none;
+  padding: 6px;
+  background: rgba(28, 28, 30, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+.phone .dock-search {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: rgba(28, 28, 30, 0.92);
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.phone .dock-search svg { width: 22px; height: 22px; }
+.phone .dock-search.is-active { background: #fff; color: #241828; }
+
+.phone .tab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 38px;
+  padding: 0;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0;
+  border-radius: 999px;
+  transition: background 0.2s, color 0.2s;
+  box-sizing: border-box;
+}
+.phone .tab svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
+}
+.phone .tab.is-active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+}
+.phone .tab .dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FF3B30;
+  bottom: 7px;
+  right: 10px;
+  top: auto;
+  border: 1.5px solid rgba(28, 28, 30, 0.92);
+}
+.phone .tab .tab-label { display: none; }
+
+/* Active service (Makeup, Salon, …) replaces Home until the user returns home or switches. */
+.phone .dock-svc {
+  width: auto;
+  min-width: 46px;
+  height: 38px;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+.phone .dock-svc svg { width: 15px; height: 15px; }
+.phone .dock-svc span {
+  font-size: 0.55rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  max-width: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.phone .dock-svc.is-active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Category switcher (Home / dock-svc) */
+.phone .cat-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(16, 8, 24, 0);
+  pointer-events: none;
+  transition: background 0.28s ease;
+}
+.phone .cat-sheet.is-on {
+  pointer-events: auto;
+  background: rgba(16, 8, 24, 0.48);
+}
+.phone .cat-sheet__panel {
+  width: calc(100% - 20px);
+  max-width: 370px;
+  margin: 0 10px calc(var(--dock-space) + 8px);
+  padding: 10px 12px 14px;
+  border-radius: 22px;
+  background: #1C1C1E;
+  color: #fff;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.4);
+  transform: translateY(118%);
+  opacity: 0.6;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+.phone .cat-sheet.is-on .cat-sheet__panel {
+  transform: none;
+  opacity: 1;
+}
+.phone .cat-sheet__handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.22);
+  margin: 0 auto 12px;
+}
+.phone .cat-sheet__title {
+  margin: 0 4px 12px;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+.phone .cat-sheet__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.phone .cat-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-height: 92px;
+  padding: 12px 6px 10px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: #fff;
+  background: transparent;
+  border: none;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.phone .cat-pick:active { background: rgba(255, 255, 255, 0.08); }
+.phone .cat-pick.is-on { background: rgba(255, 255, 255, 0.14); }
+.phone .cat-pick img,
+.phone .cat-pick__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  object-fit: cover;
+}
+.phone .cat-pick__icon {
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.14);
+}
+.phone .cat-pick__icon svg { width: 20px; height: 20px; }
+
+/* Keep scroll content / sticky CTAs clear of the floating dock — no overlap / blind spots */
+.phone.has-dock .body {
+  padding-bottom: calc(var(--footer-above-dock) + 72px) !important;
+}
+/* Bottom sheets: leave room so Yes/Keep (etc.) sit above the always-visible dock */
+.phone.has-dock .sheet__panel,
+.phone.has-dock .ba__panel {
+  padding-bottom: calc(var(--footer-above-dock) + 28px) !important;
+  box-sizing: border-box;
+}
+.phone.has-dock .sticky,
+.phone.has-dock .footer {
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 32;
+  padding: 12px 14px calc(var(--footer-above-dock) + env(safe-area-inset-bottom, 0px)) !important;
+  box-sizing: border-box;
+  background: linear-gradient(
+    to top,
+    var(--surface, #FBF7FA) 0%,
+    var(--surface, #FBF7FA) 72%,
+    rgba(247, 244, 250, 0)
+  );
+  pointer-events: none;
+}
+/* Booking-detail / similar: absolute action rows must sit above the dock */
+.phone.has-dock .actions {
+  left: 14px !important;
+  right: 14px !important;
+  bottom: calc(var(--footer-above-dock) + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 32;
+}
+.phone.has-dock .sticky > *,
+.phone.has-dock .footer > * {
+  pointer-events: auto;
+}
+.phone.has-dock .sticky .cta,
+.phone.has-dock .sticky .cartbar,
+.phone.has-dock .footer .btn,
+.phone.has-dock .footer > a.btn {
+  width: 100%;
+}
+
+.phone .top {
+  position: relative;
+  z-index: 5;
+  transition: box-shadow 0.2s ease;
+}
+.phone.is-scrolled .top {
+  box-shadow: 0 1px 0 rgba(17, 12, 34, 0.06), 0 8px 18px -14px rgba(17, 12, 34, 0.35);
+}
+.phone .top__sub {
+  max-height: 2.4em;
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
+}
+.phone.is-scrolled .top__sub {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Expand / collapse */
+.fold { border-radius: 18px; background: #fff; border: 1px solid rgba(139, 0, 232, 0.06); margin-bottom: 12px; overflow: hidden; }
+.fold__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink, #1E1530);
+}
+.fold__title { flex: 1; font-weight: 700; font-size: 0.9rem; }
+.fold__hint { font-size: 0.72rem; color: var(--muted, #6E6680); font-weight: 600; }
+.fold__chev { width: 18px; height: 18px; color: var(--muted, #6E6680); transition: transform 0.25s ease; }
+.fold.is-open .fold__chev { transform: rotate(180deg); }
+.fold__body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.28s ease; }
+.fold.is-open .fold__body { grid-template-rows: 1fr; }
+.fold__inner { min-height: 0; overflow: hidden; }
+
+@media (max-width: 430px) {
+  .phone .dock { bottom: max(16px, env(safe-area-inset-bottom)); }
+  .phone.has-dock .sticky,
+  .phone.has-dock .footer {
+    padding-bottom: calc(var(--footer-above-dock) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .phone.has-dock .actions {
+    bottom: calc(var(--footer-above-dock) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

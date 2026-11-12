@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Favourites</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: #ffffff;
+    }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; position: relative;
+    }
+    .screen::before {
+      content: ""; position: absolute; left: -18%; right: -18%; top: -36px; height: 180px;
+      pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(139,0,232,.12), transparent 70%),
+        radial-gradient(ellipse 45% 55% at 90% 30%, rgba(255,3,200,.08), transparent 70%);
+    }
+    .nav {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 10px; padding: 6px 14px 10px; flex-shrink: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,.92) 65%, rgba(255,255,255,0));
+    }
+    .back {
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      display: grid; place-items: center; color: var(--ink); text-decoration: none;
+      background: #fff; box-shadow: 0 4px 14px rgba(36,24,40,.08); cursor: pointer;
+    }
+    .back svg { width: 18px; height: 18px; }
+    .nav__meta { min-width: 0; flex: 1; }
+    .nav h1 { margin: 0; font-family: Outfit, sans-serif; font-size: 1.22rem; font-weight: 750; letter-spacing: -.03em; }
+    .nav p { margin: 2px 0 0; font-size: .74rem; color: var(--muted); font-weight: 600; }
+
+    .body {
+      position: relative; z-index: 1;
+      flex: 1; overflow-y: auto;
+      padding: 6px 16px calc(var(--footer-above-dock, 80px) + 24px);
+      scrollbar-width: none;
+    }
+    .body::-webkit-scrollbar { display: none; }
+
+    .section-label {
+      margin: 8px 0 12px; font-size: .7rem; font-weight: 750;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .05em;
+    }
+    .section-label:first-child { margin-top: 2px; }
+
+    .stylist-row { display: grid; gap: 10px; margin-bottom: 18px; }
+    .stylist-card {
+      position: relative; display: flex; align-items: center; gap: 12px;
+      background: #fff; border-radius: 18px; padding: 12px 48px 12px 12px;
+      text-decoration: none; color: inherit;
+      border: 1.5px solid rgba(139,0,232,.12);
+      transition: transform .12s, border-color .15s;
+    }
+    .stylist-card:active { transform: scale(.985); }
+    .stylist-card__av {
+      width: 52px; height: 52px; border-radius: 16px; overflow: hidden; background: #F3EEFF; flex-shrink: 0;
+      box-shadow: 0 0 0 1.5px rgba(139,0,232,.08);
+    }
+    .stylist-card__av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .stylist-card strong {
+      display: block; font-family: Outfit, sans-serif; font-size: .95rem; font-weight: 750; letter-spacing: -.02em;
+    }
+    .stylist-card span { display: block; margin-top: 3px; font-size: .74rem; font-weight: 550; color: var(--muted); }
+    .stylist-card span.rate { display: inline; font-weight: 750; color: #059669; }
+    .stylist-card__fav {
+      position: absolute; top: 50%; right: 12px; transform: translateY(-50%);
+      width: 34px; height: 34px; border-radius: 50%; border: none; background: #FFE8F6;
+      color: var(--pink); display: grid; place-items: center; cursor: pointer; padding: 0;
+    }
+    .stylist-card__fav svg { width: 16px; height: 16px; display: block; }
+
+    .fav {
+      display: block; background: #fff; border-radius: 20px; overflow: hidden; margin-bottom: 12px;
+      border: 1.5px solid rgba(139,0,232,.12);
+    }
+    .fav__media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; }
+    .fav__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .fav.is-closed .fav__media img { filter: grayscale(1); }
+    .fav__badge {
+      position: absolute; top: 12px; left: 12px; padding: 4px 9px; border-radius: 99px;
+      background: rgba(255,255,255,.95); font-size: .66rem; font-weight: 800; color: #B91C1C;
+    }
+    .fav__meta .is-closed { color: #B91C1C; }
+    .fav__heart {
+      position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%;
+      border: none; background: rgba(255,255,255,.95); color: var(--pink); display: grid; place-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.12); cursor: pointer; padding: 0;
+    }
+    .fav__heart svg { width: 18px; height: 18px; display: block; }
+    .fav__body { padding: 14px 16px 16px; }
+    .fav__top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .fav__name { margin: 0; font-family: Outfit, sans-serif; font-size: 1.05rem; font-weight: 750; letter-spacing: -.02em; }
+    .fav__meta { margin: 4px 0 0; font-size: .76rem; color: var(--muted); font-weight: 550; }
+    .fav__stars { color: #F59E0B; font-size: .82rem; font-weight: 750; white-space: nowrap; }
+    .fav__stars.is-high { color: #059669; }
+    .fav__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .fav__tags span {
+      font-size: .66rem; font-weight: 750; padding: 4px 9px; border-radius: 99px;
+      background: #F3EEFF; color: #5B21B6;
+    }
+    .fav__actions { margin-top: 14px; }
+    .btn {
+      height: 44px; border-radius: 13px; display: grid; place-items: center; text-decoration: none;
+      font-weight: 800; font-size: .84rem; border: none; cursor: pointer; font-family: inherit; width: 100%;
+    }
+    .btn--view {
+      background: var(--grad); color: #fff;
+      box-shadow: 0 8px 18px rgba(139,0,232,.28);
+    }
+
+    .empty {
+      text-align: center; padding: 36px 18px; color: var(--muted);
+      background: #fff; border-radius: 20px; border: 1.5px dashed rgba(139,0,232,.22);
+      margin-bottom: 12px;
+    }
+    .empty[hidden] { display: none; }
+    .empty strong {
+      display: block; color: var(--ink); font-family: Outfit, sans-serif;
+      font-size: 1.05rem; font-weight: 750; margin-bottom: 6px;
+    }
+    .empty p { margin: 0; font-size: .82rem; font-weight: 550; line-height: 1.4; }
+
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="nav">
+          <a class="back" href="home.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+          <div class="nav__meta">
+            <h1>Favourites</h1>
+            <p id="fav-sub">Your saved stylists &amp; salons</p>
+          </div>
+        </div>
+        <div class="body">
+          <h2 class="section-label">Favourite stylists</h2>
+          <div class="stylist-row" id="stylist-row"></div>
+          <div class="empty" id="stylist-empty" hidden>
+            <strong>No favourite stylists yet</strong>
+            <p>Tap the heart on a stylist while browsing or booking to save them here.</p>
+          </div>
+
+          <h2 class="section-label">Favourite salons</h2>
+          <div id="salon-row"></div>
+          <div class="empty" id="salon-empty" hidden>
+            <strong>No favourite salons yet</strong>
+            <p>Save a salon from its page to keep it handy here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="assets/catalog.js"></script>
+  <script src="assets/fav-specs.js"></script>
+  <script>
+    (function () {
+      var C = window.GTCatalog;
+      var Fav = window.GTFavSpecs;
+      var HEART = Fav ? Fav.HEART : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 12.6 12 20l-7.5-7.4a5 5 0 0 1 7.1-7.1l.4.4.4-.4a5 5 0 0 1 7.1 7.1Z"/></svg>';
+      var SAVED_KEY = 'gt-saved-salons';
+      var SALON_META = {
+        luxe: { dist: '0.8 km', open: 'Open till 8:30 PM', rating: '4.8', tags: ['Hair', 'Color'], closed: false },
+        bloom: { dist: '1.4 km', open: 'Open till 9:00 PM', rating: '4.6', tags: ['Brows', 'Makeup'], closed: false },
+        nord: { dist: '2.1 km', open: 'Opens 12 PM', rating: '4.7', tags: ['Men’s'], closed: true },
+        aura: { dist: '3.2 km', open: 'Open till 9:30 PM', rating: '4.9', tags: ['Spa', 'Facial'], closed: false }
+      };
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      function savedSalons() {
+        try {
+          var d = JSON.parse(localStorage.getItem(SAVED_KEY) || 'null');
+          if (Array.isArray(d) && d.length) return d;
+        } catch (e) {}
+        return ['luxe', 'bloom', 'nord', 'aura'];
+      }
+
+      function paintSub() {
+        var nSpecs = document.querySelectorAll('#stylist-row .stylist-card').length;
+        var nSalons = document.querySelectorAll('#salon-row .fav').length;
+        var total = nSpecs + nSalons;
+        document.getElementById('fav-sub').textContent = total
+          ? total + ' saved'
+          : 'Nothing saved yet';
+      }
+
+      function paintStylists() {
+        var row = document.getElementById('stylist-row');
+        var empty = document.getElementById('stylist-empty');
+        var list = (Fav ? Fav.load() : []).map(function (id) {
+          var parts = String(id).split('|');
+          var salonKey = parts[0];
+          var name = parts.slice(1).join('|');
+          var salon = C.SALONS[salonKey];
+          if (!salon) return null;
+          var spec = salon.specs.filter(function (s) { return s.name === name; })[0];
+          if (!spec) return null;
+          return { salonKey: salonKey, salon: salon, spec: spec };
+        }).filter(Boolean);
+
+        empty.hidden = !!list.length;
+        row.innerHTML = list.map(function (item) {
+          return (
+            '<a class="stylist-card" href="salon-detail.html?id=' + encodeURIComponent(item.salonKey) + '">' +
+              '<button type="button" class="stylist-card__fav is-on" data-salon="' + esc(item.salonKey) + '" data-spec="' + esc(item.spec.name) + '" aria-label="Remove favourite">' + HEART + '</button>' +
+              '<div class="stylist-card__av"><img src="' + esc(item.spec.photo) + '" alt="" /></div>' +
+              '<div>' +
+                '<strong>' + esc(item.spec.name) + '</strong>' +
+                '<span>' + esc(item.salon.short || item.salon.name) + ' · <span class="rate">★ ' + esc(item.spec.rate) + '</span></span>' +
+              '</div>' +
+            '</a>'
+          );
+        }).join('');
+      }
+
+      function paintSalons() {
+        var row = document.getElementById('salon-row');
+        var empty = document.getElementById('salon-empty');
+        var keys = savedSalons().filter(function (k) { return !!C.SALONS[k]; });
+        empty.hidden = !!keys.length;
+        row.innerHTML = keys.map(function (key) {
+          var salon = C.SALONS[key];
+          var meta = SALON_META[key] || { dist: '', open: '', rating: '4.5', tags: [], closed: false };
+          return (
+            '<article class="fav' + (meta.closed ? ' is-closed' : '') + '" data-salon="' + esc(key) + '">' +
+              '<div class="fav__media">' +
+                '<img src="' + esc(salon.photo) + '" alt="" style="object-position:' + esc(salon.pos || '50% 50%') + ';" />' +
+                (meta.closed ? '<span class="fav__badge">Closed</span>' : '') +
+                '<button type="button" class="fav__heart" data-salon="' + esc(key) + '" aria-label="Remove favourite">' + HEART + '</button>' +
+              '</div>' +
+              '<div class="fav__body">' +
+                '<div class="fav__top">' +
+                  '<div>' +
+                    '<h2 class="fav__name">' + esc(salon.name) + '</h2>' +
+                    '<p class="fav__meta"><span class="dist">' + esc(meta.dist) + '</span>' +
+                      (meta.closed
+                        ? ' · <span class="is-closed">Closed</span>' + (meta.open ? ' · ' + esc(meta.open) : '')
+                        : (meta.open ? ' · ' + esc(meta.open) : '')) +
+                    '</p>' +
+                  '</div>' +
+                  '<span class="fav__stars is-high">★ ' + esc(meta.rating) + '</span>' +
+                '</div>' +
+                (meta.tags && meta.tags.length
+                  ? '<div class="fav__tags">' + meta.tags.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div>'
+                  : '') +
+                '<div class="fav__actions">' +
+                  '<a class="btn btn--view" href="salon-detail.html?id=' + encodeURIComponent(key) + '">View</a>' +
+                '</div>' +
+              '</div>' +
+            '</article>'
+          );
+        }).join('');
+      }
+
+      function paint() {
+        paintStylists();
+        paintSalons();
+        paintSub();
+      }
+
+      document.body.addEventListener('click', function (e) {
+        var stylistFav = e.target.closest('.stylist-card__fav');
+        if (stylistFav && Fav) {
+          e.preventDefault();
+          e.stopPropagation();
+          Fav.toggle(stylistFav.getAttribute('data-salon'), stylistFav.getAttribute('data-spec'));
+          paint();
+          return;
+        }
+        var salonFav = e.target.closest('.fav__heart');
+        if (salonFav) {
+          e.preventDefault();
+          e.stopPropagation();
+          var key = salonFav.getAttribute('data-salon');
+          var list = savedSalons().filter(function (k) { return k !== key; });
+          localStorage.setItem(SAVED_KEY, JSON.stringify(list));
+          paint();
+        }
+      });
+
+      paint();
+    })();
+  </script>
+  <script src="assets/rating.js"></script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

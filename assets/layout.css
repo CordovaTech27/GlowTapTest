@@ -1,0 +1,181 @@
+/* Frameless phone layout shared by every Customer screen.
+   Loaded after each page's own styles so it can override the old device-frame mock. */
+
+html, body { height: 100%; }
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  overflow: auto;
+  background: #EFEAF4;
+}
+
+.studio, .island, .status, .home-ind, .demo { display: none !important; }
+
+/* Keep the iPhone frame (390×844) on every screen. Scale down only when the window is shorter. */
+.stage {
+  width: min(390px, calc((100dvh - 48px) * 390 / 844)) !important;
+  height: min(844px, calc(100dvh - 48px)) !important;
+  aspect-ratio: 390 / 844;
+  flex-shrink: 0;
+  margin: 0 auto;
+  animation: none;
+}
+.phone {
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  margin: 0 auto;
+  border-radius: 0;
+  box-shadow: 0 0 0 1px rgba(36, 24, 40, 0.06), 0 20px 50px rgba(36, 24, 40, 0.12);
+}
+@media (max-width: 430px) {
+  body { display: block; padding: 0; overflow: hidden; }
+  .stage, .phone {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    aspect-ratio: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* —— Shared top chrome (every screen) ——
+   Status/island are decorative and hidden above. Never reserve a second band for them.
+   One inset + padding for .top / .nav / .chrome / hero controls. */
+:root {
+  --safe-top: max(47px, env(safe-area-inset-top, 0px));
+  --app-top: var(--safe-top);
+  --nav-pad-y: 8px;
+  --nav-pad-x: 14px;
+  --nav-control: 42px;
+  /* Shared content-row height so home .top and service .nav match */
+  --nav-row: 56px;
+}
+
+.screen { padding-top: 0 !important; }
+
+.top,
+.nav,
+.chrome {
+  box-sizing: border-box;
+  padding-top: calc(var(--app-top) + var(--nav-pad-y)) !important;
+  padding-left: var(--nav-pad-x) !important;
+  padding-right: var(--nav-pad-x) !important;
+  padding-bottom: var(--nav-pad-y) !important;
+  min-height: calc(var(--app-top) + var(--nav-pad-y) * 2 + var(--nav-row)) !important;
+}
+
+/* Back + title bars — sub-home header style (every screen except home) */
+.nav {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-shrink: 0;
+  background: transparent !important;
+}
+.nav .back,
+.top .back,
+.chrome .back,
+.page-head__back,
+.sub__back,
+.hero__nav .round,
+.hero__nav .back {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(237, 228, 236, 0.95) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 6px 16px rgba(36, 24, 40, 0.05) !important;
+  color: var(--ink, #241828) !important;
+  display: grid !important;
+  place-items: center !important;
+  flex-shrink: 0;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+.nav .back svg,
+.top .back svg,
+.chrome .back svg,
+.page-head__back svg,
+.sub__back svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+.nav__meta,
+.page-head__titles,
+.sub__titles {
+  min-width: 0;
+  flex: 1;
+  padding-top: 2px;
+}
+.nav .eyebrow,
+.page-head__eyebrow,
+.sub__eyebrow {
+  margin: 0 0 2px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--violet, #8B00E8);
+}
+.nav h1,
+.nav__title,
+.page-head__title,
+.sub__title {
+  margin: 0;
+  font-family: Outfit, 'DM Sans', sans-serif;
+  font-size: 1.28rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--ink, #241828);
+}
+.nav p,
+.nav__id,
+.page-head__sub,
+.sub__sub {
+  margin: 4px 0 0;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  color: var(--muted, #7A6E78);
+  line-height: 1.35;
+}
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+.page-head--solo { margin-bottom: 4px; }
+
+/* Floating photo-hero / map controls sit on the same top line as .nav content */
+.hero__nav {
+  top: calc(var(--app-top) + var(--nav-pad-y)) !important;
+  left: var(--nav-pad-x) !important;
+  right: var(--nav-pad-x) !important;
+}
+
+/* Photo heroes only (salon-detail header.hero + .hero__nav) — edge-to-edge.
+   Do NOT zero padding on profile's gradient .hero card. */
+.phone:has(.hero__nav) .screen { padding-top: 0 !important; }
+.phone header.hero {
+  margin-top: 0;
+  padding-top: 0 !important;
+}
+
+.phone[aria-label*="Profile"] .body {
+  padding-top: calc(var(--app-top) + var(--nav-pad-y)) !important;
+}
+#ok-view, #fail-view {
+  padding-top: calc(var(--app-top) + 24px) !important;
+}
+
+.dock { bottom: max(16px, env(safe-area-inset-bottom)); }
+.sheet-backdrop { border-radius: 0; }

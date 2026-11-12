@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Book</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: #ffffff;
+    }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; }
+    .nav {
+      display: flex; align-items: center; gap: 10px; padding: 6px 14px 10px; flex-shrink: 0;
+      background: linear-gradient(180deg, #fff 72%, rgba(255,255,255,0));
+    }
+    .back {
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      display: grid; place-items: center; color: var(--ink); text-decoration: none;
+      background: #fff; box-shadow: 0 4px 14px rgba(36,24,40,.08); cursor: pointer;
+    }
+    .back svg { width: 18px; height: 18px; }
+    .nav__meta { min-width: 0; flex: 1; }
+    .nav h1 { margin: 0; font-family: Outfit, sans-serif; font-size: 1.18rem; font-weight: 750; letter-spacing: -.03em; }
+    .nav p { margin: 2px 0 0; font-size: .74rem; color: var(--muted); font-weight: 600; }
+    .steps {
+      display: flex; gap: 6px; padding: 0 16px 12px; flex-shrink: 0;
+    }
+    .steps span {
+      flex: 1; height: 5px; border-radius: 99px; background: rgba(139,0,232,.1);
+      transition: background .25s ease, transform .2s ease;
+    }
+    .steps span.is-on { background: var(--grad); transform: scaleY(1.15); }
+    .body { flex: 1; overflow-y: auto; padding: 6px 16px calc(var(--footer-above-dock, 80px) + 96px); scrollbar-width: none; }
+    .body::-webkit-scrollbar { display: none; }
+    .step { display: none; }
+    .step.is-active { display: block; animation: bookIn .28s ease; }
+    @keyframes bookIn {
+      from { opacity: .4; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+    .step h2 { margin: 0 0 6px; font-family: Outfit, sans-serif; font-size: 1.22rem; font-weight: 750; letter-spacing: -.03em; }
+    .step .sub { margin: 0 0 16px; font-size: .82rem; color: var(--muted); line-height: 1.4; }
+    .card {
+      background: transparent; border-radius: 18px; padding: 13px 14px; margin-bottom: 8px;
+      border: 1.5px solid rgba(139,0,232,.1); cursor: pointer; text-align: left; width: 100%;
+      font-family: inherit; color: inherit; transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .card.is-active {
+      border-color: rgba(139,0,232,.45); background: #fff;
+      box-shadow: 0 0 0 3px rgba(139,0,232,.1), 0 10px 24px rgba(91,33,182,.06);
+    }
+    .card__title { font-weight: 700; font-size: .92rem; }
+    .card__meta { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+    .card__row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .card__desc { margin-top: 4px; font-size: .74rem; line-height: 1.4; color: #4B5563; }
+    .card__cost { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+    .card__cost s { font-size: .72rem; font-weight: 600; color: var(--muted); }
+    .card__check {
+      width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #D9CFE6; flex-shrink: 0;
+      display: grid; place-items: center; color: transparent; margin-top: 1px;
+    }
+    .card__check svg { width: 13px; height: 13px; }
+    .card.is-active .card__check { border-color: transparent; background: var(--grad); color: #fff; }
+    .svc-total {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 8px;
+      padding: 12px 14px; border-radius: 16px;
+      background: linear-gradient(120deg, #F8F4FF, #FFF5FB); border: 1px solid rgba(139,0,232,.1);
+      font-size: .82rem; font-weight: 750; color: #5B21B6;
+    }
+    .svc-total[hidden] { display: none; }
+    .sum-card {
+      background: #fff; border-radius: 20px; padding: 16px 16px 14px; margin-bottom: 12px;
+      border: 1.5px solid rgba(139,0,232,.12); cursor: default;
+    }
+    .sum-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 14px; font-size: .88rem; }
+    .sum-meta span { color: var(--muted); font-weight: 600; }
+    .sum-meta strong { font-weight: 750; color: var(--ink); }
+    .sum-items { display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px; }
+    .sum-line { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .sum-line__copy { min-width: 0; flex: 1; }
+    .sum-line__title { display: block; font-size: .88rem; font-weight: 700; color: var(--ink); line-height: 1.3; }
+    .sum-line__meta { display: block; margin-top: 3px; font-size: .72rem; font-weight: 500; color: var(--muted); line-height: 1.35; }
+    .sum-line__price { flex: 0 0 auto; text-align: right; font-size: .88rem; font-weight: 750; color: var(--ink); line-height: 1.25; }
+    .sum-line__price s {
+      display: block; color: var(--muted); font-weight: 600; font-size: .72rem;
+      text-decoration-thickness: 1.5px;
+    }
+    .sum-totals { display: flex; flex-direction: column; gap: 8px; }
+    .sum-totals .row { margin-bottom: 0; }
+    .sum-totals .row.offer strong { color: #059669; }
+    .sum-totals .row.total {
+      margin-top: 0; padding-top: 0; border-top: none;
+      font-family: Outfit, sans-serif; font-size: 1.1rem;
+    }
+    .sum-sep { height: 0; border: none; border-top: 1.5px dashed rgba(139,0,232,.16); margin: 4px 0 2px; }
+    .card__price { font-family: Outfit, sans-serif; font-weight: 700; color: var(--violet); }
+    .card__off {
+      font-size: .62rem; font-weight: 800; padding: 2px 7px; border-radius: 99px;
+      background: #ECFDF5; color: #059669; white-space: nowrap;
+    }
+    .dates { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; margin-bottom: 18px; }
+    .dates::-webkit-scrollbar { display: none; }
+    .date {
+      flex: 0 0 52px; height: 58px; border-radius: 14px; border: 1.5px solid rgba(139,0,232,.1);
+      background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: inherit; cursor: pointer; color: var(--ink);
+      transition: transform .15s, box-shadow .15s, border-color .15s, background .15s;
+    }
+    .date small { font-size: .58rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .date strong { font-family: Outfit, sans-serif; font-size: .95rem; margin-top: 1px; letter-spacing: -.02em; }
+    .date.is-active {
+      border-color: transparent; background: var(--grad); color: #fff;
+      box-shadow: 0 6px 14px rgba(139,0,232,.24); transform: translateY(-1px);
+    }
+    .date.is-active small { color: rgba(255,255,255,.85); }
+    .slot-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 10px;
+    }
+    .slot-head h3 { margin: 0; font-family: Outfit, sans-serif; font-size: .95rem; font-weight: 700; }
+    .slot-head span { font-size: .72rem; font-weight: 600; color: var(--muted); }
+    .slot-group { margin-bottom: 14px; }
+    .slot-group__label {
+      margin: 0 0 8px; font-size: .72rem; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .slot {
+      min-height: 40px; border-radius: 11px; border: 1.5px solid rgba(139,0,232,.1); background: transparent;
+      font-family: inherit; font-weight: 750; font-size: .72rem; cursor: pointer; color: var(--ink);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 6px 3px;
+      transition: border-color .15s, background .15s, box-shadow .15s, color .15s;
+    }
+    .slot small { font-size: .56rem; font-weight: 600; color: var(--muted); }
+    .slot.is-active {
+      border-color: transparent; background: var(--grad); color: #fff;
+      box-shadow: 0 5px 12px rgba(139,0,232,.22);
+    }
+    .slot.is-active small { color: rgba(255,255,255,.88); }
+    .slot.is-full, .slot:disabled {
+      opacity: 1; cursor: not-allowed; background: #F4F2F6; border-color: transparent;
+      color: #9AA6B2; text-decoration: none;
+    }
+    .slot.is-full small, .slot:disabled small { color: #C45B5B; font-weight: 700; }
+    .date.is-full:not(.is-active) { opacity: .5; }
+    .slots-empty {
+      margin: 0 0 14px; padding: 18px 12px; border-radius: 14px; border: 1.5px dashed var(--line);
+      background: #fff; text-align: center; font-size: .82rem; font-weight: 600; color: var(--muted);
+    }
+    .legend {
+      display: flex; gap: 12px; flex-wrap: wrap; margin: 4px 0 0; font-size: .7rem; font-weight: 600; color: var(--muted);
+    }
+    .legend i {
+      display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px;
+    }
+    .legend .avail { background: var(--grad); }
+    .legend .full { background: #EDE4EC; border: 1px solid #D5DCE4; }
+    .spec {
+      display: flex; align-items: center; gap: 12px; width: 100%;
+      background: transparent; border: 1.5px solid rgba(139,0,232,.1); border-radius: 18px;
+      padding: 12px; margin-bottom: 8px; font-family: inherit; cursor: pointer; text-align: left; color: inherit;
+      position: relative; transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .spec.is-active {
+      border-color: rgba(139,0,232,.45); background: #fff;
+      box-shadow: 0 0 0 3px rgba(139,0,232,.1), 0 10px 22px rgba(91,33,182,.06);
+    }
+    .spec__av {
+      width: 52px; height: 52px; border-radius: 16px; overflow: hidden; background: #eee; flex-shrink: 0;
+    }
+    .spec__av img { width: 100%; height: 100%; object-fit: cover; }
+    .spec__body { flex: 1; min-width: 0; }
+    .spec__name { font-weight: 700; font-size: .9rem; }
+    .spec__about { margin-top: 4px; font-size: .74rem; line-height: 1.35; color: #4B5563; }
+    .spec__next { margin-top: 5px; font-size: .7rem; font-weight: 700; color: #059669; }
+    .spec__next.is-later { color: #B45309; }
+    .spec.is-busy { cursor: not-allowed; background: #FAFAFB; box-shadow: none; }
+    .spec.is-busy .spec__av, .spec.is-busy .spec__name, .spec.is-busy .spec__meta, .spec.is-busy .spec__about { opacity: .55; }
+    .spec.is-busy .spec__next { color: #C45B5B; }
+    .spec__meta { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+    .spec__meta .rate { color: #F59E0B; font-weight: 700; }
+    .spec__meta .rate.is-high { color: #059669; }
+    .spec__liked {
+      margin-left: auto; flex-shrink: 0; font-size: .68rem; font-weight: 800;
+      padding: 5px 8px; border-radius: 99px; background: #ECFDF5; color: #059669;
+    }
+    .spec__fav {
+      position: absolute; top: 10px; right: 10px; z-index: 2;
+      width: 34px; height: 34px; border-radius: 50%; border: none; padding: 0;
+      display: grid; place-items: center; cursor: pointer;
+      background: #FAF7FD; color: #C4B5D4;
+      box-shadow: 0 2px 8px rgba(26,16,36,.08);
+    }
+    .spec__fav svg { width: 16px; height: 16px; display: block; pointer-events: none; }
+    .spec__fav.is-on { color: #FF03C8; background: #FFE8F6; }
+    .spec__fav:active { transform: scale(.92); }
+    .spec.is-active .spec__fav { background: #fff; }
+    .with-spec {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 0 0 12px;
+      border-radius: 14px; background: #F3EEFF; border: 1px solid rgba(139,0,232,.14);
+      font-size: .8rem; color: #5B21B6; font-weight: 600;
+    }
+    .with-spec[hidden] { display: none; }
+    .with-spec img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .with-spec strong { color: var(--ink); }
+    .picked {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: #fff;
+      border: 1.5px solid rgba(139,0,232,.14); font-size: .82rem;
+    }
+    .picked[hidden] { display: none; }
+    .picked span { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .svc-tabs {
+      margin: 0 0 14px;
+    }
+    .svc-tabs[hidden] { display: none; }
+    .svc-tabs__hint {
+      margin: 0 0 8px; font-size: .72rem; font-weight: 600; color: var(--muted);
+    }
+    .svc-tabs__row {
+      display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+      padding-bottom: 2px; margin: 0 -4px; padding-left: 4px; padding-right: 4px;
+    }
+    .svc-tabs__row::-webkit-scrollbar { display: none; }
+    .svc-tab {
+      flex: 0 0 auto; min-width: 0; max-width: 168px;
+      display: flex; align-items: stretch; gap: 0;
+      border-radius: 14px; border: 1.5px solid var(--line);
+      background: #fff; color: var(--ink); overflow: hidden;
+    }
+    .svc-tabs__row .svc-tab:only-child { max-width: min(100%, 220px); }
+    .svc-tab__main {
+      flex: 1; min-width: 0; max-width: 134px; display: flex; flex-direction: column; align-items: stretch; gap: 2px;
+      padding: 8px 10px; border: none; background: transparent; color: inherit;
+      font-family: inherit; text-align: left; cursor: pointer;
+    }
+    .svc-tab__name {
+      display: flex; align-items: center; gap: 5px; min-width: 0; max-width: 100%;
+      font-size: .78rem; font-weight: 700;
+    }
+    .svc-tab__label {
+      min-width: 0; flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .svc-tab__meta {
+      display: block; min-width: 0; max-width: 100%;
+      font-size: .64rem; font-weight: 600; color: var(--muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .svc-tab__tick {
+      flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%;
+      background: #059669; color: #fff; display: grid; place-items: center;
+      font-size: .62rem; font-weight: 800; line-height: 1;
+    }
+    .svc-tab__clear {
+      flex-shrink: 0; width: 34px; border: none; border-left: 1.5px solid var(--line);
+      background: #F8FAFC; color: var(--muted); font-size: 1.05rem; font-weight: 700;
+      line-height: 1; cursor: pointer; font-family: inherit;
+    }
+    .svc-tab__clear:active { background: #FEE2E2; color: #B91C1C; }
+    .svc-tab.is-on {
+      border-color: transparent; background: var(--grad); color: #fff;
+      box-shadow: 0 6px 14px rgba(139, 0, 232, 0.22);
+    }
+    .svc-tab.is-on .svc-tab__meta { color: rgba(255,255,255,.88); }
+    .svc-tab.is-on .svc-tab__tick { background: rgba(255,255,255,.28); }
+    .svc-tab.is-on .svc-tab__clear {
+      border-left-color: rgba(255,255,255,.22); background: rgba(255,255,255,.14); color: #fff;
+    }
+    .spec-note {
+      margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: #FFF7ED;
+      font-size: .78rem; font-weight: 600; color: #9A3412;
+    }
+    .row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-size: .88rem; align-items: baseline; }
+    .row span { color: var(--muted); font-weight: 600; }
+    .row strong { font-weight: 750; }
+    .total { margin-top: 10px; padding-top: 12px; border-top: 1.5px dashed rgba(139,0,232,.16); font-family: Outfit, sans-serif; font-size: 1.1rem; }
+    .row[hidden] { display: none; }
+    .bill {
+      background: #fff; border-radius: 20px; padding: 14px 16px; margin-bottom: 12px;
+      border: 1.5px solid rgba(139,0,232,.12);
+    }
+    .bill__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .bill__title { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .bill__link {
+      border: none; background: none; padding: 0; font-family: inherit;
+      font-size: .8rem; font-weight: 750; color: var(--violet); cursor: pointer;
+    }
+    .bill__body { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    .bill__tag {
+      font-size: .62rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+      padding: 3px 9px; border-radius: 99px; background: #F3EEFF; color: #5B21B6;
+    }
+    .bill__lines { font-size: .84rem; line-height: 1.45; color: #475569; }
+    .bill__lines div:first-child { font-weight: 750; color: var(--ink); }
+    textarea {
+      margin-top: 0;
+      width: 100%; min-height: 76px; border-radius: 20px; border: 1.5px solid rgba(139,0,232,.12);
+      padding: 12px 14px; font-family: inherit; font-size: .85rem; resize: vertical; outline: none;
+      background: #fff; box-sizing: border-box;
+    }
+    textarea:focus { border-color: rgba(139,0,232,.4); box-shadow: 0 0 0 3px rgba(139,0,232,.1); }
+    .footer {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 32;
+      display: flex; flex-direction: column; gap: 0;
+      padding: 0 12px calc(var(--footer-above-dock, 80px) + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
+      background: linear-gradient(to top, rgba(251,247,250,.96) 35%, rgba(251,247,250,0));
+      pointer-events: none;
+    }
+    .footer > * { pointer-events: auto; }
+    .footer__actions {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; border-radius: 18px; background: #1A1024; color: #fff;
+      box-shadow: 0 14px 36px rgba(26,16,36,.35), 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .footer.single .footer__actions { gap: 10px; }
+    .footer.single #btn-prev,
+    .footer.has-hint #btn-prev { display: none; }
+    .footer__meta {
+      flex: 1; min-width: 0; padding: 0 2px;
+    }
+    .footer__meta[hidden] { display: none; }
+    .footer__meta strong {
+      display: block; font-family: Outfit, sans-serif; font-size: .82rem; font-weight: 750;
+      letter-spacing: -.02em; line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .footer__meta span {
+      display: block; margin-top: 2px; font-size: .68rem; font-weight: 600;
+      color: rgba(255,255,255,.62); line-height: 1.3;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .footer__meta.is-ready strong { color: #6EE7B7; }
+    .coupon-bar {
+      display: flex; align-items: center; gap: 8px; width: 100%; margin: 0 0 12px; padding: 12px 14px;
+      border-radius: 18px; border: 1.5px dashed rgba(139,0,232,.28); background: linear-gradient(120deg, #FAF7FD, #fff);
+    }
+    .coupon-bar.is-on { border-style: solid; border-color: rgba(5,150,105,.35); background: #F3FBF7; }
+    .coupon-bar__main {
+      flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
+      border: none; background: none; padding: 0; font-family: inherit; color: inherit;
+      text-align: left; cursor: pointer;
+    }
+    .coupon-bar__mark {
+      width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0;
+      background: var(--grad); color: #fff; font-weight: 800; font-size: .95rem;
+    }
+    .coupon-bar.is-on .coupon-bar__mark { background: #059669; }
+    .coupon-bar__copy { min-width: 0; }
+    .coupon-bar__copy strong { display: block; font-size: .9rem; font-weight: 700; }
+    .coupon-bar__copy span { display: block; margin-top: 2px; font-size: .72rem; font-weight: 600; color: var(--muted); }
+    .coupon-bar.is-on .coupon-bar__copy span { color: #059669; font-weight: 700; }
+    .coupon-bar__remove {
+      border: none; background: none; color: #B91C1C; font-family: inherit; font-weight: 800;
+      font-size: .78rem; cursor: pointer; padding: 6px 2px;
+    }
+    .coupon-bar__remove[hidden] { display: none; }
+    .sheet--coupons .sheet__panel { max-height: 82%; display: flex; flex-direction: column; }
+    .coupon-entry { display: flex; gap: 8px; }
+    .coupon-entry input {
+      flex: 1; min-width: 0; height: 44px; border-radius: 12px; border: 1.5px solid var(--line);
+      padding: 0 12px; font-family: inherit; font-size: .86rem; font-weight: 700; letter-spacing: .04em;
+      text-transform: uppercase; outline: none;
+    }
+    .coupon-entry button {
+      height: 44px; padding: 0 14px; border: none; border-radius: 12px; background: var(--grad); color: #fff;
+      font-family: inherit; font-weight: 800; cursor: pointer;
+    }
+    .coupon-err { margin: 8px 0 0; font-size: .75rem; font-weight: 700; color: #B91C1C; }
+    .coupon-err[hidden] { display: none; }
+    .coupon-list { overflow-y: auto; min-height: 0; margin-top: 12px; padding-bottom: 4px; }
+    .cp { border: 1.5px solid var(--line); border-radius: 16px; padding: 12px; margin-bottom: 10px; background: #fff; }
+    .cp.is-on { border-color: rgba(5,150,105,.45); background: #F6FDF9; }
+    .cp.is-off { background: #F8F7FA; }
+    .cp__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .cp__title { display: block; font-size: .92rem; font-weight: 700; }
+    .cp__code {
+      display: inline-block; margin-top: 6px; padding: 3px 8px; border-radius: 8px;
+      border: 1px dashed #C9A6E8; color: var(--violet); font-size: .7rem; font-weight: 800; letter-spacing: .04em;
+    }
+    .cp__apply {
+      height: 32px; padding: 0 12px; border-radius: 10px; border: 1.5px solid var(--violet); background: #fff;
+      color: var(--violet); font-weight: 800; font-size: .75rem; font-family: inherit; cursor: pointer; flex-shrink: 0;
+    }
+    .cp.is-on .cp__apply { background: #059669; border-color: #059669; color: #fff; }
+    .cp__na { font-size: .68rem; font-weight: 800; color: #B91C1C; text-align: right; }
+    .cp__save { margin: 8px 0 0; font-size: .75rem; font-weight: 700; color: #059669; }
+    .cp.is-off .cp__save { color: var(--muted); }
+    .cp__terms {
+      display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; padding: 0; border: none; background: none;
+      color: var(--muted); font-size: .72rem; font-weight: 700; font-family: inherit; cursor: pointer;
+    }
+    .cp__terms svg { width: 14px; height: 14px; transition: transform .2s; }
+    .cp__terms.is-open svg { transform: rotate(180deg); }
+    .cp__fine { margin: 8px 0 0; padding-left: 16px; color: #4B5563; font-size: .72rem; line-height: 1.45; }
+    .cp__fine[hidden] { display: none; }
+    .btn {
+      height: 48px; border-radius: 14px; border: none; font-family: inherit; font-weight: 700;
+      font-size: .9rem; cursor: pointer;
+    }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn--ghost { background: #fff; border: 1.5px solid var(--line); color: var(--ink); }
+    .btn--primary {
+      background: var(--grad); color: #fff; box-shadow: 0 8px 20px rgba(139,0,232,.3);
+    }
+    #btn-prev {
+      flex-shrink: 0; height: 42px; min-width: 72px; padding: 0 14px; border-radius: 13px;
+      border: 1.5px solid rgba(255,255,255,.14); background: rgba(255,255,255,.08); color: #fff;
+      font-family: inherit; font-weight: 800; font-size: .82rem; cursor: pointer;
+    }
+    #btn-next {
+      flex-shrink: 0; height: 42px; border: none; border-radius: 13px; padding: 0 16px;
+      background: var(--grad); color: #fff; font-family: inherit; font-weight: 800; font-size: .84rem;
+      cursor: pointer; box-shadow: 0 8px 18px rgba(139,0,232,.35);
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      min-width: 108px;
+    }
+    #btn-next:disabled { opacity: .45; }
+    .footer:not(.has-hint) #btn-next { flex: 1; }
+    .footer .btn[hidden] { display: none; }
+    .footer[hidden], .steps[hidden] { display: none; }
+    .phone.has-dock .footer {
+      padding: 0 12px calc(var(--footer-above-dock, 80px) + env(safe-area-inset-bottom, 0px)) !important;
+      background: linear-gradient(to top, rgba(251,247,250,.96) 35%, rgba(251,247,250,0)) !important;
+    }
+    .phone.has-dock .footer #btn-prev { width: auto !important; }
+    .phone.has-dock .footer #btn-next { width: auto !important; }
+    .phone.has-dock .footer:not(.has-hint) #btn-next { flex: 1; width: auto !important; }
+    .rs-current {
+      display: flex; align-items: center; gap: 12px; margin: 0 0 16px; padding: 12px 14px; border-radius: 16px;
+      background: #fff; border: 1.5px dashed #D9CCF5;
+    }
+    .rs-current[hidden] { display: none; }
+    .rs-current__icon { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: #F3EEFF; color: var(--violet); flex-shrink: 0; }
+    .rs-current__icon svg { width: 18px; height: 18px; }
+    .rs-current small { display: block; font-size: .66rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+    .rs-current strong { display: block; font-size: .9rem; margin-top: 2px; }
+    .rs-current span { display: block; font-size: .74rem; color: var(--muted); margin-top: 2px; }
+    .rs-done { text-align: center; padding-top: 18px; }
+    .rs-done__icon {
+      width: 72px; height: 72px; margin: 0 auto 14px; border-radius: 50%; display: grid; place-items: center;
+      background: #059669; color: #fff; box-shadow: 0 12px 28px rgba(5, 150, 105, .3);
+    }
+    .rs-done__icon svg { width: 34px; height: 34px; }
+    .rs-done .card { text-align: left; cursor: default; margin-top: 4px; }
+    .rs-was { color: var(--muted); text-decoration: line-through; font-weight: 600 !important; }
+    .rs-new { color: var(--violet); }
+    .rs-note {
+      margin: 10px 0 18px; padding: 10px 12px; border-radius: 12px; background: #ECFDF5;
+      font-size: .78rem; font-weight: 600; color: #047857; text-align: left; line-height: 1.4;
+    }
+    .rs-actions { display: grid; gap: 10px; }
+    .rs-actions .btn { display: grid; place-items: center; text-decoration: none; }
+    .sheet {
+      position: absolute; inset: 0; z-index: 70; display: none; align-items: flex-end;
+      background: rgba(16, 8, 24, .45);
+    }
+    .sheet.is-open { display: flex; }
+    .sheet__panel {
+      width: 100%; max-height: 88%; overflow: auto; background: #fff; border-radius: 22px 22px 0 0;
+      padding: 14px 16px calc(28px + 88px);
+      box-shadow: 0 -12px 40px rgba(0,0,0,.18); animation: slideUp .28s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(24px); opacity: .6; }
+      to { transform: none; opacity: 1; }
+    }
+    .sheet__handle {
+      width: 40px; height: 4px; border-radius: 99px; background: #EDE4EC; margin: 0 auto 12px;
+    }
+    .sheet__title { margin: 0 0 4px; font-family: Outfit, sans-serif; font-size: 1.1rem; font-weight: 700; }
+    .sheet__sub { margin: 0 0 14px; font-size: .8rem; color: var(--muted); font-weight: 600; }
+    .pay-method {
+      display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+      padding: 12px; margin-bottom: 8px; border-radius: 14px; border: 1.5px solid var(--line);
+      background: #fff; font-family: inherit; cursor: pointer; color: inherit;
+    }
+    .pay-method.is-active {
+      border-color: rgba(139,0,232,.45); box-shadow: 0 0 0 3px rgba(139,0,232,.1);
+    }
+    .pay-method__icon {
+      width: 48px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+      background: #F3EEFF; color: var(--violet); font-weight: 800; font-size: .68rem; flex-shrink: 0;
+    }
+    .pay-method__icon.wallet { background: #FFF4EC; color: #EA580C; font-size: 1rem; }
+    .pay-method__icon.rzp { width: 64px; background: #EEF3FF; color: #0C2451; font-size: .66rem; }
+    .pay-method__name { font-weight: 700; font-size: .9rem; }
+    .pay-method__meta { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+    .sheet__actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 12px; }
+    .date--cal { border-style: dashed; border-color: #CDBAF0; background: #FAF7FD; color: var(--violet); }
+    .date--cal svg { width: 16px; height: 16px; }
+    .date--cal small { color: var(--violet); margin-top: 2px; font-size: .52rem; }
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin: 2px 0 10px; }
+    .cal-nav strong { font-family: Outfit, sans-serif; font-size: 1rem; }
+    .cal-nav button {
+      width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; color: var(--ink);
+      display: grid; place-items: center; cursor: pointer;
+    }
+    .cal-nav button svg { width: 16px; height: 16px; }
+    .cal-nav button:disabled { opacity: .35; cursor: not-allowed; }
+    .cal-week, .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+    .cal-week span { font-size: .66rem; font-weight: 700; color: var(--muted); text-transform: uppercase; padding-bottom: 4px; }
+    .cal-day {
+      height: 40px; border-radius: 12px; border: 1.5px solid transparent; background: none; font-family: inherit;
+      font-size: .86rem; font-weight: 700; color: var(--ink); cursor: pointer; position: relative;
+    }
+    .cal-day.is-today { border-color: rgba(139,0,232,.35); }
+    .cal-day.is-on { background: var(--grad); color: #fff; border-color: transparent; }
+    .cal-day:disabled { cursor: not-allowed; color: #C3CBD4; }
+    .cal-day.is-full:disabled { color: #C45B5B; text-decoration: line-through; opacity: .6; }
+    .cal-legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 0 0; font-size: .7rem; font-weight: 600; color: var(--muted); }
+    .cal-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="nav">
+          <button type="button" class="back" id="btn-back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></button>
+          <div class="nav__meta">
+            <h1 id="nav-title">Book</h1>
+            <p id="step-label">Step 1 of 4 · Service</p>
+          </div>
+        </div>
+        <div class="steps" id="steps" aria-hidden="true">
+          <span class="is-on"></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="body">
+          <div class="step is-active" data-step="0">
+            <h2>Choose services</h2>
+            <p class="sub">Add what you want for this visit · <span id="salon-label">Luxe Curls</span></p>
+            <div class="with-spec" id="with-spec" hidden></div>
+            <div id="service-cards"></div>
+            <div class="svc-total" id="svc-total" hidden></div>
+          </div>
+
+          <div class="step" data-step="1">
+            <h2 id="slot-title">When works?</h2>
+            <p class="sub" id="slot-intro">Select a time for every service to continue. You’ll pick a specialist next.</p>
+            <div class="picked" id="picked" hidden></div>
+            <div class="svc-tabs" id="slot-svc-tabs" hidden>
+              <p class="svc-tabs__hint">Tap a service to set its time</p>
+              <div class="svc-tabs__row" id="slot-svc-row" role="tablist" aria-label="Services"></div>
+            </div>
+            <div class="rs-current" id="rs-current" hidden>
+              <span class="rs-current__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span>
+              <div><small>Current appointment</small><strong id="rs-from">Tomorrow, 27 Aug · 11:30 AM</strong><span id="rs-what">Haircut &amp; Style · Priya S.</span></div>
+            </div>
+            <div class="dates" id="dates"></div>
+
+            <div class="slot-head">
+              <h3 id="slot-sub">Slots for Today</h3>
+              <span id="slot-count">5 open</span>
+            </div>
+            <div id="slots"></div>
+            <p class="legend"><span><i class="avail"></i>Available</span><span><i class="full"></i>Not available / full</span></p>
+          </div>
+
+          <div class="step" data-step="2">
+            <h2>Who’s doing it?</h2>
+            <p class="sub" id="spec-intro">Free on Today at 11:30 AM</p>
+            <div class="svc-tabs" id="spec-svc-tabs" hidden>
+              <p class="svc-tabs__hint">Tap a service to pick its specialist</p>
+              <div class="svc-tabs__row" id="spec-svc-row" role="tablist" aria-label="Services"></div>
+            </div>
+            <p class="spec-note" id="spec-note"></p>
+            <div id="spec-list"></div>
+          </div>
+
+          <div class="step" data-step="3">
+            <h2>Review &amp; pay</h2>
+            <p class="sub">One last look before you confirm</p>
+            <div class="sum-card">
+              <div class="sum-meta"><span>Duration</span><strong id="sum-dur">45 min</strong></div>
+              <div class="sum-items" id="sum-items"></div>
+              <div class="sum-totals">
+                <div class="row"><span id="price-label">Subtotal</span><strong id="sum-price">₹899</strong></div>
+                <div class="row offer" id="offer-row" hidden><span>Salon offers</span><strong id="sum-offer">−₹180</strong></div>
+                <div class="row offer" id="coupon-row" hidden><span id="coupon-label">Coupon</span><strong id="sum-coupon">−₹150</strong></div>
+                <div class="sum-sep"></div>
+                <div class="row total"><span>Total</span><strong id="sum-total">₹899</strong></div>
+              </div>
+            </div>
+            <div class="coupon-bar" id="coupon-bar">
+              <button type="button" class="coupon-bar__main" id="coupon-open">
+                <span class="coupon-bar__mark" aria-hidden="true">%</span>
+                <span class="coupon-bar__copy">
+                  <strong id="coupon-title">Apply coupon</strong>
+                  <span id="coupon-sub">View coupons and terms</span>
+                </span>
+              </button>
+              <button type="button" class="coupon-bar__remove" id="coupon-remove" hidden>Remove</button>
+            </div>
+            <div class="bill" id="bill">
+              <div class="bill__head">
+                <span class="bill__title">Billing address</span>
+                <button type="button" class="bill__link" id="bill-change">Edit</button>
+              </div>
+              <div class="bill__body">
+                <span class="bill__tag" id="bill-tag">Home</span>
+                <div class="bill__lines" id="bill-lines"></div>
+              </div>
+            </div>
+            <textarea placeholder="Notes to salon (optional)"></textarea>
+          </div>
+
+          <div class="step rs-done" data-step="4">
+            <span class="rs-done__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m5 12 5 5L20 7"/></svg></span>
+            <h2>Appointment rescheduled</h2>
+            <p class="sub">We’ve sent the new time to the salon and to you by SMS &amp; email.</p>
+            <div class="card">
+              <div class="row"><span>Salon</span><strong id="rs-salon">Luxe Curls — Indiranagar</strong></div>
+              <div class="row"><span>Service</span><strong id="rs-svc">Haircut &amp; Style</strong></div>
+              <div class="row"><span>Specialist</span><strong id="rs-spec">Priya S.</strong></div>
+              <div class="row"><span>Was</span><strong class="rs-was" id="rs-was">Tomorrow, 27 Aug · 11:30 AM</strong></div>
+              <div class="row"><span>New time</span><strong class="rs-new" id="rs-new">Wed, 14 Oct · 2:00 PM</strong></div>
+            </div>
+            <p class="rs-note" id="rs-note">No extra charge — your payment carries over to the new time.</p>
+            <div class="rs-actions">
+              <a class="btn btn--primary" id="rs-view" href="booking-detail.html?id=GT-48291">View booking</a>
+              <a class="btn btn--ghost" href="home.html">Back to home</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer" id="footer">
+        <div class="footer__actions">
+          <button type="button" class="btn btn--ghost" id="btn-prev">Back</button>
+          <div class="footer__meta" id="footer-hint" hidden>
+            <strong id="footer-hint-title">Select a time</strong>
+            <span id="footer-hint-sub">Required for every service</span>
+          </div>
+          <button type="button" class="btn btn--primary" id="btn-next">Continue</button>
+        </div>
+      </div>
+
+      <div class="sheet sheet--coupons" id="coupon-sheet" aria-hidden="true">
+        <div class="sheet__panel" role="dialog" aria-labelledby="coupon-sheet-title">
+          <div class="sheet__handle"></div>
+          <h2 class="sheet__title" id="coupon-sheet-title">Coupons</h2>
+          <p class="sheet__sub">Salon offers stay on. Coupons stack on top. Read the terms before you apply.</p>
+          <div class="coupon-entry">
+            <input id="coupon-input" type="text" placeholder="Enter coupon code" autocomplete="off" />
+            <button type="button" id="coupon-apply-code">Apply</button>
+          </div>
+          <p class="coupon-err" id="coupon-err" hidden>This coupon isn’t valid on this booking.</p>
+          <div class="coupon-list" id="coupon-list"></div>
+        </div>
+      </div>
+
+      <div class="sheet" id="pay-sheet" aria-hidden="true">
+        <div class="sheet__panel" role="dialog" aria-labelledby="pay-title">
+          <div class="sheet__handle"></div>
+          <h2 class="sheet__title" id="pay-title">Payment method</h2>
+          <p class="sheet__sub">Pay <strong id="pay-amount">₹719</strong> securely to confirm</p>
+          <button type="button" class="pay-method is-active" data-method="Razorpay">
+            <span class="pay-method__icon rzp">Razorpay</span>
+            <span>
+              <div class="pay-method__name">Razorpay</div>
+              <div class="pay-method__meta">UPI · Cards · Netbanking</div>
+            </span>
+          </button>
+          <button type="button" class="pay-method" data-method="Wallet">
+            <span class="pay-method__icon wallet">₹</span>
+            <span>
+              <div class="pay-method__name">GlowTap wallet</div>
+              <div class="pay-method__meta">Balance <span id="wallet-bal">₹500</span></div>
+            </span>
+          </button>
+          <div class="sheet__actions">
+            <button type="button" class="btn btn--ghost" id="pay-cancel">Cancel</button>
+            <button type="button" class="btn btn--primary" id="pay-confirm">Pay now</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet" id="cal-sheet" aria-hidden="true">
+        <div class="sheet__panel" role="dialog" aria-labelledby="cal-title">
+          <div class="sheet__handle"></div>
+          <h2 class="sheet__title" id="cal-title">Pick a date</h2>
+          <p class="sheet__sub">Book up to 30 days ahead</p>
+          <div class="cal-nav">
+            <button type="button" id="cal-prev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m15 6-6 6 6 6"/></svg></button>
+            <strong id="cal-month">October 2026</strong>
+            <button type="button" id="cal-next" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 6 6 6-6 6"/></svg></button>
+          </div>
+          <div class="cal-week"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <p class="cal-legend"><span><i style="background:var(--grad);"></i>Selected</span><span><i style="background:#fff;border:1.5px solid rgba(139,0,232,.35);"></i>Today</span><span><i style="background:#F8D7D7;"></i>Fully booked</span></p>
+          <div class="sheet__actions">
+            <button type="button" class="btn btn--ghost" id="cal-cancel">Cancel</button>
+            <button type="button" class="btn btn--primary" id="cal-done">Show slots</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/billing.js"></script>
+  <script src="assets/catalog.js"></script>
+  <script src="assets/cart.js"></script>
+  <script src="assets/fav-specs.js"></script>
+  <script>
+    (function () {
+      var step = 0;
+      var max = 3;
+      var busy = false;
+      var labels = ['Service', 'Date & time', 'Specialist', 'Review'];
+      var state = {
+        items: [],
+        svc: '',
+        price: 0,
+        off: 0,
+        offLabel: '',
+        couponId: '',
+        dur: '',
+        spec: '',
+        dayIdx: 0,
+        date: 'Today',
+        time: '',
+        method: 'Razorpay',
+        svcKey: '',
+        focusKey: '',
+        plan: {},
+        salonKey: 'luxe',
+        salonName: 'Luxe Curls — Indiranagar'
+      };
+      // When booking starts from a specialist (profile / favorites / stylist Book), skip the Specialist step.
+      var lockedSpec = false;
+      var favSpec = null;
+
+      var C = window.GTCatalog;
+      var salonCatalog = C.SALONS;
+      var SLOT_GROUPS = C.SLOT_GROUPS;
+      var DAYS = C.DAYS;
+      var dayDate = C.dayDate;
+      var dayLabel = C.dayLabel;
+      var rupees = C.rupees;
+
+      function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+      }
+
+      var params = new URLSearchParams(location.search);
+      var resched = params.get('reschedule');
+      var salonKey = params.get('salon') || 'luxe';
+      if (!salonCatalog[salonKey]) salonKey = 'luxe';
+      var salon = salonCatalog[salonKey];
+      state.salonKey = salonKey;
+      state.salonName = salon.name;
+
+      document.getElementById('salon-label').textContent = salon.short;
+      document.getElementById('spec-note').innerHTML = salon.note;
+
+      function slotStatus(spec, day, time) {
+        return C.slotStatus(salonKey, spec, day, time);
+      }
+
+      function focusKey() {
+        return state.focusKey || (state.items[0] && state.items[0].key) || '';
+      }
+
+      function specsForService(key) {
+        return C.specsFor(salonKey, key || focusKey());
+      }
+
+      function freeSpecs(day, time, key) {
+        if (lockedSpec && favSpec) {
+          return slotStatus(favSpec.name, day, time) !== 'Full' ? [favSpec] : [];
+        }
+        return specsForService(key).filter(function (s) { return slotStatus(s.name, day, time) !== 'Full'; });
+      }
+
+      // Open if a named specialist is free, or (new booking) any specialist for the focused service.
+      function slotOpen(day, time, spec, key) {
+        key = key || focusKey();
+        if (lockedSpec && favSpec) return slotStatus(favSpec.name, day, time) !== 'Full';
+        if (spec) return slotStatus(spec, day, time) !== 'Full';
+        return resched ? slotStatus(state.spec, day, time) !== 'Full' : freeSpecs(day, time, key).length > 0;
+      }
+
+      function firstOpen(day, spec, key) {
+        key = key || focusKey();
+        for (var g = 0; g < SLOT_GROUPS.length; g++) {
+          var times = SLOT_GROUPS[g][1];
+          for (var t = 0; t < times.length; t++) {
+            if (slotOpen(day, times[t], spec, key)) return times[t];
+          }
+        }
+        return '';
+      }
+
+      function nextFree(spec, key) {
+        key = key || focusKey();
+        for (var d = 0; d < DAYS; d++) {
+          var t = firstOpen(d, spec, key);
+          if (t) return { day: d, time: t };
+        }
+        return { day: 0, time: '' };
+      }
+
+      function saveFocus() {
+        var key = focusKey();
+        if (!key) return;
+        state.plan[key] = {
+          dayIdx: state.dayIdx,
+          date: state.date,
+          time: state.time,
+          spec: state.spec
+        };
+        syncCart();
+      }
+
+      function clearTimePick(day) {
+        state.dayIdx = day == null ? (state.dayIdx || 0) : day;
+        state.date = dayLabel(state.dayIdx);
+        state.time = '';
+        if (!resched && !lockedSpec) state.spec = '';
+      }
+
+      function loadFocus(key) {
+        state.focusKey = key;
+        var p = state.plan[key];
+        if (p) {
+          state.dayIdx = p.dayIdx;
+          state.date = p.date;
+          state.time = p.time || '';
+          state.spec = p.spec || '';
+        } else {
+          clearTimePick(0);
+        }
+      }
+
+      function ensureSpec(key) {
+        if (resched) return;
+        if (lockedSpec && favSpec) {
+          state.spec = favSpec.name;
+          return;
+        }
+        if (!state.time) {
+          state.spec = '';
+          return;
+        }
+        key = key || focusKey();
+        var free = freeSpecs(state.dayIdx, state.time, key).map(function (s) { return s.name; });
+        if (free.indexOf(state.spec) !== -1) return;
+        var prefer = '';
+        if (favSpec && free.indexOf(favSpec.name) !== -1) prefer = favSpec.name;
+        state.spec = prefer && free.indexOf(prefer) !== -1 ? prefer : (free[0] || '');
+      }
+
+      function skipSpec() {
+        return !forceSpec && lockedSpec;
+      }
+
+      function nextStep(from) {
+        var n = from + 1;
+        if (skipSpec() && n === 2) n = 3;
+        return n;
+      }
+
+      function prevStep(from) {
+        var p = from - 1;
+        if (skipSpec() && p === 2) p = 1;
+        return p;
+      }
+
+      var forceSpec = false;
+
+      function preferredSpec(key) {
+        if (lockedSpec && favSpec) return favSpec;
+        var eligible = specsForService(key);
+        return eligible.filter(function (s) {
+          return (window.GTFavSpecs && GTFavSpecs.has(salonKey, s.name)) || s.liked;
+        })[0] || eligible[0] || null;
+      }
+
+      function paintSlotHint() {
+        var wrap = document.getElementById('footer-hint');
+        var title = document.getElementById('footer-hint-title');
+        var sub = document.getElementById('footer-hint-sub');
+        var foot = document.getElementById('footer');
+        if (!wrap || !title || !sub || !foot) return;
+        var onTime = typeof step !== 'undefined' && step === 1;
+        var onSpec = typeof step !== 'undefined' && step === 2 && !lockedSpec;
+        if ((!onTime && !onSpec) || resched) {
+          wrap.hidden = true;
+          foot.classList.remove('has-hint');
+          wrap.classList.remove('is-ready');
+          return;
+        }
+        var n = state.items.length;
+        wrap.hidden = false;
+        foot.classList.add('has-hint');
+
+        if (onSpec) {
+          var specDone = state.items.filter(function (s) {
+            var p = state.plan[s.key];
+            return p && p.spec;
+          }).length;
+          var specReady = n > 0 && specDone >= n;
+          wrap.classList.toggle('is-ready', specReady);
+          if (!n) {
+            title.textContent = 'No services';
+            sub.textContent = 'Go back and add a service';
+            return;
+          }
+          if (n === 1) {
+            title.textContent = specReady ? 'Stylist selected' : 'Select a stylist';
+            sub.textContent = specReady ? 'Continue to review & pay' : 'Required to proceed further';
+            return;
+          }
+          if (specReady) {
+            title.textContent = 'All ' + n + ' stylists set';
+            sub.textContent = 'Continue to review & pay';
+            return;
+          }
+          title.textContent = specDone + ' of ' + n + ' stylists set';
+          sub.textContent = 'Select a stylist for all services';
+          return;
+        }
+
+        var done = state.items.filter(function (s) {
+          var p = state.plan[s.key];
+          return p && p.time;
+        }).length;
+        var ready = n > 0 && done >= n;
+        wrap.classList.toggle('is-ready', ready);
+        if (!n) {
+          title.textContent = 'Add a service';
+          sub.textContent = 'Then pick a time to continue';
+          return;
+        }
+        if (n === 1) {
+          title.textContent = ready ? 'Time selected' : 'Select a time';
+          sub.textContent = ready ? 'Continue to specialists' : 'Required to proceed further';
+          return;
+        }
+        if (ready) {
+          title.textContent = 'All ' + n + ' times set';
+          sub.textContent = 'Continue to choose specialists';
+          return;
+        }
+        title.textContent = done + ' of ' + n + ' times set';
+        sub.textContent = 'Select a time for all services';
+      }
+
+      function bookableServices() {
+        if (!lockedSpec || !favSpec) return salon.services;
+        return salon.services.filter(function (s) {
+          return !favSpec.for || favSpec.for.indexOf(s.key) !== -1;
+        });
+      }
+
+      function planReady(field) {
+        return state.items.every(function (s) {
+          var p = state.plan[s.key];
+          return p && p[field];
+        });
+      }
+
+      function multiSvc() {
+        return !resched && state.items.length > 1;
+      }
+
+      function fullDay(i) {
+        var d = dayDate(i);
+        var name = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+        return name + ', ' + d.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+      }
+
+      function selectEarliest(key) {
+        key = key || focusKey();
+        var prefer = '';
+        if (favSpec && !resched && specsForService(key).some(function (s) { return s.name === favSpec.name; })) prefer = favSpec.name;
+        var n = nextFree(prefer, key);
+        if (!n.time) n = nextFree('', key);
+        state.dayIdx = n.day;
+        state.date = dayLabel(n.day);
+        state.time = n.time;
+      }
+
+      function paintSvcTabs(wrapId, rowId, mode) {
+        var wrap = document.getElementById(wrapId);
+        var row = document.getElementById(rowId);
+        var hint = wrap.querySelector('.svc-tabs__hint');
+        // Always show selected service name(s) on slot/specialist steps — including a single remaining service.
+        if (!state.items.length) {
+          wrap.hidden = true;
+          row.innerHTML = '';
+          return;
+        }
+        wrap.hidden = false;
+        if (hint) {
+          hint.textContent = state.items.length > 1
+            ? (mode === 'time'
+              ? 'Tap a service to set its time'
+              : 'Tap a service to pick its specialist')
+            : (mode === 'time'
+              ? 'Booking · ' + state.items[0].name
+              : 'Specialist for · ' + state.items[0].name);
+        }
+        var focus = focusKey();
+        row.innerHTML = state.items.map(function (s) {
+          var p = state.plan[s.key] || {};
+          var done = mode === 'time' ? !!p.time : !!p.spec;
+          var meta = mode === 'time'
+            ? (p.time ? p.date + ' · ' + p.time : 'Pick a time')
+            : (p.spec ? p.spec : 'Pick a specialist');
+          var clearLabel = 'Remove ' + s.name + ' from this booking';
+          return (
+            '<div class="svc-tab' + (s.key === focus ? ' is-on' : '') + '" data-key="' + esc(s.key) + '">' +
+              '<button type="button" class="svc-tab__main" role="tab" aria-selected="' + (s.key === focus) + '">' +
+                '<span class="svc-tab__name"><span class="svc-tab__label">' + esc(s.name) + '</span>' +
+                  (done ? '<span class="svc-tab__tick" aria-hidden="true">✓</span>' : '') +
+                '</span>' +
+                '<span class="svc-tab__meta">' + esc(meta) + '</span>' +
+              '</button>' +
+              '<button type="button" class="svc-tab__clear" data-clear="' + esc(s.key) + '" aria-label="' + esc(clearLabel) + '">×</button>' +
+            '</div>'
+          );
+        }).join('');
+        row.querySelectorAll('.svc-tab__main').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            switchFocus(btn.closest('.svc-tab').getAttribute('data-key'));
+          });
+        });
+        row.querySelectorAll('.svc-tab__clear').forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            removeServiceFromBooking(btn.getAttribute('data-clear'));
+          });
+        });
+        var on = row.querySelector('.svc-tab.is-on');
+        if (on) {
+          var left = on.offsetLeft - 12;
+          if (left < row.scrollLeft || on.offsetLeft + on.offsetWidth > row.scrollLeft + row.clientWidth) {
+            row.scrollLeft = Math.max(0, left);
+          }
+        }
+      }
+
+      // × removes only that service — others stay. Add it again from Select services if needed.
+      function removeServiceFromBooking(key) {
+        if (!key) return;
+        var nextKeys = state.items.map(function (s) { return s.key; }).filter(function (k) { return k !== key; });
+        if (focusKey() !== key) saveFocus();
+        delete state.plan[key];
+        if (!nextKeys.length) {
+          firstStep = 0;
+          fixedService = false;
+          state.focusKey = '';
+          setServices([]);
+          syncCart();
+          renderServices([]);
+          showStep(0);
+          syncSummary();
+          return;
+        }
+        // Keep the other service(s) and their saved times; focus the first remaining.
+        state.focusKey = nextKeys[0];
+        setServices(nextKeys);
+        if (state.plan[nextKeys[0]]) loadFocus(nextKeys[0]);
+        else clearTimePick(0);
+        var wrap = document.getElementById('service-cards');
+        if (wrap && wrap.children.length) {
+          wrap.querySelectorAll('.card').forEach(function (card) {
+            var on = nextKeys.indexOf(card.getAttribute('data-key')) !== -1;
+            card.classList.toggle('is-active', on);
+            card.setAttribute('aria-pressed', String(on));
+          });
+        } else {
+          renderServices(nextKeys);
+        }
+        renderDates();
+        renderSlots();
+        renderSpecs();
+        paintSvcTabsAll();
+        syncSummary();
+      }
+
+      function switchFocus(key) {
+        if (!key || key === focusKey()) return;
+        saveFocus();
+        loadFocus(key);
+        renderDates();
+        renderSlots();
+        renderSpecs();
+        paintSvcTabsAll();
+        syncSummary();
+      }
+
+      function paintSvcTabsAll() {
+        paintSvcTabs('slot-svc-tabs', 'slot-svc-row', 'time');
+        paintSvcTabs('spec-svc-tabs', 'spec-svc-row', 'spec');
+      }
+
+      var CHECK = '<span class="card__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>';
+
+      function renderServices(chosen) {
+        var wrap = document.getElementById('service-cards');
+        var list = bookableServices();
+        var allowed = list.map(function (s) { return s.key; });
+        chosen = (chosen || []).filter(function (k) { return allowed.indexOf(k) !== -1; });
+        if (!chosen.length && list[0]) chosen = [list[0].key];
+        wrap.innerHTML = list.map(function (svc) {
+          var on = chosen.indexOf(svc.key) !== -1;
+          return (
+            '<button type="button" class="card' + (on ? ' is-active' : '') + '" data-key="' + esc(svc.key) + '" aria-pressed="' + on + '">' +
+              '<div class="card__row">' + CHECK + '<div style="flex:1;min-width:0;">' +
+                '<div class="card__title">' + esc(svc.name) + '</div>' +
+                '<div class="card__meta">' + esc(svc.dur) + '</div>' +
+                '<div class="card__desc">' + esc(svc.desc) + '</div>' +
+              '</div><div class="card__cost">' +
+                (svc.off ? '<s>' + rupees(svc.price) + '</s>' : '') +
+                '<span class="card__price">' + rupees(svc.price - svc.off) + '</span>' +
+                (svc.off ? '<span class="card__off">' + esc(svc.offTag) + '</span>' : '') +
+              '</div></div>' +
+            '</button>'
+          );
+        }).join('');
+        setServices(chosen);
+        wrap.querySelectorAll('.card').forEach(function (card) {
+          card.addEventListener('click', function () {
+            var on = !card.classList.contains('is-active');
+            card.classList.toggle('is-active', on);
+            card.setAttribute('aria-pressed', String(on));
+            setServices([].map.call(wrap.querySelectorAll('.card.is-active'), function (c) { return c.getAttribute('data-key'); }));
+            syncSummary();
+          });
+        });
+      }
+
+      function setServices(keys) {
+        state.items = bookableServices().filter(function (s) { return keys.indexOf(s.key) !== -1; });
+        var t = C.totals(state.items);
+        state.svcKey = state.items.map(function (s) { return s.key; }).join(',');
+        state.svc = state.items.map(function (s) { return s.name; }).join(' + ');
+        state.price = t.price;
+        state.dur = t.dur;
+        refreshCoupon();
+        var keep = {};
+        state.items.forEach(function (s) {
+          keep[s.key] = state.plan[s.key] || null;
+        });
+        state.plan = {};
+        state.items.forEach(function (s) {
+          if (keep[s.key]) state.plan[s.key] = keep[s.key];
+        });
+        if (!state.focusKey || keys.indexOf(state.focusKey) === -1) {
+          state.focusKey = keys[0] || '';
+        }
+        if (state.focusKey && !state.plan[state.focusKey]) {
+          clearTimePick(0);
+        } else if (state.focusKey) {
+          loadFocus(state.focusKey);
+        }
+        syncCart();
+        paintSvcTabsAll();
+      }
+
+      // Keep services in cart, but never stash a picked slot — cart always resumes at Pick time.
+      function syncCart() {
+        if (resched) return;
+        var keys = state.items.map(function (s) { return s.key; });
+        window.GTCart.sync(salonKey, keys, null);
+        window.GTCart.clearSlot();
+      }
+
+      function busyText(spec, key) {
+        var n = nextFree(spec, key);
+        if (!n.time) return 'Busy at ' + state.time + ' · fully booked this week';
+        return 'Busy at ' + state.time + ' · next free ' + dayLabel(n.day) + ', ' + n.time;
+      }
+
+      function renderSpecs() {
+        var wrap = document.getElementById('spec-list');
+        var key = focusKey();
+        var svc = state.items.filter(function (s) { return s.key === key; })[0];
+        document.getElementById('spec-intro').textContent = state.time
+          ? (svc && multiSvc() ? svc.name + ' · free on ' : 'Free on ') + state.date + ' at ' + state.time
+          : 'Pick a time first';
+        paintSvcTabs('spec-svc-tabs', 'spec-svc-row', 'spec');
+        var list = specsForService(key).map(function (s) {
+          return { s: s, free: !!state.time && slotStatus(s.name, state.dayIdx, state.time) !== 'Full' };
+        }).sort(function (a, b) { return Number(b.free) - Number(a.free); });
+        wrap.innerHTML = list.length ? list.map(function (row) {
+          var s = row.s;
+          var favOn = window.GTFavSpecs && GTFavSpecs.has(salonKey, s.name);
+          return (
+            '<div class="spec' + (row.free && s.name === state.spec ? ' is-active' : '') + (row.free ? '' : ' is-busy') +
+              '" role="button" tabindex="' + (row.free ? '0' : '-1') + '" data-spec="' + esc(s.name) + '" aria-disabled="' + (row.free ? 'false' : 'true') + '">' +
+              '<button type="button" class="spec__fav' + (favOn ? ' is-on' : '') + '" data-spec="' + esc(s.name) + '" aria-pressed="' + (favOn ? 'true' : 'false') + '" aria-label="' + (favOn ? 'Remove from favourites' : 'Add to favourites') + '">' +
+              (window.GTFavSpecs ? GTFavSpecs.HEART : '♥') + '</button>' +
+              '<span class="spec__av"><img src="' + esc(s.photo) + '" alt="" /></span>' +
+              '<span class="spec__body"><div class="spec__name">' + esc(s.name) + '</div>' +
+              '<div class="spec__meta">' + esc(s.role) + ' · <span class="rate is-high">★ ' + esc(s.rate) + '</span></div>' +
+              '<div class="spec__about">' + esc(s.about) + '</div>' +
+              '<div class="spec__next">' + esc(row.free ? 'Free at ' + state.time : busyText(s.name, key)) + '</div></span>' +
+              (s.liked ? '<span class="spec__liked">' + esc(s.liked) + '</span>' : '') +
+            '</div>'
+          );
+        }).join('') : '<p class="slots-empty">No specialists offer this service.</p>';
+        wrap.querySelectorAll('.spec__fav').forEach(function (favBtn) {
+          favBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!window.GTFavSpecs) return;
+            var name = favBtn.getAttribute('data-spec');
+            var on = GTFavSpecs.toggle(salonKey, name);
+            favBtn.classList.toggle('is-on', on);
+            favBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            favBtn.setAttribute('aria-label', on ? 'Remove from favourites' : 'Add to favourites');
+          });
+        });
+        wrap.querySelectorAll('.spec:not(.is-busy)').forEach(function (el) {
+          function pick() {
+            wrap.querySelectorAll('.spec').forEach(function (x) { x.classList.remove('is-active'); });
+            el.classList.add('is-active');
+            state.spec = el.getAttribute('data-spec');
+            saveFocus();
+            paintSvcTabsAll();
+            paintSlotHint();
+            syncSummary();
+          }
+          el.addEventListener('click', function (e) {
+            if (e.target.closest('.spec__fav')) return;
+            pick();
+          });
+          el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+          });
+        });
+      }
+
+      function pickTime(time) {
+        state.time = time;
+        ensureSpec();
+        saveFocus();
+        renderSpecs();
+        paintSvcTabsAll();
+        paintSlotHint();
+        syncSummary();
+      }
+
+      var MAX_DAYS = 30;
+      var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      var CAL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>';
+
+      function selectDay(i) {
+        state.dayIdx = i;
+        state.date = dayLabel(i);
+        state.time = '';
+        if (!resched && !lockedSpec) state.spec = '';
+        var key = focusKey();
+        if (key) {
+          state.plan[key] = { dayIdx: i, date: state.date, time: '', spec: state.spec || '' };
+          syncCart();
+        }
+        renderDates();
+        renderSlots();
+        paintSvcTabsAll();
+        paintSlotHint();
+        syncSummary();
+      }
+
+      function renderDates() {
+        var wrap = document.getElementById('dates');
+        wrap.innerHTML = '';
+        var cal = document.createElement('button');
+        cal.type = 'button';
+        cal.className = 'date date--cal';
+        cal.id = 'cal-open';
+        cal.setAttribute('aria-label', 'Open calendar — book up to ' + MAX_DAYS + ' days ahead');
+        cal.innerHTML = CAL_ICON + '<small>Calendar</small>';
+        cal.addEventListener('click', openCal);
+        wrap.appendChild(cal);
+        var days = [];
+        for (var i = 0; i < DAYS; i++) days.push(i);
+        if (state.dayIdx >= DAYS) days.push(state.dayIdx);
+        days.forEach(function (i) {
+          var d = dayDate(i);
+          var short = i === 0 ? 'Today' : (i === 1 ? 'Tmr' : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]);
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'date' + (i === state.dayIdx ? ' is-active' : '') + (firstOpen(i, resched ? state.spec : '', focusKey()) ? '' : ' is-full');
+          btn.innerHTML = '<small>' + short + '</small><strong>' + d.getDate() + '</strong>';
+          btn.setAttribute('data-idx', String(i));
+          btn.addEventListener('click', function () { selectDay(i); });
+          wrap.appendChild(btn);
+        });
+        var on = wrap.querySelector('.date.is-active');
+        if (on) {
+          var over = on.getBoundingClientRect().right - wrap.getBoundingClientRect().right;
+          if (over > 0) wrap.scrollLeft += over;
+        }
+      }
+
+      /* ---------- Calendar sheet ---------- */
+      var calSheet = document.getElementById('cal-sheet');
+      var calMonth, calPick;
+
+      function dayIndex(date) {
+        var t = new Date(); t.setHours(0, 0, 0, 0);
+        var d = new Date(date); d.setHours(0, 0, 0, 0);
+        return Math.round((d - t) / 864e5);
+      }
+
+      function renderCal() {
+        var first = new Date(calMonth.getFullYear(), calMonth.getMonth(), 1);
+        var last = dayDate(MAX_DAYS - 1);
+        document.getElementById('cal-month').textContent = MONTHS[first.getMonth()] + ' ' + first.getFullYear();
+        document.getElementById('cal-prev').disabled = dayIndex(first) <= 0;
+        document.getElementById('cal-next').disabled = first.getFullYear() * 12 + first.getMonth() >= last.getFullYear() * 12 + last.getMonth();
+        var html = '';
+        for (var b = 0; b < first.getDay(); b++) html += '<span></span>';
+        var inMonth = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+        for (var n = 1; n <= inMonth; n++) {
+          var idx = dayIndex(new Date(first.getFullYear(), first.getMonth(), n));
+          var out = idx < 0 || idx >= MAX_DAYS;
+          var full = !out && !firstOpen(idx, resched ? state.spec : '', focusKey());
+          html += '<button type="button" class="cal-day' + (idx === 0 ? ' is-today' : '') + (idx === calPick ? ' is-on' : '') + (full ? ' is-full' : '') + '"' +
+            ' data-idx="' + idx + '"' + (out || full ? ' disabled' : '') +
+            ' aria-label="' + (out ? 'Not bookable' : full ? 'Fully booked' : 'Available') + ', ' + n + ' ' + MONTHS[first.getMonth()] + '">' + n + '</button>';
+        }
+        var grid = document.getElementById('cal-grid');
+        grid.innerHTML = html;
+        grid.querySelectorAll('.cal-day:not(:disabled)').forEach(function (b) {
+          b.addEventListener('click', function () { calPick = Number(b.getAttribute('data-idx')); renderCal(); });
+        });
+        document.getElementById('cal-done').textContent = 'Show slots · ' + fullDay(calPick);
+      }
+
+      function openCal() {
+        calPick = state.dayIdx;
+        var d = dayDate(state.dayIdx);
+        calMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+        renderCal();
+        calSheet.classList.add('is-open');
+        calSheet.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeCal() {
+        calSheet.classList.remove('is-open');
+        calSheet.setAttribute('aria-hidden', 'true');
+      }
+
+      document.getElementById('cal-prev').addEventListener('click', function () {
+        calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1); renderCal();
+      });
+      document.getElementById('cal-next').addEventListener('click', function () {
+        calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); renderCal();
+      });
+      document.getElementById('cal-cancel').addEventListener('click', closeCal);
+      document.getElementById('cal-done').addEventListener('click', function () { closeCal(); selectDay(calPick); });
+      calSheet.addEventListener('click', function (e) { if (e.target === calSheet) closeCal(); });
+
+      function renderSlots() {
+        var wrap = document.getElementById('slots');
+        var key = focusKey();
+        var svc = state.items.filter(function (s) { return s.key === key; })[0];
+        var open = 0;
+        var html = SLOT_GROUPS.map(function (g) {
+          return '<div class="slot-group"><p class="slot-group__label">' + g[0] + '</p><div class="slots">' +
+            g[1].map(function (t) {
+              if (!slotOpen(state.dayIdx, t, resched ? state.spec : '', key)) {
+                return '<button type="button" class="slot is-full" disabled data-time="' + t + '">' + t + '<small>Full</small></button>';
+              }
+              open++;
+              return '<button type="button" class="slot' + (t === state.time ? ' is-active' : '') + '" data-time="' + t + '">' + t + '</button>';
+            }).join('') +
+          '</div></div>';
+        }).join('');
+        wrap.innerHTML = open ? html : '<p class="slots-empty">' +
+          (resched ? esc(state.spec) + ' is fully booked' : 'No specialists for this service are free') +
+          ' on ' + esc(state.date) + ' — try another day.</p>';
+        document.getElementById('slot-sub').textContent = resched
+          ? state.spec.split(' ')[0] + '’s slots · ' + state.date
+          : (svc && multiSvc() ? svc.name + ' · ' : 'Slots · ') + state.date;
+        document.getElementById('slot-count').textContent = open + ' open';
+        paintSvcTabs('slot-svc-tabs', 'slot-svc-row', 'time');
+        wrap.querySelectorAll('.slot:not(:disabled)').forEach(function (slot) {
+          slot.addEventListener('click', function () {
+            wrap.querySelectorAll('.slot').forEach(function (s) { s.classList.remove('is-active'); });
+            slot.classList.add('is-active');
+            pickTime(slot.getAttribute('data-time'));
+          });
+        });
+      }
+
+      var specParam = params.get('spec');
+      favSpec = salon.specs.filter(function (s) { return s.name === specParam; })[0] || null;
+      lockedSpec = !!favSpec && !resched;
+      state.spec = favSpec ? favSpec.name : (resched ? salon.specs[0].name : '');
+
+      var fromCart = params.get('cart') === '1';
+      var rsFrom = params.get('from') || '';
+      var chosen = (params.get('service') || '').split(',').filter(function (k) {
+        return salon.services.some(function (s) { return s.key === k; });
+      });
+      if (resched && !chosen.length) {
+        var byName = salon.services.filter(function (s) { return s.name === params.get('svc'); })[0];
+        if (byName) chosen = [byName.key];
+      }
+      var fixedService = chosen.length > 0;
+      var firstStep = resched || fixedService ? 1 : 0;
+
+      renderServices(fixedService ? chosen : (bookableServices()[0] ? [bookableServices()[0].key] : []));
+
+      var dayParam = Number(params.get('day'));
+      if (!Number.isInteger(dayParam) || params.get('day') === null) {
+        dayParam = params.get('date') === 'Today' ? 0 : (params.get('date') === 'Tomorrow' ? 1 : -1);
+      }
+      var timeParam = params.get('time');
+      // Only honour an explicit time from the URL — never auto-assign the earliest slot.
+      if (dayParam >= 0 && dayParam < MAX_DAYS) {
+        state.dayIdx = dayParam;
+        state.date = dayLabel(dayParam);
+        if (timeParam && slotOpen(dayParam, timeParam, resched ? state.spec : '', focusKey())) {
+          state.time = timeParam;
+          ensureSpec();
+          saveFocus();
+        } else {
+          state.time = '';
+          if (!resched && !lockedSpec) state.spec = '';
+        }
+      } else {
+        clearTimePick(0);
+      }
+      loadFocus(state.items[0] ? state.items[0].key : focusKey());
+      if (!(state.plan[focusKey()] && state.plan[focusKey()].time)) clearTimePick(state.dayIdx || 0);
+      renderSpecs();
+      renderDates();
+      renderSlots();
+      paintSvcTabsAll();
+      paintSlotHint();
+
+      if (favSpec) {
+        var withSpec = document.getElementById('with-spec');
+        withSpec.innerHTML = '<img src="' + esc(favSpec.photo) + '" alt="" />' +
+          '<span>Booking with <strong>' + esc(favSpec.name) + '</strong> · ' + esc(favSpec.role) +
+          '<br />' + (lockedSpec ? 'Pick services, then a time — specialist is already set' : 'Pick your services to continue') + '</span>';
+        withSpec.hidden = false;
+      }
+
+      var stepEls = document.querySelectorAll('.step');
+      var stepBars = document.querySelectorAll('#steps span');
+      var stepLabel = document.getElementById('step-label');
+      var btnNext = document.getElementById('btn-next');
+      var btnPrev = document.getElementById('btn-prev');
+      var btnBack = document.getElementById('btn-back');
+      var footer = document.getElementById('footer');
+      var paySheet = document.getElementById('pay-sheet');
+      var payConfirm = document.getElementById('pay-confirm');
+      var walletBal = Number(localStorage.getItem('gt-wallet') || 500);
+      document.getElementById('wallet-bal').textContent = rupees(walletBal);
+
+      stepBars.forEach(function (bar, idx) {
+        bar.hidden = idx < firstStep || (skipSpec() && idx === 2);
+      });
+
+      function salonSave() {
+        return state.items.reduce(function (n, s) { return n + (s.off || 0); }, 0);
+      }
+      function total() {
+        return Math.max(0, state.price - salonSave() - (state.off || 0));
+      }
+
+      function availableCoupons() {
+        var price = state.price || 0;
+        var glow = Math.min(Math.round(price * 0.1), 150);
+        return [
+          {
+            id: 'glow10',
+            code: 'GLOW10',
+            title: '10% OFF up to ₹150',
+            save: price >= 499 ? glow : 0,
+            ok: price >= 499,
+            why: price >= 499 ? '' : 'Add services worth ₹' + (499 - price) + ' more',
+            terms: [
+              'Valid this week when you pay online.',
+              'Minimum booking value ₹499.',
+              'Maximum discount ₹150.',
+              'Stacks on top of salon offers.'
+            ]
+          },
+          {
+            id: 'save200',
+            code: 'SAVE200',
+            title: 'Flat ₹200 OFF',
+            save: price >= 999 ? 200 : 0,
+            ok: price >= 999,
+            why: price >= 999 ? '' : 'Add services worth ₹' + Math.max(0, 999 - price) + ' more',
+            terms: [
+              'Minimum booking value ₹999.',
+              'Valid on one booking per customer.',
+              'Not valid on wallet top-up.',
+              'Stacks on top of salon offers. One coupon per booking.'
+            ]
+          }
+        ];
+      }
+
+      function refreshCoupon() {
+        var c = availableCoupons().filter(function (x) { return x.id === state.couponId; })[0];
+        if (!c || !c.ok) {
+          state.couponId = '';
+          state.off = 0;
+          state.offLabel = '';
+          return;
+        }
+        state.off = c.save;
+        state.offLabel = 'Coupon · ' + c.code;
+      }
+
+      function renderCoupons() {
+        var box = document.getElementById('coupon-list');
+        box.innerHTML = availableCoupons().map(function (c) {
+          var on = state.couponId === c.id;
+          return '<article class="cp' + (c.ok ? '' : ' is-off') + (on ? ' is-on' : '') + '">' +
+            '<div class="cp__top"><div><strong class="cp__title">' + esc(c.title) + '</strong>' +
+            '<span class="cp__code">' + esc(c.code) + '</span></div>' +
+            (c.ok
+              ? '<button type="button" class="cp__apply" data-apply="' + esc(c.id) + '">' + (on ? 'Applied' : 'Apply') + '</button>'
+              : '<span class="cp__na">Not applicable</span>') +
+            '</div><p class="cp__save">' + (c.ok ? 'You save ' + rupees(c.save) + ' on this booking' : esc(c.why)) + '</p>' +
+            '<button type="button" class="cp__terms" aria-expanded="false">Terms &amp; conditions <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></button>' +
+            '<ul class="cp__fine" hidden>' + c.terms.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></article>';
+        }).join('');
+        box.querySelectorAll('.cp__apply').forEach(function (btn) {
+          btn.addEventListener('click', function () { applyCoupon(btn.getAttribute('data-apply')); });
+        });
+        box.querySelectorAll('.cp__terms').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var fine = btn.nextElementSibling;
+            var open = fine.hidden;
+            fine.hidden = !open;
+            btn.classList.toggle('is-open', open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          });
+        });
+      }
+
+      function openCoupons() {
+        document.getElementById('coupon-err').hidden = true;
+        document.getElementById('coupon-input').value = '';
+        renderCoupons();
+        var sheet = document.getElementById('coupon-sheet');
+        sheet.classList.add('is-open');
+        sheet.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeCoupons() {
+        var sheet = document.getElementById('coupon-sheet');
+        sheet.classList.remove('is-open');
+        sheet.setAttribute('aria-hidden', 'true');
+      }
+
+      function applyCoupon(id) {
+        var c = availableCoupons().filter(function (x) { return x.id === id; })[0];
+        if (!c || !c.ok) return;
+        state.couponId = c.id;
+        refreshCoupon();
+        closeCoupons();
+        syncSummary();
+      }
+
+      function applyTypedCode() {
+        var code = document.getElementById('coupon-input').value.trim().toUpperCase();
+        var err = document.getElementById('coupon-err');
+        var c = availableCoupons().filter(function (x) { return x.code === code; })[0];
+        if (!code || !c) {
+          err.textContent = 'This coupon code isn’t valid.';
+          err.hidden = false;
+          return;
+        }
+        if (!c.ok) {
+          err.textContent = c.why || 'This coupon isn’t valid on this booking.';
+          err.hidden = false;
+          return;
+        }
+        err.hidden = true;
+        applyCoupon(c.id);
+      }
+
+      function setMethod(method) {
+        state.method = method;
+        document.querySelectorAll('.pay-method').forEach(function (m) {
+          m.classList.toggle('is-active', m.getAttribute('data-method') === method);
+        });
+        payConfirm.textContent = method === 'Wallet' ? 'Pay ' + rupees(total()) + ' from wallet' : 'Pay ' + rupees(total());
+      }
+
+      function syncSummary() {
+        saveFocus();
+        var n = state.items.length;
+        document.getElementById('sum-items').innerHTML = state.items.map(function (s) {
+          var p = state.plan[s.key] || {};
+          var title = esc(s.name) + (p.spec ? ' · ' + esc(p.spec) : '');
+          var metaParts = [s.dur];
+          if (p.time) { metaParts.push(p.date); metaParts.push(p.time); }
+          if (s.off) metaParts.push(s.offTag || (rupees(s.off) + ' OFF'));
+          var pay = s.price - (s.off || 0);
+          var priceHtml = s.off
+            ? '<s>' + rupees(s.price) + '</s>' + rupees(pay)
+            : rupees(s.price);
+          return '<div class="sum-line">'
+            + '<div class="sum-line__copy"><span class="sum-line__title">' + title + '</span>'
+            + '<span class="sum-line__meta">' + esc(metaParts.join(' · ')) + '</span></div>'
+            + '<div class="sum-line__price">' + priceHtml + '</div></div>';
+        }).join('');
+        document.getElementById('sum-dur').textContent = state.dur;
+        document.getElementById('price-label').textContent = n > 1 ? 'Subtotal' : 'Price';
+        document.getElementById('sum-price').textContent = rupees(state.price);
+        var salonAmt = salonSave();
+        document.getElementById('offer-row').hidden = !salonAmt;
+        document.getElementById('sum-offer').textContent = '−' + rupees(salonAmt);
+        document.getElementById('coupon-row').hidden = !state.off;
+        document.getElementById('coupon-label').textContent = state.offLabel || 'Coupon';
+        document.getElementById('sum-coupon').textContent = '−' + rupees(state.off || 0);
+        var couponBar = document.getElementById('coupon-bar');
+        var ready = availableCoupons().filter(function (c) { return c.ok; }).length;
+        couponBar.classList.toggle('is-on', !!state.couponId);
+        document.getElementById('coupon-title').textContent = state.couponId
+          ? state.offLabel.replace('Coupon · ', '') + ' applied'
+          : 'Apply coupon';
+        document.getElementById('coupon-sub').textContent = state.couponId
+          ? 'Extra ' + rupees(state.off) + ' off on top of salon offers'
+          : (ready ? ready + ' coupon' + (ready > 1 ? 's' : '') + ' for this booking' : 'View coupons and terms');
+        document.getElementById('coupon-remove').hidden = !state.couponId;
+        document.getElementById('sum-total').textContent = rupees(total());
+        document.getElementById('pay-amount').textContent = rupees(total());
+        var svcTotal = document.getElementById('svc-total');
+        svcTotal.hidden = !n;
+        svcTotal.innerHTML = '<span>' + n + ' service' + (n > 1 ? 's' : '') + ' · ' + esc(state.dur) + '</span><span>' + rupees(total()) + '</span>';
+        var picked = document.getElementById('picked');
+        picked.hidden = !fixedService || !!resched;
+        picked.innerHTML = '<strong>' + esc(state.svc) + '</strong><span>' + esc(state.dur) + ' · ' + rupees(total()) + '</span>';
+        if (step === max) btnNext.textContent = 'Pay ' + rupees(total());
+        if (resched && step === 1) btnNext.textContent = 'Confirm new time';
+        paintSlotHint();
+        var needTime = multiSvc() ? !planReady('time') : !state.time;
+        var needSpec = lockedSpec ? false : (multiSvc() ? !planReady('spec') : !state.spec);
+        btnNext.disabled = busy || (step === 0 && !n) || (step === 1 && needTime) || (step === 2 && needSpec);
+        paintSvcTabsAll();
+      }
+
+      function showStep(i) {
+        if (skipSpec() && i === 2) i = 3;
+        step = i;
+        stepEls.forEach(function (el) {
+          el.classList.toggle('is-active', Number(el.getAttribute('data-step')) === step);
+        });
+        stepBars.forEach(function (bar, idx) {
+          bar.classList.toggle('is-on', idx <= step && !(skipSpec() && idx === 2));
+          bar.hidden = idx < firstStep || (skipSpec() && idx === 2);
+        });
+        if (resched) {
+          stepLabel.textContent = state.svc + ' · ' + state.spec;
+        } else {
+          var order = (skipSpec() ? [0, 1, 3] : [0, 1, 2, 3]).filter(function (x) { return x >= firstStep; });
+          var pos = Math.max(1, order.indexOf(step) + 1);
+          stepLabel.textContent = 'Step ' + pos + ' of ' + order.length + ' · ' + labels[step];
+        }
+        document.getElementById('slot-intro').textContent = lockedSpec
+          ? (multiSvc()
+            ? 'Select a time for every service with ' + favSpec.name + ' to proceed further.'
+            : 'Pick a date and time for ' + favSpec.name + ' to proceed further.')
+          : (multiSvc()
+            ? 'Select a time for all services to proceed further. Use the tabs to switch between them.'
+            : 'Select a date and time for your service to proceed further.');
+        var review = step === max;
+        btnPrev.hidden = review;
+        btnPrev.style.visibility = (step === firstStep || review) ? 'hidden' : 'visible';
+        btnNext.textContent = 'Continue';
+        footer.classList.toggle('single', step === firstStep || review);
+        footer.classList.toggle('has-hint', false);
+        if (step === 1) { renderDates(); renderSlots(); }
+        if (step === 2) renderSpecs();
+        paintSlotHint();
+        syncSummary();
+      }
+
+      function primaryPlan() {
+        saveFocus();
+        var first = state.items[0] && state.plan[state.items[0].key];
+        return first || { dayIdx: state.dayIdx, date: state.date, time: state.time, spec: state.spec };
+      }
+
+      function retryUrl() {
+        var p = primaryPlan();
+        return 'book.html?' + new URLSearchParams({
+          salon: salonKey, service: state.svcKey, spec: p.spec,
+          day: String(p.dayIdx), time: p.time, step: '3', cart: fromCart ? '1' : ''
+        }).toString().replace(/&cart=$/, '');
+      }
+
+      function pay() {
+        if (busy) return;
+        busy = true;
+        payConfirm.disabled = true;
+        payConfirm.textContent = 'Processing…';
+        var ok = state.method === 'Razorpay';
+        var p = primaryPlan();
+        var specs = state.items.map(function (s) { return (state.plan[s.key] || {}).spec; }).filter(Boolean);
+        var whens = state.items.map(function (s) {
+          var x = state.plan[s.key] || {};
+          return x.time ? x.date + ' · ' + x.time : '';
+        }).filter(Boolean);
+        var q = new URLSearchParams({
+          status: ok ? 'success' : 'failed',
+          svc: state.svc,
+          when: whens.length > 1 && new Set(whens).size > 1 ? whens.join(' · ') : (p.date + ' · ' + p.time),
+          spec: specs.length > 1 && new Set(specs).size > 1 ? specs.join(' · ') : p.spec,
+          salon: state.salonName,
+          salonKey: salonKey,
+          method: state.method === 'Wallet' ? 'GlowTap wallet' : 'Razorpay',
+          total: String(total()),
+          retry: retryUrl()
+        });
+        if (ok) window.GTCart.clear();
+        setTimeout(function () { location.href = 'booking-confirm.html?' + q.toString(); }, 700);
+      }
+
+      function openPaySheet() {
+        setMethod(state.method);
+        paySheet.classList.add('is-open');
+        paySheet.setAttribute('aria-hidden', 'false');
+      }
+
+      function closePaySheet() {
+        paySheet.classList.remove('is-open');
+        paySheet.setAttribute('aria-hidden', 'true');
+      }
+
+      function leave() {
+        if (resched) { location.href = 'booking-detail.html?id=' + encodeURIComponent(resched); return; }
+        // Leaving mid-flow always drops the held slot so cart resumes at Pick time.
+        if (fromCart && window.GTCart) window.GTCart.clearSlot();
+        if (fromCart) { location.href = 'cart.html'; return; }
+        history.length > 1 ? history.back() : (location.href = 'salon-detail.html?id=' + encodeURIComponent(salonKey));
+      }
+
+      function showRescheduled() {
+        var newWhen = fullDay(state.dayIdx) + ' · ' + state.time;
+        var amt = params.get('amt') || rupees(total());
+        document.getElementById('rs-salon').textContent = state.salonName;
+        document.getElementById('rs-svc').textContent = state.svc;
+        document.getElementById('rs-spec').textContent = state.spec;
+        document.getElementById('rs-was').textContent = rsFrom;
+        document.getElementById('rs-new').textContent = newWhen;
+        document.getElementById('rs-note').textContent = params.get('pay') === 'Pay at salon'
+          ? 'No extra charge — you’ll still pay ' + amt + ' at the salon.'
+          : 'No extra charge — your payment of ' + amt + ' carries over to the new time.';
+        document.getElementById('rs-view').href = 'booking-detail.html?' + new URLSearchParams({
+          id: resched, rescheduled: '1', date: fullDay(state.dayIdx), time: state.time, from: rsFrom
+        }).toString();
+        step = 4;
+        stepEls.forEach(function (el) { el.classList.toggle('is-active', el.getAttribute('data-step') === '4'); });
+        stepLabel.textContent = 'Done';
+        footer.hidden = true;
+      }
+
+      document.querySelectorAll('.pay-method').forEach(function (method) {
+        method.addEventListener('click', function () {
+          setMethod(method.getAttribute('data-method'));
+        });
+      });
+
+      btnNext.addEventListener('click', function () {
+        if (busy) return;
+        if (resched) { if (state.time) showRescheduled(); return; }
+        if (step < max) showStep(nextStep(step));
+        else openPaySheet();
+      });
+
+      btnPrev.addEventListener('click', function () {
+        if (busy) return;
+        closePaySheet();
+        if (step > firstStep) showStep(prevStep(step));
+      });
+
+      function paintBilling() {
+        var a = GTBilling.selected();
+        state.billing = a;
+        document.getElementById('bill-tag').textContent = a.label;
+        document.getElementById('bill-lines').innerHTML = GTBilling.lines(a).map(function (l) {
+          return '<div>' + esc(l) + '</div>';
+        }).join('');
+      }
+      try { paintBilling(); } catch (err) { /* billing sheet is optional in this prototype */ }
+      document.getElementById('bill-change').addEventListener('click', function () {
+        GTBilling.open({ onChange: paintBilling, sub: 'Choose the address for this booking’s invoice' });
+      });
+
+      btnBack.addEventListener('click', function () {
+        if (busy) return;
+        if (GTBilling.isOpen()) {
+          GTBilling.close();
+          return;
+        }
+        if (paySheet.classList.contains('is-open')) {
+          closePaySheet();
+          return;
+        }
+        if (document.getElementById('coupon-sheet').classList.contains('is-open')) {
+          closeCoupons();
+          return;
+        }
+        if (calSheet.classList.contains('is-open')) {
+          closeCal();
+          return;
+        }
+        if (resched && step === 4) { location.href = document.getElementById('rs-view').href; return; }
+        if (step > firstStep) showStep(prevStep(step));
+        else leave();
+      });
+
+      document.getElementById('coupon-open').addEventListener('click', openCoupons);
+      document.getElementById('coupon-remove').addEventListener('click', function () {
+        state.couponId = '';
+        refreshCoupon();
+        syncSummary();
+      });
+      document.getElementById('coupon-apply-code').addEventListener('click', applyTypedCode);
+      document.getElementById('coupon-input').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') applyTypedCode();
+      });
+      document.getElementById('coupon-sheet').addEventListener('click', function (e) {
+        if (e.target.id === 'coupon-sheet') closeCoupons();
+      });
+
+      document.getElementById('pay-cancel').addEventListener('click', function () {
+        if (!busy) closePaySheet();
+      });
+      payConfirm.addEventListener('click', pay);
+      paySheet.addEventListener('click', function (e) {
+        if (e.target === paySheet && !busy) closePaySheet();
+      });
+
+      var startStep = Number(params.get('step'));
+      if (!Number.isFinite(startStep) || startStep < 0 || startStep > max) startStep = 0;
+      if (startStep >= 2 && !state.spec) startStep = 1;
+      if (lockedSpec && startStep === 2) startStep = fixedService ? 1 : 0;
+      if (startStep < firstStep) startStep = firstStep;
+
+      if (resched) {
+        startStep = 1;
+        document.getElementById('nav-title').textContent = 'Reschedule';
+        document.getElementById('steps').hidden = true;
+        document.getElementById('slot-title').textContent = 'Pick a new date & time';
+        document.getElementById('slot-intro').textContent = 'Same service and specialist — only the time changes.';
+        document.getElementById('rs-current').hidden = false;
+        document.getElementById('rs-from').textContent = rsFrom;
+        document.getElementById('rs-what').textContent = state.svc + ' · ' + state.spec;
+      }
+
+      showStep(startStep);
+      if (resched && params.get('done') === '1') showRescheduled();
+      if (!resched && params.get('pay') === '1' && startStep === max) openPaySheet();
+    })();
+  </script>
+  <script src="assets/rating.js"></script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

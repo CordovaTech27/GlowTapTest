@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Discount offers</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: #ffffff; }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 4px 14px 10px; background: #fff; flex-shrink: 0; }
+    .back { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; color: var(--ink); text-decoration: none; background: #fff; }
+    .back svg { width: 18px; height: 18px; }
+    .nav__meta { min-width: 0; flex: 1; }
+    .nav h1 { margin: 0; font-family: Outfit, sans-serif; font-size: 1.15rem; font-weight: 700; }
+    .nav p { margin: 1px 0 0; font-size: .72rem; color: var(--muted); font-weight: 600; }
+    .body { flex: 1; overflow-y: auto; padding: 14px 16px 110px; scrollbar-width: none; }
+    .body::-webkit-scrollbar { display: none; }
+    .offer {
+      position: relative;
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid rgba(139, 0, 232, 0.1);
+      box-shadow: 0 6px 16px rgba(36, 24, 40, 0.05);
+      margin-bottom: 10px;
+    }
+    .offer::before,
+    .offer::after {
+      content: "";
+      position: absolute;
+      left: 90px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--surface);
+      z-index: 1;
+    }
+    .offer::before { top: -6px; }
+    .offer::after { bottom: -6px; }
+    .offer__cut {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 12px 8px;
+      color: #fff;
+      background: var(--grad);
+    }
+    .offer__cut strong {
+      font-family: Outfit, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+    .offer__cut span {
+      margin-top: 2px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+    .offer__body { padding: 12px 12px 12px 16px; min-width: 0; }
+    .offer__salon { display: block; font-size: 0.9rem; font-weight: 700; letter-spacing: -0.02em; }
+    .offer__line { display: block; margin-top: 2px; font-size: 0.72rem; font-weight: 600; color: var(--muted); }
+    .offer__code {
+      display: inline-flex;
+      margin-top: 8px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      border: 1px dashed #C9A6E8;
+      background: #FBF7FF;
+      color: var(--violet);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="nav">
+          <a class="back" href="home.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+          <div class="nav__meta">
+            <p class="eyebrow">Offers</p>
+            <h1>Discount offers</h1>
+            <p>8 live offers · apply at checkout</p>
+          </div>
+        </div>
+        <div class="body">
+          <a class="offer" href="salon-detail.html?id=aura">
+            <div class="offer__cut"><strong>30%</strong><span>OFF</span></div>
+            <div class="offer__body">
+              <span class="offer__salon">Aura Spa Retreat</span>
+              <span class="offer__line">Massage &amp; therapy · till Sunday</span>
+              <span class="offer__code">AURA30</span>
+            </div>
+          </a>
+          <a class="offer" href="salon-detail.html?id=bandra-glow">
+            <div class="offer__cut"><strong>20%</strong><span>OFF</span></div>
+            <div class="offer__body">
+              <span class="offer__salon">Luxe Curls — Indiranagar</span>
+              <span class="offer__line">Haircut &amp; color · min ₹499</span>
+              <span class="offer__code">LUXE20</span>
+            </div>
+          </a>
+          <a class="offer" href="salon-detail.html?id=bloom">
+            <div class="offer__cut"><strong>₹200</strong><span>OFF</span></div>
+            <div class="offer__body">
+              <span class="offer__salon">Bloom &amp; Brow</span>
+              <span class="offer__line">Facial &amp; makeup · min ₹549</span>
+              <span class="offer__code">BLOOM200</span>
+            </div>
+          </a>
+          <a class="offer" href="salon-detail.html?id=nord">
+            <div class="offer__cut"><strong>15%</strong><span>OFF</span></div>
+            <div class="offer__body">
+              <span class="offer__salon">Velvet Color Bar</span>
+              <span class="offer__line">Color &amp; balayage · min ₹1,299</span>
+              <span class="offer__code">VELVET15</span>
+            </div>
+          </a>
+          <a class="offer" href="salon-detail.html?promo=pay">
+            <div class="offer__cut"><strong>10%</strong><span>OFF</span></div>
+            <div class="offer__body">
+              <span class="offer__salon">Pay online &amp; save</span>
+              <span class="offer__line">All salons · this week</span>
+              <span class="offer__code">GLOW10</span>
+            </div>
+          </a>
+          <a class="offer" href="salon-detail.html?promo=peak">
+            <div class="offer__cut"><strong>₹299</strong><span>FROM</span></div>
+            <div class="offer__body">
+              <span class="offer__salon">Off-peak slots</span>
+              <span class="offer__line">Weekday mornings · selected salons</span>
+              <span class="offer__code">PEAK299</span>
+            </div>
+          </a>
+          <a class="offer" href="salon-detail.html?id=nord">
+            <div class="offer__cut"><strong>₹150</strong><span>OFF</span></div>
+            <div class="offer__body">
+              <span class="offer__salon">Nord Hair Lab</span>
+              <span class="offer__line">Men’s haircut &amp; beard · weekdays</span>
+              <span class="offer__code">NORD150</span>
+            </div>
+          </a>
+          <a class="offer" href="salon-detail.html?id=bloom">
+            <div class="offer__cut"><strong>10%</strong><span>OFF</span></div>
+            <div class="offer__body">
+              <span class="offer__salon">Tip &amp; Toe Nails</span>
+              <span class="offer__line">First gel set · new guests</span>
+              <span class="offer__code">TIP10</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

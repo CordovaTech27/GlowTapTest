@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Bookings</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Outfit:wght@500;600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828;
+      --muted: #7A6E78;
+      --line: #EDE4EC;
+      --violet: #8B00E8;
+      --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA;
+      --phone-w: 390px;
+      --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #ffffff;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
+      min-height: 100dvh;
+      padding: 24px 16px;
+      overflow: auto;
+    }
+    .studio {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: #ffffff;
+    }
+    .stage {
+      position: relative;
+      z-index: 1;
+      width: var(--phone-w);
+      height: var(--phone-h);
+      flex-shrink: 0;
+      animation: in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: none; }
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 42px;
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .island {
+      position: absolute;
+      top: 11px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 32px;
+      background: #050308;
+      border-radius: 20px;
+      z-index: 40;
+      pointer-events: none;
+    }
+    .status {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      z-index: 35;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 28px 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink);
+      pointer-events: none;
+    }
+    .status__right { display: flex; align-items: center; gap: 6px; }
+    .status__right svg { display: block; width: 16px; height: 11px; }
+    .status__right .status-battery { width: 25px; height: 12px; }
+
+    .screen {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding-top: 52px;
+      position: relative;
+    }
+    .screen::before {
+      content: ""; position: absolute; left: -18%; right: -18%; top: -36px; height: 200px;
+      pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(139,0,232,.12), transparent 70%),
+        radial-gradient(ellipse 45% 55% at 90% 35%, rgba(255,3,200,.08), transparent 70%);
+    }
+
+    .top {
+      position: relative; z-index: 1;
+      flex-shrink: 0;
+      padding: 6px 16px 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92) 65%, rgba(255,255,255,0));
+    }
+    .top__row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .top__title {
+      margin: 0;
+      font-family: Outfit, sans-serif;
+      font-size: 1.28rem;
+      font-weight: 750;
+      letter-spacing: -0.03em;
+    }
+    .top__sub {
+      margin: 3px 0 0;
+      font-size: 0.74rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .seg {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(139,0,232,.06);
+      border: 1.5px solid rgba(139,0,232,.08);
+      border-radius: 16px;
+    }
+    .seg__btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      border-radius: 12px;
+      padding: 9px 8px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 750;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .seg__btn.is-active {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 4px 14px rgba(91,33,182,.08);
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      background: #fff;
+      border: 1.5px solid rgba(139,0,232,.12);
+      border-radius: 16px;
+      padding: 11px 12px 11px 14px;
+    }
+    .search:focus-within {
+      border-color: rgba(139,0,232,.4);
+      box-shadow: 0 0 0 3px rgba(139,0,232,.1);
+    }
+    .search svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
+    .search input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 550;
+      color: var(--ink);
+      min-width: 0;
+    }
+    .search input::placeholder { color: #94A3B8; }
+
+    .body {
+      position: relative; z-index: 1;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px 16px calc(var(--footer-above-dock, 80px) + 24px);
+      scrollbar-width: none;
+    }
+    .body::-webkit-scrollbar { display: none; }
+
+    .panel { display: none; }
+    .panel.is-active { display: block; animation: bookIn .28s ease; }
+    @keyframes bookIn {
+      from { opacity: .45; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 750;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 2px 0 12px;
+    }
+
+    .booking {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      border-radius: 20px;
+      border: 1.5px solid rgba(139, 0, 232, 0.12);
+      padding: 14px 14px 12px;
+      margin-bottom: 12px;
+      transition: transform 0.12s, border-color .15s, box-shadow .15s;
+    }
+    .booking:active { transform: scale(0.985); }
+    .booking__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 99px;
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+      white-space: nowrap;
+    }
+    .badge--booked { background: #F3EEFF; color: #5B21B6; }
+    .badge--confirmed { background: #ECFDF5; color: #047857; }
+    .badge--progress { background: #FFF7ED; color: #C2410C; }
+    .badge--completed { background: #EEF2FF; color: #4338CA; }
+    .badge--cancelled { background: #FEF2F2; color: #B91C1C; }
+    .badge--requested { background: #FFFBEB; color: #B45309; }
+    .pay-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 99px;
+      font-size: 0.66rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .pay-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .pay-pill--paid { background: #ECFDF5; color: #047857; }
+    .pay-pill--due { background: #FFFBEB; color: #B45309; }
+    .pay-pill--refunding { background: #F3EEFF; color: #6D28D9; }
+    .pay-pill--salon { background: #EEF2FF; color: #4338CA; }
+    .pay-pill--refunded { background: #ECFEFF; color: #0E7490; }
+    .booking__status { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
+
+    .booking__main {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 14px;
+    }
+    a.booking__main:active { opacity: .92; }
+    .booking__thumb {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #eee;
+      box-shadow: 0 0 0 1.5px rgba(139,0,232,.08);
+    }
+    .booking__thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .booking__info { min-width: 0; flex: 1; }
+    .booking__salon {
+      margin: 0 0 2px;
+      font-family: Outfit, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+    .booking__salon-name {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .booking__chev {
+      flex-shrink: 0;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 1.05rem;
+      line-height: 1;
+      margin-top: -1px;
+    }
+    .booking__service {
+      margin: 0 0 6px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 550;
+      line-height: 1.35;
+    }
+    .booking__stylist {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: -2px 0 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .booking__stylist .fav-tag {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #BE185D;
+      background: #FCE7F3;
+      padding: 2px 7px;
+      border-radius: 99px;
+    }
+    .booking__when {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .booking__when svg { width: 14px; height: 14px; color: var(--violet); flex-shrink: 0; }
+
+    .booking__foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1.5px dashed rgba(139,0,232,.14);
+    }
+    .booking__pay {
+      font-size: 0.72rem;
+      font-weight: 650;
+      color: var(--muted);
+    }
+    .booking__pay strong { color: var(--ink); font-weight: 700; }
+    .booking__amt {
+      font-family: Outfit, sans-serif;
+      font-weight: 750;
+      font-size: 1rem;
+      letter-spacing: -.02em;
+    }
+    .booking__actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .booking__again {
+      display: grid;
+      place-items: center;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 13px;
+      background: var(--grad);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 8px 18px rgba(139, 0, 232, 0.28);
+    }
+    .booking__again:active { transform: scale(0.98); }
+    .booking__actions--upcoming { grid-template-columns: 1fr 1.15fr; }
+    .booking__cancel {
+      display: grid;
+      place-items: center;
+      height: 42px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(185,28,28,.22);
+      background: #FFF7F7;
+      color: #B91C1C;
+      font-size: 0.8rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+    .booking__details {
+      display: grid;
+      place-items: center;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 13px;
+      border: none;
+      background: var(--grad);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(139, 0, 232, 0.28);
+    }
+    .booking__rate {
+      display: grid;
+      place-items: center;
+      height: 42px;
+      padding: 0 12px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(139,0,232,.18);
+      background: #FAF7FD;
+      color: var(--violet);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 750;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .booking__actions--with-rate {
+      grid-template-columns: 1.15fr 1fr;
+    }
+    .booking__actions--again-only {
+      grid-template-columns: 1fr;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+      background: #fff;
+      border-radius: 20px;
+      border: 1.5px dashed rgba(139,0,232,.22);
+    }
+    .empty h3 {
+      margin: 0 0 6px;
+      font-family: Outfit, sans-serif;
+      color: var(--ink);
+      font-size: 1.05rem;
+      font-weight: 750;
+    }
+    .empty p { margin: 0 0 16px; font-size: 0.85rem; font-weight: 550; }
+    .empty a {
+      display: inline-flex;
+      padding: 11px 18px;
+      border-radius: 13px;
+      background: var(--grad);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-decoration: none;
+      box-shadow: 0 8px 18px rgba(139,0,232,.28);
+    }
+
+    .dock { display: none; }
+    .home-ind { display: none; }
+
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status, .home-ind { display: none; }
+      .stage { width: 100%; height: 100dvh; animation: none; }
+      .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+      .body { padding-bottom: calc(var(--footer-above-dock, 80px) + 24px); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/app-shell.css" />
+  <link rel="stylesheet" href="assets/layout.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone" role="application" aria-label="GlowTap — Bookings">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true">
+        <span>9:41</span>
+        <span class="status__right">
+          <svg viewBox="0 0 17 12"><rect x="0" y="8" width="3" height="4" rx="0.6" fill="currentColor"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="0.6" fill="currentColor"/><rect x="9" y="3" width="3" height="9" rx="0.6" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="0.6" fill="currentColor" opacity="0.35"/></svg>
+          <svg viewBox="0 0 16 12"><path fill="currentColor" d="M8 9.6a1.35 1.35 0 1 1 0 2.7 1.35 1.35 0 0 1 0-2.7Zm0-3.55c1.5 0 2.88.55 3.95 1.47l-1.2 1.2A3.9 3.9 0 0 0 8 7.85c-.95 0-1.82.34-2.5.9L4.3 7.55A5.55 5.55 0 0 1 8 6.05Zm0-3.5c2.45 0 4.68.9 6.42 2.4L13.2 6.15A7.35 7.35 0 0 0 8 4.35c-2.1 0-4.02.78-5.5 2.06L1.3 5.2A9.55 9.55 0 0 1 8 2.55Z"/></svg>
+          <svg class="status-battery" viewBox="0 0 28 13"><rect x="0.75" y="0.75" width="23.5" height="11.5" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"/><rect x="2.4" y="2.5" width="18" height="8" rx="1.2" fill="currentColor"/><path fill="currentColor" opacity="0.9" d="M25.2 4.2h1.4c.7 0 1.2.5 1.2 1.15v2.3c0 .65-.5 1.15-1.2 1.15h-1.4V4.2Z"/></svg>
+        </span>
+      </div>
+
+      <div class="screen">
+        <header class="top">
+          <div class="top__row">
+            <div>
+              <h1 class="top__title">My bookings</h1>
+              <p class="top__sub">Manage upcoming and past appointments</p>
+            </div>
+          </div>
+          <div class="seg" role="tablist" aria-label="Booking views">
+            <button type="button" class="seg__btn is-active" data-panel="upcoming" role="tab" aria-selected="true">Upcoming</button>
+            <button type="button" class="seg__btn" data-panel="past" role="tab" aria-selected="false">Past</button>
+            <button type="button" class="seg__btn" data-panel="all" role="tab" aria-selected="false">All</button>
+          </div>
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" id="booking-search" placeholder="Search salon or service…" aria-label="Search bookings" />
+          </div>
+        </header>
+
+        <div class="body">
+          <div class="panel is-active" id="panel-upcoming" data-view="upcoming">
+            <div class="section-label">Upcoming bookings</div>
+
+            <article class="booking" data-q="luxe curls multi services rahul kavya signature cut beard fade haircut">
+              <div class="booking__top">
+                <span class="badge badge--confirmed">Confirmed</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-mens.jpg" alt="" style="object-position:40% 55%;" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Luxe Curls — Indiranagar</h3>
+                  <p class="booking__service">4 services</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    Today · from 10:00 AM · 2 hr 35 min
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="pay-pill pay-pill--paid">Paid online</span>
+                <span class="booking__amt">₹2,466</span>
+              </div>
+              <div class="booking__actions booking__actions--upcoming">
+                <a class="booking__cancel" href="booking-detail.html?id=GT-48401&amp;cancel=1">Cancel booking</a>
+                <a class="booking__details" href="booking-detail.html?id=GT-48401">Details</a>
+              </div>
+            </article>
+
+            <article class="booking" data-q="luxe curls haircut confirmed">
+              <div class="booking__top">
+                <span class="badge badge--confirmed">Confirmed</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-interior.jpg" alt="" style="object-position:50% 30%;" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Luxe Curls — Indiranagar</h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    Tomorrow · 11:30 AM
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="pay-pill pay-pill--paid">Paid online</span>
+                <span class="booking__amt">₹899</span>
+              </div>
+              <div class="booking__actions booking__actions--upcoming">
+                <a class="booking__cancel" href="booking-detail.html?id=GT-48291&amp;cancel=1">Cancel booking</a>
+                <a class="booking__details" href="booking-detail.html?id=GT-48291">Details</a>
+              </div>
+            </article>
+
+            <article class="booking" data-q="bloom facial confirmed">
+              <div class="booking__top">
+                <span class="badge badge--confirmed">Confirmed</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-facial.jpg" alt="" style="object-position:50% 35%;" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Bloom &amp; Brow</h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    Sat, 29 Aug · 4:00 PM
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="pay-pill pay-pill--paid">Paid online</span>
+                <span class="booking__amt">₹1,299</span>
+              </div>
+              <div class="booking__actions booking__actions--upcoming">
+                <a class="booking__cancel" href="booking-detail.html?id=GT-48302&amp;cancel=1">Cancel booking</a>
+                <a class="booking__details" href="booking-detail.html?id=GT-48302">Details</a>
+              </div>
+            </article>
+
+            <article class="booking" data-q="nord haircut booked">
+              <div class="booking__top">
+                <span class="badge badge--booked">Booked</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-mens.jpg" alt="" style="object-position:40% 55%;" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Nord Hair Lab</h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    Mon, 1 Sep · 6:30 PM
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="pay-pill pay-pill--due">Pay at salon</span>
+                <span class="booking__amt">₹699</span>
+              </div>
+              <div class="booking__actions booking__actions--upcoming">
+                <a class="booking__cancel" href="booking-detail.html?id=GT-48310&amp;cancel=1">Cancel booking</a>
+                <a class="booking__details" href="booking-detail.html?id=GT-48310">Details</a>
+              </div>
+            </article>
+
+            <article class="booking" data-q="aura spa massage confirmed">
+              <div class="booking__top">
+                <span class="badge badge--confirmed">Confirmed</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-spa.jpg" alt="" style="object-position:10% 20%;" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Aura Spa Retreat</h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    Wed, 3 Sep · 10:00 AM
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="pay-pill pay-pill--paid">Paid online</span>
+                <span class="booking__amt">₹1,899</span>
+              </div>
+              <div class="booking__actions booking__actions--upcoming">
+                <a class="booking__cancel" href="booking-detail.html?id=GT-48322&amp;cancel=1">Cancel booking</a>
+                <a class="booking__details" href="booking-detail.html?id=GT-48322">Details</a>
+              </div>
+            </article>
+          </div>
+
+          <div class="panel" id="panel-past" data-view="past">
+            <article class="booking" data-q="luxe curls completed priya rate blow dry" data-detail="booking-detail.html?id=GT-48110">
+              <div class="booking__top">
+                <span class="badge badge--completed">Completed</span>
+              </div>
+              <a class="booking__main" href="booking-detail.html?id=GT-48110" aria-label="Open booking details">
+                <div class="booking__thumb"><img src="assets/photos/salon-color.jpg" alt="" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon"><span class="booking__salon-name">Luxe Curls — Indiranagar</span><span class="booking__chev" aria-hidden="true">›</span></h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    12 Aug · 2:00 PM
+                  </div>
+                </div>
+              </a>
+              <div class="booking__foot">
+                <span class="pay-pill pay-pill--paid">Paid online</span>
+                <span class="booking__amt">₹499</span>
+              </div>
+              <div class="booking__actions booking__actions--with-rate">
+                <a class="booking__again" href="cart.html" data-salon="luxe" data-services="blowdry">Book again</a>
+                <a class="booking__rate" href="rate.html?id=GT-48110&amp;stylist=Priya%20S.&amp;svc=Blow%20Dry">Rate &amp; review</a>
+              </div>
+            </article>
+
+            <article class="booking" data-q="luxe curls rated priya favourite haircut" data-detail="booking-detail.html?id=GT-48055&amp;rated=1">
+              <div class="booking__top">
+                <span class="badge badge--completed">Completed</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-interior.jpg" alt="" style="object-position:50% 30%;" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Luxe Curls — Indiranagar</h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    28 Jul · 11:30 AM
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="booking__status">
+                  <span class="pay-pill pay-pill--paid">Paid online</span>
+                  <span class="booking__pay" style="color:#059669;font-weight:700;">You rated Priya ★5</span>
+                </span>
+                <span class="booking__amt">₹899</span>
+              </div>
+              <div class="booking__actions booking__actions--again-only">
+                <a class="booking__again" href="cart.html" data-salon="luxe" data-services="haircut">Book again</a>
+              </div>
+            </article>
+
+            <article class="booking" data-q="nord rated arjun favourite signature cut" data-detail="booking-detail.html?id=GT-47940&amp;rated=1">
+              <div class="booking__top">
+                <span class="badge badge--completed">Completed</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-mens.jpg" alt="" style="object-position:40% 55%;" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Nord Hair Lab</h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    15 Jul · 6:00 PM
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="booking__status">
+                  <span class="pay-pill pay-pill--salon">Paid at salon</span>
+                  <span class="booking__pay" style="color:#059669;font-weight:700;">You rated Arjun ★4</span>
+                </span>
+                <span class="booking__amt">₹699</span>
+              </div>
+              <div class="booking__actions booking__actions--again-only">
+                <a class="booking__again" href="cart.html" data-salon="nord" data-services="haircut">Book again</a>
+              </div>
+            </article>
+
+            <article class="booking" data-q="aura spa cancelled meera swedish massage" data-detail="booking-detail.html?id=GT-48088">
+              <div class="booking__top">
+                <span class="badge badge--cancelled">Cancelled</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-spa.jpg" alt="" style="object-position:60% 40%;" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Aura Spa Retreat</h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    3 Aug · 11:00 AM
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="pay-pill pay-pill--refunded">Refunded</span>
+                <span class="booking__amt">₹1,899</span>
+              </div>
+              <div class="booking__actions booking__actions--again-only">
+                <a class="booking__again" href="cart.html" data-salon="aura" data-services="swedish">Book again</a>
+              </div>
+            </article>
+
+            <article class="booking" data-q="bloom brow cancelled refund ananya threading" data-detail="booking-detail.html?id=GT-48140">
+              <div class="booking__top">
+                <span class="badge badge--cancelled">Cancelled</span>
+              </div>
+              <div class="booking__main">
+                <div class="booking__thumb"><img src="assets/photos/salon-makeup.jpg" alt="" /></div>
+                <div class="booking__info">
+                  <h3 class="booking__salon">Bloom &amp; Brow</h3>
+                  <p class="booking__service">1 service</p>
+                  <div class="booking__when">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    20 Aug · 5:00 PM
+                  </div>
+                </div>
+              </div>
+              <div class="booking__foot">
+                <span class="pay-pill pay-pill--refunding">Refund in progress</span>
+                <span class="booking__amt">₹249</span>
+              </div>
+              <div class="booking__actions booking__actions--again-only">
+                <a class="booking__again" href="cart.html" data-salon="bloom" data-services="brow">Book again</a>
+              </div>
+            </article>
+          </div>
+
+          <div class="panel" id="panel-all" data-view="all">
+            <!-- filled by JS from upcoming + past clones -->
+          </div>
+        </div>
+      </div>
+
+      <div class="dock">
+        <nav class="tabbar" aria-label="Primary">
+          <a class="tab" href="home.html" title="Home" aria-label="Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"/></svg>
+          </a>
+          <a class="tab is-active" href="bookings.html" title="Bookings" aria-label="Bookings" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3.5h10a.5.5 0 0 1 .5.5v1.5H6.5V4a.5.5 0 0 1 .5-.5Zm-2 3h14A1.5 1.5 0 0 1 20.5 8v12A1.5 1.5 0 0 1 19 21.5H5A1.5 1.5 0 0 1 3.5 20V8A1.5 1.5 0 0 1 5 6.5ZM8 11h3v3H8v-3Zm5 0h3v3h-3v-3ZM8 16h3v3H8v-3Zm5 0h3v3h-3v-3Z"/></svg>
+          </a>
+          <a class="tab" href="notifications.html" title="Alerts" aria-label="Alerts">
+            <span class="dot" aria-hidden="true"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.5 9a5.5 5.5 0 0 1 11 0c0 6.5 2.5 6.5 2.5 8.5H4c0-2 2.5-2 2.5-8.5"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+          </a>
+          <a class="tab" href="profile.html" title="Profile" aria-label="Profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5a7 7 0 0 1 14 0"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <div class="home-ind" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <script src="assets/catalog.js"></script>
+  <script src="assets/cart.js"></script>
+  <script>
+    (function () {
+      document.addEventListener('click', function (e) {
+        var again = e.target.closest('.booking__again');
+        if (!again) return;
+        e.preventDefault();
+        var salon = again.getAttribute('data-salon');
+        var keys = (again.getAttribute('data-services') || '').split(',').map(function (k) {
+          return k.trim();
+        }).filter(Boolean);
+        if (window.GTCart && salon && keys.length) {
+          GTCart.sync(salon, keys);
+          GTCart.clearSlot();
+        }
+        location.href = 'cart.html';
+      });
+
+      var buttons = Array.prototype.slice.call(document.querySelectorAll('.seg__btn'));
+      var panels = {
+        upcoming: document.getElementById('panel-upcoming'),
+        past: document.getElementById('panel-past'),
+        all: document.getElementById('panel-all')
+      };
+      var allPanel = panels.all;
+
+      var cancels = {};
+      try { cancels = JSON.parse(localStorage.getItem('gt-cancels') || '{}') || {}; } catch (e) {}
+      panels.upcoming.querySelectorAll('.booking').forEach(function (card) {
+        var link = card.querySelector('.booking__details');
+        var bid = link && new URL(link.getAttribute('href'), location.href).searchParams.get('id');
+        var c = cancels[bid];
+        if (!c) return;
+        var badge = card.querySelector('.badge');
+        var requested = c.status === 'requested';
+        badge.className = 'badge badge--' + (requested ? 'requested' : 'cancelled');
+        badge.textContent = requested ? 'Cancellation initiated' : 'Cancelled';
+        var cancel = card.querySelector('.booking__cancel');
+        if (cancel) {
+          cancel.remove();
+          card.querySelector('.booking__actions').style.gridTemplateColumns = '1fr';
+        }
+        link.href = 'booking-detail.html?id=' + encodeURIComponent(bid) + '&cancelled=1' + (!requested && c.viaSalon ? '&approved=1' : '');
+      });
+
+      function wireBookingOpen(card) {
+        var details = card.querySelector('.booking__details');
+        var mainLink = card.querySelector('a.booking__main');
+        var href = (details && details.getAttribute('href'))
+          || card.getAttribute('data-detail')
+          || (mainLink && mainLink.getAttribute('href'));
+        if (!href) return;
+        var main = card.querySelector('.booking__main');
+        if (main && main.tagName !== 'A') {
+          var a = document.createElement('a');
+          a.className = main.className;
+          a.href = href;
+          a.setAttribute('aria-label', 'Open booking details');
+          while (main.firstChild) a.appendChild(main.firstChild);
+          main.parentNode.replaceChild(a, main);
+          main = a;
+        } else if (main) {
+          main.href = href;
+        }
+        var salon = card.querySelector('.booking__salon');
+        if (salon && !salon.querySelector('.booking__chev')) {
+          var name = salon.textContent.trim();
+          salon.textContent = '';
+          var span = document.createElement('span');
+          span.className = 'booking__salon-name';
+          span.textContent = name;
+          salon.appendChild(span);
+          var chev = document.createElement('span');
+          chev.className = 'booking__chev';
+          chev.setAttribute('aria-hidden', 'true');
+          chev.textContent = '›';
+          salon.appendChild(chev);
+        }
+      }
+      [panels.upcoming, panels.past].forEach(function (panel) {
+        panel.querySelectorAll('.booking').forEach(wireBookingOpen);
+      });
+
+      function buildAll() {
+        allPanel.innerHTML = '';
+        var label = document.createElement('div');
+        label.className = 'section-label';
+        label.textContent = 'All bookings';
+        allPanel.appendChild(label);
+
+        [panels.upcoming, panels.past].forEach(function (panel) {
+          panel.querySelectorAll('.booking').forEach(function (node) {
+            allPanel.appendChild(node.cloneNode(true));
+          });
+        });
+      }
+      buildAll();
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-panel');
+          buttons.forEach(function (b) {
+            b.classList.toggle('is-active', b === btn);
+            b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+          });
+          Object.keys(panels).forEach(function (key) {
+            panels[key].classList.toggle('is-active', key === id);
+          });
+        });
+      });
+
+      var search = document.getElementById('booking-search');
+      search.addEventListener('input', function () {
+        var q = (search.value || '').trim().toLowerCase();
+        document.querySelectorAll('.panel .booking').forEach(function (card) {
+          var hay = ((card.getAttribute('data-q') || '') + ' ' + card.textContent).toLowerCase();
+          card.style.display = !q || hay.indexOf(q) !== -1 ? '' : 'none';
+        });
+      });
+    })();
+
+  </script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

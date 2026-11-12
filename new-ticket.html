@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — New Ticket</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: #ffffff; }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 4px 14px 10px; background: #fff; }
+    .back { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; color: var(--ink); text-decoration: none; }
+    .back svg { width: 18px; height: 18px; }
+    .nav h1 { margin: 0; font-family: Outfit, sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .body { flex: 1; overflow-y: auto; padding: 12px 16px 28px; scrollbar-width: none; }
+    .body::-webkit-scrollbar { display: none; }
+    label { display: block; font-size: .72rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin: 0 0 6px; }
+    .field { margin-bottom: 14px; }
+    input, select, textarea {
+      width: 100%; border: 1.5px solid #E8E4EF; border-radius: 14px; padding: 12px 14px;
+      font-family: inherit; font-size: .9rem; font-weight: 500; background: #fff; color: var(--ink); outline: none;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: rgba(139,0,232,.4); box-shadow: 0 0 0 3px rgba(139,0,232,.08); }
+    .attach {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px;
+      border: 1.5px dashed #D6D0E0; background: #fff; color: var(--muted); font-size: .85rem; font-weight: 600;
+    }
+    .btn {
+      display: grid; place-items: center; height: 48px; border-radius: 14px; border: none; width: 100%;
+      background: var(--grad); color: #fff; font-family: inherit; font-weight: 700; font-size: .92rem;
+      cursor: pointer; box-shadow: 0 8px 20px rgba(139,0,232,.28); margin-top: 8px;
+    }
+    .btn:disabled { background: #D9D3E3; box-shadow: none; cursor: not-allowed; }
+    .picker {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
+      border: 1.5px solid #E8E4EF; border-radius: 14px; padding: 12px 14px; background: #fff; cursor: pointer;
+      font-family: inherit; font-size: .9rem; font-weight: 500; color: var(--ink); text-align: left;
+    }
+    .picker__value { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .picker__value.is-empty { color: #8A94A0; }
+    .picker svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
+    .is-missing { border-color: #F2A7A7 !important; box-shadow: 0 0 0 3px rgba(220,38,38,.08); }
+    .form-error { margin: 4px 2px 0; font-size: .78rem; font-weight: 600; color: #B91C1C; }
+    .form-error[hidden] { display: none; }
+
+    .sheet-backdrop {
+      position: absolute; inset: 0; z-index: 50; background: rgba(16,8,24,.38);
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      opacity: 0; pointer-events: none; transition: opacity .22s;
+    }
+    .sheet-backdrop.is-open { opacity: 1; pointer-events: auto; }
+    .sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 55; max-height: 88%; display: flex; flex-direction: column;
+      background: #fff; border-radius: 22px 22px 0 0; padding: 14px 16px 18px;
+      transform: translateY(110%); transition: transform .28s ease;
+    }
+    .sheet.is-open { transform: none; }
+    .sheet__handle { width: 40px; height: 4px; border-radius: 99px; background: #EDE4EC; margin: 0 auto 10px; flex-shrink: 0; }
+    .ps__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .ps__title { margin: 0; font-family: Outfit, sans-serif; font-size: 1.1rem; font-weight: 700; }
+    .ps__close { width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+    .ps__close svg { width: 16px; height: 16px; }
+    .ps__list { overflow-y: auto; scrollbar-width: none; }
+    .ps__list::-webkit-scrollbar { display: none; }
+    .ps__group { margin: 10px 2px 4px; font-size: .68rem; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .ps__opt {
+      display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; margin-bottom: 4px; border-radius: 12px;
+      border: 1.5px solid transparent; background: none; font-family: inherit; color: var(--ink); text-align: left; cursor: pointer;
+    }
+    .ps__opt.is-on { border-color: rgba(139,0,232,.35); background: #F8F3FF; }
+    .ps__thumb { width: 36px; height: 36px; border-radius: 9px; object-fit: cover; flex-shrink: 0; }
+    .ps__icon { width: 36px; height: 36px; border-radius: 9px; background: var(--surface); color: var(--muted); display: grid; place-items: center; flex-shrink: 0; }
+    .ps__icon svg { width: 17px; height: 17px; }
+    .ps__text { flex: 1; min-width: 0; }
+    .ps__name { display: block; font-size: .86rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ps__meta { display: block; font-size: .72rem; color: var(--muted); margin-top: 1px; }
+    .ps__tag { flex-shrink: 0; padding: 3px 8px; border-radius: 999px; background: #FEF3C7; color: #92400E; font-size: .64rem; font-weight: 700; }
+    .ps__check { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #D6D0E0; flex-shrink: 0; display: grid; place-items: center; }
+    .ps__opt.is-on .ps__check { background: var(--violet); border-color: var(--violet); color: #fff; }
+    .ps__check svg { width: 12px; height: 12px; opacity: 0; }
+    .ps__opt.is-on .ps__check svg { opacity: 1; }
+    .ps__opt.is-locked {
+      opacity: 0.4;
+      filter: grayscale(0.55);
+      cursor: not-allowed;
+    }
+    .ps__opt.is-locked .ps__tag { opacity: 1; filter: none; }
+    .pick {
+      display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 8px 10px; border-radius: 14px;
+      background: #fff; border: 1px solid rgba(139,0,232,.08);
+    }
+    .pick[hidden] { display: none; }
+    .pick__thumb { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+    .pick__info { min-width: 0; }
+    .pick__salon { margin: 0; font-size: .84rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pick__meta { margin: 1px 0 0; font-size: .74rem; color: var(--muted); }
+    .form-intro a { color: var(--violet); font-weight: 700; text-decoration: none; }
+    .form-intro { margin: 0 2px 14px; font-size: .78rem; color: var(--muted); line-height: 1.45; }
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="nav">
+          <a class="back" href="tickets.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+          <div class="nav__meta">
+            <p class="eyebrow">Support</p>
+            <h1>New ticket</h1>
+          </div>
+        </div>
+        <div class="body">
+          <p class="form-intro">Tell us what went wrong and we’ll look into it. You can follow replies in My tickets. Need help faster? <a href="contact.html">Call or chat with us</a>.</p>
+          <form id="contact-form" action="tickets.html" method="get" novalidate>
+            <div class="field">
+              <label for="reason-btn">Reason</label>
+              <button type="button" class="picker" id="reason-btn" data-picker="reason"><span class="picker__value is-empty">Select reason</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+              <select id="reason" hidden>
+                <option value="">Select reason</option>
+                <option>Booking issue</option>
+                <option>Payment / refund</option>
+                <option>Account</option>
+                <option>App feedback</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="booking-btn">Booking / service</label>
+              <button type="button" class="picker" id="booking-btn" data-picker="booking"><span class="picker__value is-empty">Select booking</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+              <select id="booking" hidden>
+                <option value="">Select booking</option>
+                <option value="none">Not related to a booking</option>
+              </select>
+              <div class="pick" id="pick" hidden>
+                <img class="pick__thumb" id="pick-thumb" src="" alt="" />
+                <div class="pick__info">
+                  <p class="pick__salon" id="pick-salon"></p>
+                  <p class="pick__meta" id="pick-meta"></p>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="subject">Subject</label>
+              <input id="subject" type="text" placeholder="Short summary" required />
+            </div>
+            <div class="field">
+              <label for="desc">Description</label>
+              <textarea id="desc" placeholder="Tell us what happened…" required></textarea>
+            </div>
+            <div class="field">
+              <label>Attachment (optional)</label>
+              <div class="attach">📷 Add photo or screenshot</div>
+            </div>
+            <p class="form-error" id="form-error" hidden>Please fill in the highlighted fields.</p>
+            <button type="submit" class="btn" id="submit">Submit ticket</button>
+          </form>
+        </div>
+      </div>
+      <div class="sheet-backdrop" id="ps-backdrop"></div>
+      <div class="sheet ps" id="ps" role="dialog" aria-modal="true" aria-labelledby="ps-title" aria-hidden="true">
+        <div class="sheet__handle" aria-hidden="true"></div>
+        <div class="ps__head">
+          <h2 class="ps__title" id="ps-title">Select reason</h2>
+          <button type="button" class="ps__close" id="ps-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
+        <div class="ps__list" id="ps-list"></div>
+      </div>
+    </div>
+  </div>
+  <script src="assets/tickets.js"></script>
+  <script>
+    (function () {
+      var T = window.GTTickets;
+      var form = document.getElementById('contact-form');
+      var reason = document.getElementById('reason');
+      var booking = document.getElementById('booking');
+      var pick = document.getElementById('pick');
+
+      ['Upcoming', 'Past'].forEach(function (g) {
+        var group = document.createElement('optgroup');
+        group.label = g === 'Upcoming' ? 'Upcoming bookings' : 'Past bookings';
+        T.BOOKINGS.forEach(function (b) {
+          if (b.group !== g) return;
+          var o = document.createElement('option');
+          o.value = b.id;
+          o.textContent = T.bookingLabel(b);
+          group.appendChild(o);
+        });
+        booking.appendChild(group);
+      });
+
+      function showPick() {
+        var b = T.booking(booking.value);
+        pick.hidden = !b;
+        if (!b) return;
+        var img = document.getElementById('pick-thumb');
+        img.src = b.photo;
+        img.style.objectPosition = b.pos;
+        document.getElementById('pick-salon').textContent = b.salon;
+        document.getElementById('pick-meta').textContent = b.svc + ' · ' + b.when;
+      }
+
+      var CHECK = '<span class="ps__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"><path d="m5 12 5 5L20 7"/></svg></span>';
+      var NO_BOOKING = '<span class="ps__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></span>';
+      var ps = document.getElementById('ps');
+      var psBackdrop = document.getElementById('ps-backdrop');
+      var psList = document.getElementById('ps-list');
+      var openFor = null;
+
+      function esc(s) {
+        return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+      }
+
+      function syncPicker(sel) {
+        var btn = document.getElementById(sel.id + '-btn');
+        var val = btn.querySelector('.picker__value');
+        var o = sel.options[sel.selectedIndex];
+        val.textContent = o ? o.text : '';
+        val.classList.toggle('is-empty', !sel.value);
+        btn.classList.remove('is-missing');
+      }
+
+      function taken(bookingId) {
+        return T.openTicket(reason.value, bookingId);
+      }
+
+      function clearTakenBooking() {
+        if (!booking.value || !taken(booking.value)) return;
+        booking.value = '';
+        syncPicker(booking);
+        showPick();
+      }
+
+      function option(value, inner, on, locked) {
+        return '<button type="button" class="ps__opt' + (on && !locked ? ' is-on' : '') + (locked ? ' is-locked' : '') + '" data-value="' + esc(value) + '"' + (locked ? ' disabled' : '') + '>' + inner + (locked ? '' : CHECK) + '</button>';
+      }
+
+      function renderSheet(kind) {
+        var html = '';
+        if (kind === 'reason') {
+          Array.prototype.forEach.call(reason.options, function (o) {
+            if (!o.value) return;
+            html += option(o.value, '<span class="ps__text"><span class="ps__name">' + esc(o.text) + '</span></span>', reason.value === o.value, false);
+          });
+        } else {
+          var noneTaken = !!taken('none');
+          html += option('none', NO_BOOKING + '<span class="ps__text"><span class="ps__name">Not related to a booking</span><span class="ps__meta">Account, app or general question</span></span>' + (noneTaken ? '<span class="ps__tag">Open ticket</span>' : ''), booking.value === 'none', noneTaken);
+          ['Upcoming', 'Past'].forEach(function (g) {
+            html += '<p class="ps__group">' + g + ' bookings</p>';
+            T.BOOKINGS.forEach(function (b) {
+              if (b.group !== g) return;
+              var lock = !!taken(b.id);
+              html += option(b.id, '<img class="ps__thumb" src="' + b.photo + '" alt="" style="object-position:' + b.pos + '" />' +
+                '<span class="ps__text"><span class="ps__name">' + esc(b.salon) + '</span><span class="ps__meta">' + esc(b.svc + ' · ' + b.when) + '</span></span>' +
+                (lock ? '<span class="ps__tag">Open ticket</span>' : ''), booking.value === b.id, lock);
+            });
+          });
+        }
+        psList.innerHTML = html;
+      }
+
+      function openSheet(kind) {
+        openFor = kind;
+        document.getElementById('ps-title').textContent = kind === 'reason' ? 'Select reason' : 'Select booking / service';
+        renderSheet(kind);
+        psList.scrollTop = 0;
+        psBackdrop.classList.add('is-open');
+        ps.classList.add('is-open');
+        ps.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeSheet() {
+        psBackdrop.classList.remove('is-open');
+        ps.classList.remove('is-open');
+        ps.setAttribute('aria-hidden', 'true');
+        openFor = null;
+      }
+
+      document.querySelectorAll('.picker').forEach(function (btn) {
+        btn.addEventListener('click', function () { openSheet(btn.getAttribute('data-picker')); });
+      });
+      document.getElementById('ps-close').addEventListener('click', closeSheet);
+      psBackdrop.addEventListener('click', closeSheet);
+      psList.addEventListener('click', function (e) {
+        var opt = e.target.closest('.ps__opt');
+        if (!opt || !openFor || opt.disabled || opt.classList.contains('is-locked')) return;
+        var sel = openFor === 'reason' ? reason : booking;
+        sel.value = opt.getAttribute('data-value');
+        sel.dispatchEvent(new Event('change'));
+        closeSheet();
+      });
+
+      reason.addEventListener('change', function () { syncPicker(reason); clearTakenBooking(); });
+      booking.addEventListener('change', function () {
+        if (taken(booking.value)) { booking.value = ''; }
+        syncPicker(booking);
+        showPick();
+      });
+      ['subject', 'desc'].forEach(function (f) {
+        document.getElementById(f).addEventListener('input', function () { this.classList.remove('is-missing'); });
+      });
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (taken(booking.value)) { clearTakenBooking(); return; }
+        var missing = [
+          [!reason.value, 'reason-btn'], [!booking.value, 'booking-btn'],
+          [!document.getElementById('subject').value.trim(), 'subject'], [!document.getElementById('desc').value.trim(), 'desc']
+        ].filter(function (m) { return m[0]; });
+        missing.forEach(function (m) { document.getElementById(m[1]).classList.add('is-missing'); });
+        document.getElementById('form-error').hidden = !missing.length;
+        if (missing.length) return;
+        var id = T.create({
+          title: document.getElementById('subject').value.trim(),
+          reason: reason.value,
+          booking: booking.value === 'none' ? '' : booking.value,
+          text: document.getElementById('desc').value.trim()
+        });
+        location.href = 'ticket-detail.html?id=' + id + '&new=1';
+      });
+
+      var params = new URLSearchParams(location.search);
+      var pre = params.get('reason');
+      if (pre) {
+        Array.prototype.forEach.call(reason.options, function (o) { if (o.text === pre) reason.value = o.value; });
+      }
+      if (T.booking(params.get('booking'))) booking.value = params.get('booking');
+      syncPicker(reason);
+      syncPicker(booking);
+      showPick();
+      clearTakenBooking();
+      if (params.get('pick') === 'reason' || params.get('pick') === 'booking') openSheet(params.get('pick'));
+    })();
+  </script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

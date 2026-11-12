@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Booking Confirmed</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: #ffffff;
+    }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; position: relative; }
+    .screen::before {
+      content: ""; position: absolute; left: -20%; right: -20%; top: -40px; height: 220px; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(139,0,232,.16), transparent 70%),
+        radial-gradient(ellipse 50% 60% at 85% 30%, rgba(255,3,200,.1), transparent 70%);
+    }
+    .screen.is-fail::before {
+      background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(220,38,38,.14), transparent 70%),
+        radial-gradient(ellipse 50% 60% at 85% 30%, rgba(249,115,22,.08), transparent 70%);
+    }
+    .body {
+      position: relative; z-index: 1;
+      flex: 1; overflow-y: auto; scrollbar-width: none;
+      padding: 18px 16px calc(var(--footer-above-dock, 80px) + 110px);
+      display: flex; flex-direction: column; align-items: stretch;
+    }
+    .body::-webkit-scrollbar { display: none; }
+    .body[hidden] { display: none; }
+
+    .hero {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      margin: 8px 0 20px;
+    }
+    .check {
+      width: 76px; height: 76px; border-radius: 24px; background: var(--grad); color: #fff;
+      display: grid; place-items: center; margin-bottom: 16px;
+      box-shadow: 0 14px 32px rgba(139,0,232,.32);
+      animation: pop .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    .check--ok {
+      background: #059669;
+      box-shadow: 0 14px 32px rgba(5,150,105,.28);
+    }
+    .check--err {
+      background: #DC2626;
+      box-shadow: 0 14px 32px rgba(220,38,38,.28);
+      border-radius: 50%;
+    }
+    @keyframes pop {
+      from { transform: scale(.72) translateY(8px); opacity: 0; }
+      to { transform: none; opacity: 1; }
+    }
+    .check svg { width: 34px; height: 34px; }
+    .hero h1 {
+      margin: 0 0 6px; font-family: Outfit, sans-serif; font-size: 1.42rem; font-weight: 750;
+      letter-spacing: -.03em; animation: fadeUp .45s ease .08s both;
+    }
+    .lead {
+      margin: 0; color: var(--muted); font-size: .88rem; font-weight: 550; line-height: 1.45; max-width: 28ch;
+      animation: fadeUp .45s ease .14s both;
+    }
+    .lead strong { color: var(--ink); font-weight: 700; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .sum-card {
+      background: #fff; border-radius: 20px; padding: 16px;
+      border: 1.5px solid rgba(139,0,232,.12);
+      animation: fadeUp .45s ease .18s both;
+    }
+    .sum-card--fail { border-color: rgba(220,38,38,.14); }
+    .sum-meta {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+      margin-bottom: 14px; font-size: .88rem;
+    }
+    .sum-meta span { color: var(--muted); font-weight: 600; }
+    .sum-meta strong { font-weight: 750; color: var(--ink); text-align: right; }
+    .sum-sep { height: 0; border: none; border-top: 1.5px dashed rgba(139,0,232,.16); margin: 12px 0; }
+    .sum-lines { display: flex; flex-direction: column; gap: 12px; }
+    .sum-line { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .sum-line__label { color: var(--muted); font-size: .82rem; font-weight: 600; flex-shrink: 0; }
+    .sum-line__value { font-size: .88rem; font-weight: 750; color: var(--ink); text-align: right; line-height: 1.35; }
+    .sum-line__value small {
+      display: block; margin-top: 2px; font-size: .72rem; font-weight: 550; color: var(--muted);
+    }
+    .pay-chip {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 2px;
+      padding: 5px 10px; border-radius: 99px; background: #ECFDF5; color: #047857;
+      font-size: .72rem; font-weight: 750;
+    }
+    .pay-chip--fail { background: #FEF2F2; color: #B91C1C; }
+    .tip {
+      margin: 12px 0 0; padding: 12px 14px; border-radius: 16px;
+      background: linear-gradient(120deg, #F8F4FF, #FFF5FB);
+      border: 1px solid rgba(139,0,232,.1);
+      font-size: .78rem; font-weight: 600; color: #5B21B6; line-height: 1.45;
+      animation: fadeUp .45s ease .24s both;
+    }
+    .tip--fail {
+      background: #FEF2F2; border-color: rgba(220,38,38,.12); color: #991B1B;
+    }
+
+    .links {
+      display: grid; gap: 8px; margin-top: 14px;
+      animation: fadeUp .45s ease .28s both;
+    }
+    .link-btn {
+      height: 46px; border-radius: 14px; display: grid; place-items: center; text-decoration: none;
+      font-weight: 750; font-size: .88rem; color: var(--ink);
+      background: #fff; border: 1.5px solid rgba(139,0,232,.12);
+    }
+    .cancel-link {
+      justify-self: center; margin-top: 4px; padding: 8px 10px;
+      color: #B91C1C; font-weight: 750; font-size: .84rem; text-decoration: none;
+    }
+
+    .footer {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 32;
+      padding: 0 12px calc(var(--footer-above-dock, 80px) + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
+      background: linear-gradient(to top, rgba(251,247,250,.96) 35%, rgba(251,247,250,0));
+      pointer-events: none;
+    }
+    .footer > * { pointer-events: auto; }
+    .footer__actions {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; border-radius: 18px; background: #1A1024; color: #fff;
+      box-shadow: 0 14px 36px rgba(26,16,36,.35), 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .footer .btn {
+      flex: 1; height: 42px; border: none; border-radius: 13px; padding: 0 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; font-family: inherit; font-weight: 800; font-size: .84rem;
+      background: var(--grad); color: #fff;
+      box-shadow: 0 8px 18px rgba(139,0,232,.35);
+    }
+    .footer .btn--fail {
+      background: linear-gradient(100deg, #DC2626 0%, #F97316 100%);
+      box-shadow: 0 8px 18px rgba(220,38,38,.3);
+    }
+    .footer[hidden] { display: none; }
+
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen" id="screen">
+        <div class="body" id="fail-view" hidden>
+          <div class="hero">
+            <div class="check check--err" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M7 7l10 10M17 7 7 17"/></svg>
+            </div>
+            <h1>Payment failed</h1>
+            <p class="lead">We couldn’t take the payment from your <strong id="f-method">GlowTap wallet</strong>. Your slot isn’t booked yet.</p>
+          </div>
+
+          <div class="sum-card sum-card--fail">
+            <div class="sum-meta"><span>Salon</span><strong id="f-salon">Luxe Curls — Indiranagar</strong></div>
+            <div class="sum-sep"></div>
+            <div class="sum-lines">
+              <div class="sum-line">
+                <span class="sum-line__label">Service</span>
+                <span class="sum-line__value" id="f-svc">Haircut &amp; Style</span>
+              </div>
+              <div class="sum-line">
+                <span class="sum-line__label">Amount</span>
+                <span class="sum-line__value">
+                  <span id="f-amt">₹719</span>
+                  <span class="pay-chip pay-chip--fail">Not charged</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="tip tip--fail">No money was deducted. If you see a debit, it’s reversed automatically in 5–7 working days.</p>
+
+          <div class="links">
+            <a class="link-btn" href="home.html">Back to home</a>
+          </div>
+        </div>
+
+        <div class="body" id="ok-view">
+          <div class="hero">
+            <div class="check check--ok" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m5 12 5 5L20 7"/></svg>
+            </div>
+            <h1>Booking confirmed</h1>
+            <p class="lead">You’re all set. We’ll notify you when the salon confirms.</p>
+          </div>
+
+          <div class="sum-card">
+            <div class="sum-meta"><span>Salon</span><strong id="salon">Luxe Curls — Indiranagar</strong></div>
+            <div class="sum-sep"></div>
+            <div class="sum-lines">
+              <div class="sum-line">
+                <span class="sum-line__label">Service</span>
+                <span class="sum-line__value" id="svc">Haircut &amp; Style</span>
+              </div>
+              <div class="sum-line">
+                <span class="sum-line__label">Payment</span>
+                <span class="sum-line__value">
+                  <span id="pay-amt">₹809</span>
+                  <span class="pay-chip" id="pay-chip">Paid online</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="tip">A confirmation SMS and email are on the way. You can manage this booking anytime.</p>
+
+          <div class="links">
+            <a class="link-btn" href="home.html">Back to home</a>
+            <a class="link-btn" id="book-another" href="salon-detail.html">Book another</a>
+            <a class="cancel-link" id="cancel-link" href="booking-detail.html?id=GT-48401&amp;cancel=1">Cancel booking</a>
+          </div>
+        </div>
+
+        <div class="footer" id="ok-footer">
+          <div class="footer__actions">
+            <a class="btn" id="view-booking" href="booking-detail.html?id=GT-48401">View booking</a>
+          </div>
+        </div>
+        <div class="footer" id="fail-footer" hidden>
+          <div class="footer__actions">
+            <a class="btn btn--fail" id="f-retry" href="book.html">Try again</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var p = new URLSearchParams(location.search);
+      var failed = p.get('status') === 'failed';
+      var total = p.get('total') ? '₹' + Number(p.get('total')).toLocaleString('en-IN') : '';
+      var screen = document.getElementById('screen');
+      var prefix = failed ? 'f-' : '';
+
+      ['salon', 'svc'].forEach(function (k) {
+        if (p.get(k)) document.getElementById(prefix + k).textContent = p.get(k);
+      });
+
+      if (failed) {
+        document.title = 'GlowTap Customer — Payment Failed';
+        screen.classList.add('is-fail');
+        document.getElementById('ok-view').hidden = true;
+        document.getElementById('ok-footer').hidden = true;
+        document.getElementById('fail-view').hidden = false;
+        document.getElementById('fail-footer').hidden = false;
+        if (p.get('method')) document.getElementById('f-method').textContent = p.get('method');
+        if (total) document.getElementById('f-amt').textContent = total;
+        var retry = p.get('retry');
+        if (retry && /^book\.html\?[^#]*$/.test(retry)) document.getElementById('f-retry').href = retry;
+        return;
+      }
+
+      if (total) document.getElementById('pay-amt').textContent = total;
+      var method = p.get('method');
+      document.getElementById('pay-chip').textContent = method
+        ? 'Paid · ' + method
+        : 'Paid online';
+
+      var salonKey = p.get('salonKey');
+      if (salonKey) {
+        document.getElementById('book-another').href = 'salon-detail.html?salon=' + encodeURIComponent(salonKey);
+      }
+    })();
+  </script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

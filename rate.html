@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Rate experience</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: #ffffff;
+    }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; position: relative;
+    }
+    .screen::before {
+      content: ""; position: absolute; left: -18%; right: -18%; top: -36px; height: 180px;
+      pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(139,0,232,.12), transparent 70%),
+        radial-gradient(ellipse 45% 55% at 90% 30%, rgba(255,3,200,.08), transparent 70%);
+    }
+
+    .nav {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 10px; padding: 6px 14px 10px; flex-shrink: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,.92) 65%, rgba(255,255,255,0));
+    }
+    .back {
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      display: grid; place-items: center; color: var(--ink); text-decoration: none;
+      background: #fff; box-shadow: 0 4px 14px rgba(36,24,40,.08); cursor: pointer;
+    }
+    .back svg { width: 18px; height: 18px; }
+    .nav__meta { min-width: 0; flex: 1; }
+    .nav h1 { margin: 0; font-family: Outfit, sans-serif; font-size: 1.18rem; font-weight: 750; letter-spacing: -.03em; }
+    .nav p { margin: 2px 0 0; font-size: .74rem; color: var(--muted); font-weight: 600; }
+    .eyebrow { display: none; }
+
+    .body {
+      position: relative; z-index: 1;
+      flex: 1; overflow-y: auto;
+      padding: 6px 16px calc(var(--footer-above-dock, 80px) + 88px);
+      scrollbar-width: none;
+    }
+    .body::-webkit-scrollbar { display: none; }
+
+    .card {
+      background: #fff; border-radius: 20px; padding: 14px 16px; margin-bottom: 12px;
+      border: 1.5px solid rgba(139,0,232,.12);
+    }
+    .who { display: flex; gap: 12px; align-items: center; }
+    .who__av {
+      width: 56px; height: 56px; border-radius: 16px; overflow: hidden; background: #eee; flex-shrink: 0;
+      box-shadow: 0 0 0 1.5px rgba(139,0,232,.08);
+    }
+    .who__av img { width: 100%; height: 100%; object-fit: cover; }
+    .who__name { margin: 0; font-family: Outfit, sans-serif; font-weight: 750; font-size: .98rem; letter-spacing: -.02em; }
+    .who__meta { margin: 3px 0 0; font-size: .74rem; color: var(--muted); font-weight: 550; line-height: 1.35; }
+
+    h2 { margin: 0 0 4px; font-family: Outfit, sans-serif; font-size: 1.02rem; font-weight: 750; letter-spacing: -.02em; }
+    .opt {
+      font-family: 'DM Sans', sans-serif; font-weight: 650; color: var(--muted); font-size: .72rem;
+      letter-spacing: 0;
+    }
+    .sub { margin: 0 0 14px; font-size: .78rem; color: var(--muted); font-weight: 550; line-height: 1.4; }
+
+    .stars { display: flex; gap: 8px; justify-content: center; margin: 4px 0; }
+    .star {
+      width: 46px; height: 46px; border-radius: 14px; border: 1.5px solid rgba(139,0,232,.12);
+      background: #FAF7FD; color: #CBD5E1; font-size: 1.35rem; cursor: pointer; font-family: inherit;
+      transition: transform .12s, border-color .15s, background .15s, color .15s;
+    }
+    .star:active { transform: scale(.94); }
+    .star.is-on { color: #F59E0B; border-color: rgba(245,158,11,.45); background: #FFFBEB; }
+    .score-label {
+      text-align: center; font-size: .8rem; font-weight: 750; color: #B45309;
+      min-height: 1.2em; margin-top: 8px;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      border: 1.5px solid rgba(139,0,232,.14); background: #fff; border-radius: 99px; padding: 8px 12px;
+      font-size: .74rem; font-weight: 750; cursor: pointer; font-family: inherit; color: var(--ink);
+      transition: border-color .15s, background .15s, color .15s;
+    }
+    .chip.is-on { border-color: transparent; background: var(--grad); color: #fff; }
+
+    .aspect {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 0; border-top: 1.5px dashed rgba(139,0,232,.12);
+    }
+    .aspect:first-of-type { border-top: none; padding-top: 2px; }
+    .aspect span { font-size: .84rem; font-weight: 650; }
+    .mini { display: flex; gap: 2px; }
+    .mini button {
+      width: 30px; height: 30px; border: none; background: none; font-size: 1.15rem;
+      color: #D5DCE4; cursor: pointer; padding: 0;
+    }
+    .mini button.is-on { color: #F59E0B; }
+
+    textarea {
+      width: 100%; min-height: 88px; border-radius: 16px; border: 1.5px solid rgba(139,0,232,.12);
+      padding: 12px 14px; font-family: inherit; font-size: .85rem; resize: vertical; outline: none;
+      background: #FAF7FD; color: var(--ink);
+    }
+    textarea:focus {
+      border-color: rgba(139,0,232,.4);
+      box-shadow: 0 0 0 3px rgba(139,0,232,.1);
+      background: #fff;
+    }
+    .count { display: block; margin-top: 8px; text-align: right; font-size: .7rem; font-weight: 650; color: var(--muted); }
+
+    .pics { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pic { position: relative; width: 74px; height: 74px; border-radius: 16px; overflow: hidden; }
+    .pic img { width: 100%; height: 100%; object-fit: cover; }
+    .pic button {
+      position: absolute; top: 5px; right: 5px; width: 22px; height: 22px; border-radius: 50%;
+      border: none; background: rgba(26,16,36,.78); color: #fff; font-size: .8rem; line-height: 1; cursor: pointer;
+    }
+    .pic-add {
+      width: 74px; height: 74px; border-radius: 16px; border: 1.5px dashed rgba(139,0,232,.35);
+      background: linear-gradient(180deg, #FAF7FD, #fff); color: var(--violet);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+      font-family: inherit; font-size: .66rem; font-weight: 750; cursor: pointer;
+    }
+    .pic-add svg { width: 20px; height: 20px; }
+    .pic-add[hidden] { display: none; }
+
+    .public {
+      display: flex; gap: 8px; align-items: flex-start; margin: 4px 2px 8px; padding: 12px 14px;
+      border-radius: 16px; background: linear-gradient(120deg, #F8F4FF, #FFF5FB);
+      border: 1px solid rgba(139,0,232,.08);
+      font-size: .74rem; font-weight: 600; color: #5B21B6; line-height: 1.45;
+    }
+    .public svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
+
+    .footer {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 32;
+      padding: 0 12px calc(var(--footer-above-dock, 80px) + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
+      background: linear-gradient(to top, rgba(251,247,250,.96) 35%, rgba(251,247,250,0));
+      pointer-events: none;
+    }
+    .footer > * { pointer-events: auto; }
+    .footer__bar {
+      padding: 10px; border-radius: 18px; background: #1A1024;
+      box-shadow: 0 14px 36px rgba(26,16,36,.35), 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .btn {
+      height: 42px; border-radius: 13px; border: none; font-family: inherit; font-weight: 800;
+      font-size: .84rem; cursor: pointer; text-decoration: none; display: grid; place-items: center; width: 100%;
+    }
+    .btn--primary {
+      background: var(--grad); color: #fff;
+      box-shadow: 0 8px 18px rgba(139,0,232,.35);
+    }
+    .btn--primary:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+    .btn--ghost {
+      background: #fff; border: 1.5px solid rgba(139,0,232,.12); color: var(--ink);
+    }
+
+    .done {
+      display: none; text-align: center; padding: 48px 8px 24px;
+      animation: fadeUp .4s ease both;
+    }
+    .done.is-on { display: block; }
+    .form.is-hidden { display: none; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+    .done__check {
+      width: 76px; height: 76px; border-radius: 24px; background: #059669; color: #fff;
+      display: grid; place-items: center; margin: 0 auto 16px; font-size: 1.7rem;
+      box-shadow: 0 14px 32px rgba(5,150,105,.28);
+    }
+    .done h2 {
+      margin: 0 0 20px; font-size: 1.35rem; font-weight: 750; letter-spacing: -.03em;
+    }
+    .done .btn { margin-top: 10px; height: 48px; border-radius: 14px; font-size: .9rem; }
+    .done .btn--primary { box-shadow: 0 8px 20px rgba(139,0,232,.3); }
+
+    .phone.has-dock .footer {
+      left: 0 !important; right: 0 !important; bottom: 0 !important;
+      padding: 0 12px calc(var(--footer-above-dock, 80px) + 4px) !important;
+      background: linear-gradient(to top, rgba(251,247,250,.96) 40%, rgba(251,247,250,0)) !important;
+      pointer-events: none !important;
+      display: block !important;
+      grid-template-columns: none !important;
+    }
+    .phone.has-dock .footer[hidden],
+    .phone.has-dock .footer.is-off { display: none !important; }
+    .phone.has-dock .footer .footer__bar { pointer-events: auto; }
+    .phone.has-dock .footer .btn { width: 100% !important; }
+
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="nav">
+          <a class="back" id="back" href="bookings.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+          <div class="nav__meta">
+            <h1 id="nav-title">Rate &amp; review</h1>
+            <p id="nav-sub">Blow Dry</p>
+          </div>
+        </div>
+        <div class="body">
+          <div class="form" id="form">
+            <div class="card">
+              <div class="who">
+                <div class="who__av"><img id="who-photo" src="assets/photos/stylist-1.jpg" alt="" /></div>
+                <div>
+                  <p class="who__name" id="stylist-name">Priya S.</p>
+                  <p class="who__meta" id="who-meta">Senior stylist · Luxe Curls — Indiranagar</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" id="visit-card" hidden>
+              <h2>What did you get done?</h2>
+              <p class="sub">Required · pick the main service</p>
+              <div class="chips" id="svc-chips"></div>
+              <h2 style="margin-top:16px;">Who served you? <span class="opt">optional</span></h2>
+              <div class="chips" id="spec-chips" style="margin-top:10px;"></div>
+            </div>
+
+            <div class="card">
+              <h2>Overall experience</h2>
+              <p class="sub">Required · shown on the salon’s rating</p>
+              <div class="stars" id="stars-overall" data-group="overall"></div>
+              <div class="score-label" id="overall-label"></div>
+            </div>
+
+            <div class="card" id="stylist-card">
+              <h2>Rate <span id="spec-first">Priya</span></h2>
+              <p class="sub">Required · we’ll remember this for your next booking</p>
+              <div class="stars" id="stars-stylist" data-group="stylist"></div>
+              <div class="chips" style="margin-top:14px;">
+                <button type="button" class="chip" data-tag="Skilled">Skilled</button>
+                <button type="button" class="chip" data-tag="Friendly">Friendly</button>
+                <button type="button" class="chip" data-tag="On time">On time</button>
+                <button type="button" class="chip" data-tag="Listened">Listened well</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Rate the salon <span class="opt">optional</span></h2>
+              <div class="aspect"><span>Service quality</span><div class="mini" data-aspect="Service"></div></div>
+              <div class="aspect"><span>Hygiene</span><div class="mini" data-aspect="Hygiene"></div></div>
+              <div class="aspect"><span>Value for money</span><div class="mini" data-aspect="Value"></div></div>
+            </div>
+
+            <div class="card">
+              <h2>Write a review <span class="opt">optional</span></h2>
+              <textarea id="text" maxlength="500" placeholder="What did you like? Anything the salon could do better?"></textarea>
+              <span class="count" id="count">0 / 500</span>
+            </div>
+
+            <div class="card">
+              <h2>Add photos <span class="opt">up to 3</span></h2>
+              <div class="pics" id="pics">
+                <button type="button" class="pic-add" id="pic-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="15" rx="3"/><circle cx="12" cy="12.5" r="3.5"/><path d="M9 5l1.5-2h3L15 5"/></svg>Add photo</button>
+              </div>
+            </div>
+            <p class="public"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg><span id="public-text">Your first name, rating, review and photos are shown publicly on the salon page.</span></p>
+          </div>
+
+          <div class="done" id="done">
+            <div class="done__check" aria-hidden="true">✓</div>
+            <h2>Thanks for your review</h2>
+            <a class="btn btn--primary" id="see-review" href="salon-detail.html?id=luxe&amp;tab=reviews">See it on the salon page</a>
+            <a class="btn btn--ghost" id="done-back" href="bookings.html">Back to bookings</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer" id="footer">
+        <div class="footer__bar">
+          <button type="button" class="btn btn--primary" id="btn-submit" disabled>Post review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="assets/catalog.js"></script>
+  <script>
+    (function () {
+      function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+      }
+      var VISITS = { 'GT-48110': 'luxe', 'GT-48055': 'luxe', 'GT-47940': 'nord' };
+      var WORDS = ['', 'Terrible', 'Poor', 'Okay', 'Good', 'Loved it'];
+      var state = { overall: 0, stylist: 0, aspects: {}, pics: [] };
+      var params = new URLSearchParams(location.search);
+      // No booking id → open review from the salon page: guest picks the service / specialist, not marked Verified.
+      var open = !params.get('id') && !!params.get('salon');
+      var stylist = open ? '' : params.get('stylist') || 'Priya S.';
+      var id = open ? 'open-' + params.get('salon') : params.get('id') || 'GT-48110';
+      var svc = open ? '' : params.get('svc') || 'Blow Dry';
+      var salonKey = params.get('salon') || VISITS[id] || 'luxe';
+      var salon = window.GTCatalog.SALONS[salonKey] || window.GTCatalog.SALONS.luxe;
+      var salonPage = 'salon-detail.html?id=' + encodeURIComponent(salonKey) + '&tab=reviews';
+
+      function showStylist() {
+        var spec = salon.specs.filter(function (s) { return s.name === stylist; })[0];
+        document.getElementById('stylist-card').hidden = !stylist;
+        if (!stylist) return;
+        document.getElementById('spec-first').textContent = stylist.split(' ')[0];
+        document.querySelector('textarea').placeholder = 'What did you like about ' + stylist.split(' ')[0] + '’s work? Anything the salon could do better?';
+        if (open) return;
+        document.getElementById('stylist-name').textContent = stylist;
+        document.getElementById('who-meta').textContent = (spec ? spec.role : 'Specialist') + ' · ' + salon.name;
+        if (spec) document.getElementById('who-photo').src = spec.photo;
+      }
+
+      if (open) {
+        document.title = 'GlowTap Customer — Write a review';
+        document.getElementById('nav-title').textContent = 'Write a review';
+        document.getElementById('nav-sub').textContent = salon.name;
+        document.getElementById('stylist-name').textContent = salon.name;
+        document.getElementById('who-meta').textContent = salon.area + ' · share your experience';
+        document.getElementById('who-photo').src = salon.photo;
+        document.querySelector('textarea').placeholder = 'What did you like? Anything the salon could do better?';
+        document.getElementById('public-text').textContent = 'Your first name, rating, review and photos are shown publicly on the salon page. Reviews from a GlowTap booking get a “Verified visit” badge — this one won’t.';
+        document.getElementById('back').href = salonPage;
+        document.getElementById('done-back').href = salonPage.replace('&tab=reviews', '');
+        document.getElementById('done-back').textContent = 'Back to salon';
+        document.getElementById('visit-card').hidden = false;
+        document.getElementById('svc-chips').innerHTML = salon.services.map(function (s) {
+          return '<button type="button" class="chip" data-svc="' + esc(s.name) + '">' + esc(s.name) + '</button>';
+        }).join('');
+        document.getElementById('spec-chips').innerHTML = salon.specs.map(function (s) {
+          return '<button type="button" class="chip" data-spec="' + esc(s.name) + '">' + esc(s.name) + '</button>';
+        }).join('') + '<button type="button" class="chip" data-spec="">Not sure</button>';
+        document.querySelectorAll('#svc-chips .chip').forEach(function (c) {
+          c.addEventListener('click', function () {
+            svc = c.getAttribute('data-svc');
+            document.querySelectorAll('#svc-chips .chip').forEach(function (x) { x.classList.toggle('is-on', x === c); });
+            sync();
+          });
+        });
+        document.querySelectorAll('#spec-chips .chip').forEach(function (c) {
+          c.addEventListener('click', function () {
+            var name = c.getAttribute('data-spec');
+            var same = c.classList.contains('is-on');
+            stylist = same ? '' : name;
+            document.querySelectorAll('#spec-chips .chip').forEach(function (x) { x.classList.toggle('is-on', !same && x === c); });
+            state.stylist = 0;
+            document.querySelectorAll('#stars-stylist .star').forEach(function (s) { s.classList.remove('is-on'); });
+            showStylist();
+            sync();
+          });
+        });
+      } else {
+        document.getElementById('nav-sub').textContent = svc;
+        if (params.get('from') === 'salon') document.getElementById('back').href = salonPage;
+      }
+      showStylist();
+
+      function sync() {
+        document.getElementById('btn-submit').disabled = !(state.overall && svc && (!stylist || state.stylist));
+        document.getElementById('overall-label').textContent = WORDS[state.overall];
+      }
+
+      function buildStars(wrapId, key) {
+        var wrap = document.getElementById(wrapId);
+        for (var i = 1; i <= 5; i++) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'star';
+          btn.textContent = '★';
+          btn.setAttribute('data-n', String(i));
+          btn.setAttribute('aria-label', i + ' star' + (i > 1 ? 's' : ''));
+          btn.addEventListener('click', function () {
+            state[key] = Number(this.getAttribute('data-n'));
+            wrap.querySelectorAll('.star').forEach(function (s) {
+              s.classList.toggle('is-on', Number(s.getAttribute('data-n')) <= state[key]);
+            });
+            sync();
+          });
+          wrap.appendChild(btn);
+        }
+      }
+      buildStars('stars-overall', 'overall');
+      buildStars('stars-stylist', 'stylist');
+
+      document.querySelectorAll('.mini').forEach(function (wrap) {
+        var name = wrap.getAttribute('data-aspect');
+        for (var i = 1; i <= 5; i++) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = '★';
+          b.setAttribute('data-n', String(i));
+          b.setAttribute('aria-label', name + ' ' + i + ' star' + (i > 1 ? 's' : ''));
+          b.addEventListener('click', function () {
+            var n = Number(this.getAttribute('data-n'));
+            state.aspects[name] = n;
+            wrap.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-on', Number(x.getAttribute('data-n')) <= n); });
+          });
+          wrap.appendChild(b);
+        }
+      });
+
+      document.querySelectorAll('.chip[data-tag]').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          chip.classList.toggle('is-on');
+        });
+      });
+
+      var text = document.getElementById('text');
+      text.addEventListener('input', function () {
+        document.getElementById('count').textContent = text.value.length + ' / 500';
+      });
+
+      // Demo photo picker: cycles through sample salon photos.
+      var SAMPLES = [salon.photo, 'assets/photos/salon-hair.jpg', 'assets/photos/salon-color.jpg', 'assets/photos/salon-nails.jpg'];
+      var picsWrap = document.getElementById('pics');
+      var addBtn = document.getElementById('pic-add');
+      function renderPics() {
+        picsWrap.querySelectorAll('.pic').forEach(function (p) { p.remove(); });
+        state.pics.forEach(function (src, i) {
+          var d = document.createElement('div');
+          d.className = 'pic';
+          d.innerHTML = '<img src="' + esc(src) + '" alt="" /><button type="button" aria-label="Remove photo">×</button>';
+          d.querySelector('button').addEventListener('click', function () { state.pics.splice(i, 1); renderPics(); });
+          picsWrap.insertBefore(d, addBtn);
+        });
+        addBtn.hidden = state.pics.length >= 3;
+      }
+      addBtn.addEventListener('click', function () {
+        var next = SAMPLES.filter(function (s) { return state.pics.indexOf(s) === -1; })[0];
+        if (next) state.pics.push(next);
+        renderPics();
+      });
+
+      document.getElementById('btn-submit').addEventListener('click', function () {
+        var review = {
+          salon: salonKey, id: id, n: state.overall, stylistStars: state.stylist, when: 'Just now',
+          svc: svc, spec: stylist, text: text.value.trim(), pics: state.pics.slice(), aspects: state.aspects, help: 0, verified: !open,
+          tags: stylist ? [].map.call(document.querySelectorAll('.chip[data-tag].is-on'), function (c) { return c.getAttribute('data-tag'); }) : []
+        };
+        var all;
+        try { all = JSON.parse(localStorage.getItem('gt-reviews') || '[]'); } catch (e) { all = []; }
+        all = all.filter(function (r) { return r.id !== id; }).concat([review]);
+        localStorage.setItem('gt-reviews', JSON.stringify(all));
+
+        document.getElementById('see-review').href = 'salon-detail.html?id=' + encodeURIComponent(salonKey) + '&tab=reviews';
+        document.getElementById('form').classList.add('is-hidden');
+        document.getElementById('done').classList.add('is-on');
+        document.getElementById('footer').classList.add('is-off');
+        document.getElementById('footer').style.display = 'none';
+      });
+      sync();
+    })();
+  </script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

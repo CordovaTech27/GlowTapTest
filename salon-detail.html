@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Salon Detail</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: #ffffff;
+    }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; color: #fff; pointer-events: none; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .body { flex: 1; overflow-y: auto; overflow-anchor: none; padding: 0 0 calc(var(--footer-above-dock, 104px) + 72px); scrollbar-width: none; }
+    .body::-webkit-scrollbar { display: none; }
+    .hero {
+      position: relative; height: 248px; flex-shrink: 0;
+    }
+    .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero__veil {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 42%, rgba(20,10,30,.4) 78%, transparent 100%);
+      pointer-events: none;
+    }
+    .hero__nav {
+      position: absolute; top: calc(var(--app-top, 47px) + 8px); left: 14px; right: 14px; z-index: 5;
+      display: flex; justify-content: space-between; gap: 10px;
+    }
+    .round {
+      width: 42px; height: 42px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,.92); color: var(--ink);
+      display: grid; place-items: center; text-decoration: none; cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0,0,0,.18); position: relative;
+    }
+    .round svg { width: 18px; height: 18px; }
+    .round__n {
+      position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px;
+      background: var(--pink); color: #fff; font-size: .62rem; font-weight: 800; display: grid; place-items: center;
+      border: 2px solid #fff;
+    }
+    .round__n[hidden] { display: none; }
+    .hero__badge {
+      position: absolute; left: 14px; bottom: 42px; z-index: 5;
+      padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.95);
+      font-size: .7rem; font-weight: 700; color: #15803D;
+      box-shadow: 0 4px 12px rgba(0,0,0,.12);
+    }
+    .hero__badge.is-closed { color: #B91C1C; }
+    .hero.is-closed img { filter: grayscale(1); }
+    .panel {
+      position: relative; z-index: 4;
+      background: var(--surface);
+      margin-top: -22px;
+      border-radius: 28px 28px 0 0;
+      padding: 26px 16px 20px;
+      box-shadow: 0 -12px 32px rgba(36, 24, 40, 0.1);
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 4px;
+      border-radius: 99px;
+      background: #E0D6DE;
+    }
+    .title-row { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    h1 { margin: 0; font-family: Outfit, sans-serif; font-size: 1.3rem; font-weight: 700; letter-spacing: -.03em; }
+    .meta { margin: 6px 0 0; font-size: .82rem; color: var(--muted); line-height: 1.4; text-align: left; }
+    .meta a { color: var(--violet); font-weight: 700; text-decoration: none; }
+    .title-row, .title-row > div, .meta, .rating { text-align: left; }
+    .rating {
+      display: flex; align-items: center; justify-content: flex-start; gap: 6px; width: 100%;
+      margin: 10px 0 0; font-size: .85rem; font-weight: 600; text-align: left !important;
+      border: none; background: none; padding: 0; font-family: inherit; color: inherit; cursor: pointer;
+    }
+    .rating span, .rating u { text-align: left; }
+    .rating u { text-decoration: none; color: var(--violet); font-weight: 700; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .badge-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 10px; border-radius: 999px; background: #ECFDF5;
+      font-size: .72rem; font-weight: 700; color: #047857;
+    }
+    .badge-pill--deal { background: #ECFDF5; color: #047857; }
+    .badge-pill svg { width: 14px; height: 14px; }
+    .tabs {
+      display: flex; gap: 4px; margin-top: 16px; border-bottom: 1px solid var(--line);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 0 0 auto; border: none; background: transparent; padding: 10px 12px;
+      font-family: inherit; font-size: .82rem; font-weight: 700; color: var(--muted); cursor: pointer;
+      border-bottom: 2.5px solid transparent; margin-bottom: -1px;
+    }
+    .tab-btn.is-on { color: var(--violet); border-bottom-color: var(--violet); }
+    .tab-btn small { font-size: .68rem; font-weight: 700; color: inherit; opacity: .7; }
+    .panel-tab { display: none; }
+    .panel-tab.is-on { display: block; }
+    .actions-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px;
+    }
+    .act {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      text-decoration: none; color: var(--ink); background: transparent; border: 0;
+      border-radius: 12px; padding: 6px 2px; font-size: .64rem; font-weight: 700; cursor: pointer;
+      font-family: inherit;
+    }
+    .act span {
+      width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
+      background: #F3EEFF; color: var(--violet);
+    }
+    .act span svg { width: 16px; height: 16px; }
+    .act em { font-style: normal; }
+    .act--save.is-saved { color: #BE185D; background: transparent; border: 0; }
+    .act--save.is-saved span { background: #FCE7F3; color: var(--pink); }
+    .act--save.is-saved svg { fill: currentColor; }
+    .act--save.is-pop span { animation: pop .35s ease; }
+    @keyframes pop { 50% { transform: scale(1.25); } }
+
+    .about { background: #fff; border-radius: 16px; padding: 14px; border: 1px solid rgba(139,0,232,.06); }
+    .about__text { margin: 0 0 12px; font-size: .84rem; line-height: 1.55; color: #3B4754; }
+    .about__facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .about__fact {
+      padding: 10px 8px; border-radius: 12px; background: #FAF7FD; text-align: center;
+      border: 1px solid transparent; font-family: inherit; color: inherit;
+    }
+    .about__fact strong { display: block; font-family: Outfit, sans-serif; font-size: 1rem; color: var(--violet); }
+    .about__fact span { display: block; margin-top: 2px; font-size: .68rem; font-weight: 600; color: var(--muted); }
+    button.about__fact { cursor: pointer; border-color: rgba(139,0,232,.18); background: #F3EEFF; }
+    button.about__fact span { color: var(--violet); font-weight: 700; }
+    .toast {
+      position: absolute; left: 50%; bottom: 84px; z-index: 40; transform: translate(-50%, 16px); opacity: 0;
+      padding: 10px 16px; border-radius: 999px; background: #241828; color: #fff; font-size: .8rem; font-weight: 600;
+      white-space: nowrap; pointer-events: none; transition: opacity .2s, transform .2s;
+    }
+    .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+    .toast a { color: #F9A8D4; margin-left: 8px; text-decoration: none; pointer-events: auto; }
+    .section { margin-top: 18px; }
+    .section h2 {
+      margin: 0 0 10px; font-family: Outfit, sans-serif; font-size: .95rem; font-weight: 700;
+    }
+    .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .sec-head span { font-size: .74rem; font-weight: 600; color: var(--muted); }
+    .open-line {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 8px;
+      font-size: .82rem; font-weight: 600; color: var(--ink);
+    }
+    .open-line svg { width: 16px; height: 16px; color: var(--muted); }
+    .open-line strong.is-closed { color: #B91C1C; }
+    .open-line span {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 108px; height: 26px; padding: 0 10px; box-sizing: border-box;
+      border-radius: 99px; background: #fff; border: 1px solid var(--line); font-size: .76rem;
+    }
+
+    /* Services + add to cart */
+    .svc-search {
+      display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 0 12px;
+      height: 44px; border-radius: 14px; background: #fff;
+      border: 1.5px solid rgba(139,0,232,.12); box-shadow: 0 4px 14px rgba(91,33,182,.04);
+    }
+    .svc-search:focus-within { border-color: rgba(139,0,232,.4); box-shadow: 0 0 0 3px rgba(139,0,232,.1); }
+    .svc-search svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
+    .svc-search input {
+      flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+      font: inherit; font-size: .88rem; font-weight: 600; color: var(--ink);
+    }
+    .svc-search input::placeholder { color: #A89AA6; font-weight: 500; }
+    .svc-search__clear {
+      width: 28px; height: 28px; border: none; border-radius: 99px; background: #F3EEF5;
+      color: var(--muted); font-size: 1rem; line-height: 1; cursor: pointer; display: none;
+    }
+    .svc-search.has-q .svc-search__clear { display: grid; place-items: center; }
+    .svc-empty {
+      display: none; margin: 8px 0 16px; padding: 22px 14px; text-align: center;
+      border-radius: 16px; border: 1.5px dashed var(--line); color: var(--muted);
+      font-size: .82rem; font-weight: 600;
+    }
+    .svc-empty.is-on { display: block; }
+    .svc-group {
+      margin: 0 0 10px; border-radius: 16px; background: #fff;
+      border: 1.5px solid rgba(139,0,232,.08); overflow: hidden;
+    }
+    .svc-group__toggle {
+      width: 100%; display: flex; align-items: center; gap: 10px; padding: 12px 12px;
+      border: none; background: transparent; font: inherit; color: inherit; cursor: pointer; text-align: left;
+    }
+    .svc-group__toggle:active { background: #FAF7FD; }
+    .svc-group__title {
+      flex: 1; margin: 0; font-family: Outfit, sans-serif; font-size: 0.92rem; font-weight: 750;
+      letter-spacing: -0.02em; color: var(--ink);
+    }
+    .svc-group__n {
+      font-size: .68rem; font-weight: 700; color: var(--muted); padding: 3px 8px;
+      border-radius: 99px; background: #F6F0F8;
+    }
+    .svc-group__chev {
+      width: 18px; height: 18px; color: var(--muted); flex-shrink: 0;
+      transition: transform .28s cubic-bezier(.22,1,.36,1);
+    }
+    .svc-group.is-open .svc-group__chev { transform: rotate(180deg); color: var(--violet); }
+    .svc-group__body {
+      display: grid; grid-template-rows: 0fr; transition: grid-template-rows .34s cubic-bezier(.22,1,.36,1);
+    }
+    .svc-group.is-open .svc-group__body { grid-template-rows: 1fr; }
+    .svc-group__clip { overflow: hidden; min-height: 0; }
+    .svc-group__list { padding: 0 8px 8px; }
+    .svc-group.is-filtering { border-color: transparent; background: transparent; }
+    .svc-group.is-filtering .svc-group__toggle { display: none; }
+    .svc-group.is-filtering .svc-group__body { grid-template-rows: 1fr; }
+    .svc-group.is-filtering .svc-group__list { padding: 0; }
+    .svc-group[hidden], .svc-block[hidden] { display: none !important; }
+    .svc-block { margin-bottom: 8px; }
+    .svc {
+      display: flex; gap: 12px; align-items: center; background: #fff; border-radius: 16px;
+      padding: 12px; border: 1.5px solid rgba(139,0,232,.06);
+      cursor: pointer; transition: border-color .2s, box-shadow .2s, border-radius .25s;
+    }
+    .svc-block.is-open .svc {
+      border-color: rgba(139,0,232,.45); box-shadow: 0 0 0 2px rgba(139,0,232,.1);
+      border-radius: 16px 16px 10px 10px;
+    }
+    .svc.is-added { border-color: rgba(139,0,232,.3); }
+    .svc__thumb { width: 56px; height: 56px; border-radius: 14px; overflow: hidden; flex-shrink: 0; background: #eee; }
+    .svc__thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .svc__info { flex: 1; min-width: 0; }
+    .svc__name {
+      margin: 0 0 2px; font-weight: 700; font-size: .92rem; color: var(--violet);
+    }
+    .svc__dur { margin: 0; font-size: .75rem; color: var(--muted); }
+    .svc__off { display: inline-block; margin-top: 5px; font-size: .62rem; font-weight: 800; padding: 2px 7px; border-radius: 99px; background: #ECFDF5; color: #059669; }
+    .svc__side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .svc__price { font-family: Outfit, sans-serif; font-weight: 700; font-size: .95rem; white-space: nowrap; }
+    .svc__price s { font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 600; color: var(--muted); margin-right: 4px; }
+    .svc__add {
+      display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 14px; border-radius: 999px;
+      border: 1.5px solid var(--violet); background: #fff; color: var(--violet);
+      font-family: inherit; font-size: .74rem; font-weight: 800; cursor: pointer;
+    }
+    .svc__add svg { width: 13px; height: 13px; }
+    .svc__add.is-added { border-color: transparent; background: var(--grad); color: #fff; }
+    .svc-hint { margin: 2px 0 0; font-size: .74rem; color: var(--muted); }
+    .svc-specs {
+      display: grid; grid-template-rows: 0fr; transition: grid-template-rows .38s cubic-bezier(.22,1,.36,1);
+    }
+    .svc-block.is-open .svc-specs { grid-template-rows: 1fr; }
+    .svc-specs__clip { overflow: hidden; min-height: 0; }
+    .svc-specs__panel {
+      margin-top: 0; padding: 0 10px; border: 1.5px solid transparent; border-top: 0;
+      border-radius: 0 0 16px 16px; background: linear-gradient(180deg, #FBF8FF 0%, #fff 55%);
+      opacity: 0; transform: translateY(-6px);
+      transition: opacity .28s ease, transform .32s cubic-bezier(.22,1,.36,1), padding .28s ease, border-color .2s;
+    }
+    .svc-block.is-open .svc-specs__panel {
+      padding: 10px 10px 12px; border-color: rgba(139,0,232,.28);
+      opacity: 1; transform: translateY(0);
+    }
+    .svc-specs__head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+      margin: 0 2px 10px; opacity: 0; transform: translateY(4px);
+      transition: opacity .28s ease .06s, transform .32s cubic-bezier(.22,1,.36,1) .06s;
+    }
+    .svc-block.is-open .svc-specs__head { opacity: 1; transform: none; }
+    .svc-specs__head b {
+      font-family: Outfit, sans-serif; font-size: .82rem; font-weight: 750; letter-spacing: -0.02em;
+    }
+    .svc-specs__head span { font-size: .7rem; font-weight: 600; color: var(--muted); }
+    .svc-specs__rail {
+      display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;
+      margin: 0 -2px; padding: 2px 2px 4px; -webkit-overflow-scrolling: touch;
+    }
+    .svc-specs__rail::-webkit-scrollbar { display: none; }
+    a.sty-card {
+      position: relative;
+      flex: 0 0 118px; display: block; text-decoration: none; color: inherit;
+      border-radius: 14px; overflow: hidden; background: #fff;
+      border: 1px solid rgba(139,0,232,.12);
+      box-shadow: 0 4px 14px rgba(91,33,182,.06);
+      opacity: 0; transform: translateY(10px) scale(.96);
+      transition: opacity .3s ease, transform .35s cubic-bezier(.22,1,.36,1), border-color .15s, box-shadow .15s;
+    }
+    .sty-card__fav {
+      position: absolute; top: 8px; right: 8px; z-index: 2;
+      width: 30px; height: 30px; border-radius: 50%; border: none; padding: 0;
+      display: grid; place-items: center; cursor: pointer;
+      background: rgba(255,255,255,.94); color: #C4B5D4;
+      box-shadow: 0 4px 12px rgba(26,16,36,.14);
+    }
+    .sty-card__fav svg { width: 15px; height: 15px; display: block; }
+    .sty-card__fav.is-on { color: #FF03C8; }
+    .sty-card__fav:active { transform: scale(.92); }
+    .svc-block.is-open a.sty-card {
+      opacity: 1; transform: none;
+    }
+    .svc-block.is-open a.sty-card:nth-child(1) { transition-delay: .05s; }
+    .svc-block.is-open a.sty-card:nth-child(2) { transition-delay: .1s; }
+    .svc-block.is-open a.sty-card:nth-child(3) { transition-delay: .15s; }
+    .svc-block.is-open a.sty-card:nth-child(4) { transition-delay: .2s; }
+    .svc-block.is-open a.sty-card:nth-child(5) { transition-delay: .25s; }
+    .svc-block.is-open a.sty-card:nth-child(6) { transition-delay: .3s; }
+    a.sty-card:active { transform: scale(.97); }
+    .sty-card__img { width: 100%; height: 96px; display: block; object-fit: cover; background: #eee; }
+    .sty-card__body { display: block; padding: 10px 12px 12px; }
+    .sty-card__name {
+      display: block; font-family: Outfit, sans-serif; font-size: 0.8rem; font-weight: 750;
+      letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sty-card__meta { display: block; margin-top: 2px; font-size: 0.66rem; font-weight: 600; color: var(--muted); }
+
+    /* Stylists */
+    .sty {
+      display: flex; gap: 12px; background: #fff; border-radius: 16px; padding: 12px; margin-bottom: 8px;
+      border: 1px solid rgba(139,0,232,.06);
+    }
+    .sty__av { width: 58px; height: 58px; border-radius: 16px; overflow: hidden; flex-shrink: 0; background: #eee; }
+    .sty__av img { width: 100%; height: 100%; object-fit: cover; }
+    .sty__body { flex: 1; min-width: 0; }
+    .sty__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .sty__name { font-weight: 700; font-size: .92rem; }
+    .sty__liked { font-size: .62rem; font-weight: 800; padding: 3px 7px; border-radius: 99px; background: #ECFDF5; color: #059669; white-space: nowrap; }
+    .sty__meta { margin-top: 2px; font-size: .74rem; color: var(--muted); }
+    .sty__meta .rate { font-weight: 700; }
+    .sty__reviews { border: none; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+    .sty__about { margin: 5px 0 0; font-size: .74rem; line-height: 1.4; color: #4B5563; }
+    .sty__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+    .sty__next { font-size: .7rem; font-weight: 700; color: #059669; }
+    .sty__next.is-later { color: #B45309; }
+    .sty__book {
+      flex-shrink: 0; height: 30px; padding: 0 14px; border-radius: 999px; background: var(--grad); color: #fff;
+      font-size: .74rem; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center;
+    }
+
+    /* Ratings & reviews */
+    .rv-sum {
+      display: grid; grid-template-columns: 84px 1fr; gap: 14px; align-items: center;
+      background: transparent; border-radius: 0; padding: 4px 0 2px; border: 0;
+    }
+    .rv-score { text-align: left; }
+    .rv-score strong {
+      display: block; font-family: Outfit, sans-serif; font-size: 2.2rem; line-height: 1;
+      letter-spacing: -0.04em; color: var(--ink);
+    }
+    .rv-score .stars { display: block; margin-top: 4px; font-size: .82rem; letter-spacing: 1px; color: #F59E0B; }
+    .rv-score small { display: block; margin-top: 4px; font-size: .66rem; font-weight: 600; color: var(--muted); }
+    .rv-bar { display: grid; grid-template-columns: 22px 1fr 28px; gap: 6px; align-items: center; font-size: .68rem; font-weight: 700; color: var(--muted); margin: 3px 0; }
+    .rv-bar i { display: block; height: 5px; border-radius: 99px; background: rgba(139,0,232,.08); overflow: hidden; }
+    .rv-bar i b { display: block; height: 100%; border-radius: 99px; background: var(--violet) !important; }
+    .rv-bar em { font-style: normal; text-align: right; }
+    .rv-aspects {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 12px;
+      padding: 10px 0; border-top: 1px solid rgba(237,228,236,.9); border-bottom: 1px solid rgba(237,228,236,.9);
+    }
+    .rv-aspect {
+      padding: 2px 6px; border-radius: 0; background: transparent; border: 0; text-align: center;
+      border-right: 1px solid rgba(237,228,236,.85);
+    }
+    .rv-aspect:last-child { border-right: 0; }
+    .rv-aspect .rate { display: block; font-family: Outfit, sans-serif; font-weight: 750; font-size: .9rem; color: var(--violet); }
+    .rv-aspect span { display: block; margin-top: 2px; font-size: .62rem; font-weight: 650; color: var(--muted); }
+    .rv-rate {
+      display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 11px 12px; border-radius: 14px;
+      background: #F3EEFF; border: 0;
+    }
+    .rv-rate[hidden] { display: none; }
+    .rv-rate__icon { width: 36px; height: 36px; border-radius: 11px; background: rgba(255,255,255,.7); color: #F59E0B; display: grid; place-items: center; font-size: 1.1rem; flex-shrink: 0; }
+    .rv-rate__text { flex: 1; min-width: 0; font-size: .76rem; color: var(--muted); line-height: 1.35; }
+    .rv-rate__text strong { display: block; color: var(--ink); font-size: .84rem; }
+    .rv-rate__btn {
+      flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--grad); color: #fff;
+      font-size: .72rem; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .rv-rate.is-muted { background: transparent; border: 1px dashed var(--line); }
+    .rv-rate.is-muted .rv-rate__text { color: var(--muted); }
+    .rv-pick {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: stretch;
+      margin-top: 14px; padding: 4px; border-radius: 14px; background: rgba(139,0,232,.06); border: 0;
+    }
+    .rv-pick button {
+      position: relative; z-index: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+      border: none; background: transparent; padding: 8px 6px; cursor: pointer; font-family: inherit; outline: none;
+      white-space: nowrap; border-radius: 11px; transition: background .15s, color .15s;
+    }
+    .rv-pick button.is-on {
+      z-index: 1; background: #fff; box-shadow: 0 4px 12px rgba(139,0,232,.12); width: auto; margin: 0;
+    }
+    .rv-pick button.is-on[data-view="salon"],
+    .rv-pick button.is-on[data-view="spec"] { margin: 0; border-radius: 11px; width: auto; }
+    .rv-pick b { position: relative; z-index: 1; font-family: Outfit, sans-serif; font-size: .82rem; font-weight: 750; color: var(--muted); }
+    .rv-pick small { position: relative; z-index: 1; font-size: .62rem; font-weight: 600; color: #A89AA6; }
+    .rv-pick button.is-on b { color: var(--violet); }
+    .rv-pick button.is-on small { color: var(--muted); }
+    .rv-people { margin-top: 10px; }
+    .rv-people[hidden], #reviews-list[hidden] { display: none; }
+    .rv-person {
+      background: transparent; border-radius: 0; padding: 12px 0; margin-bottom: 0;
+      border: 0; border-bottom: 1px solid rgba(237,228,236,.9);
+    }
+    .rv-person:last-child { border-bottom: 0; }
+    .rv-person__head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .rv-person__head img { width: 40px; height: 40px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+    .rv-person__head b { display: block; font-family: Outfit, sans-serif; font-size: .9rem; }
+    .rv-person__head small { display: block; margin-top: 2px; font-size: .68rem; font-weight: 650; color: var(--muted); }
+    .rv-chips { display: flex; gap: 6px; margin: 12px 0 10px; overflow-x: auto; scrollbar-width: none; }
+    .rv-chips::-webkit-scrollbar { display: none; }
+    .rv-chip {
+      flex: 0 0 auto; height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(139,0,232,.14);
+      background: transparent; font-family: inherit; font-size: .72rem; font-weight: 700; color: var(--muted); cursor: pointer;
+    }
+    .rv-chip.is-on { border-color: transparent; background: var(--violet); color: #fff; }
+    .review {
+      background: transparent; border-radius: 0; padding: 12px 0; margin-bottom: 0;
+      border: 0; border-bottom: 1px solid rgba(237,228,236,.9); font-size: .82rem;
+    }
+    .review:last-child { border-bottom: 0; }
+    .review.is-mine { border-color: rgba(139,0,232,.2); background: rgba(139,0,232,.04); border-radius: 14px; padding: 12px; margin-bottom: 8px; border: 1px solid rgba(139,0,232,.14); }
+    .review__head { display: flex; align-items: center; gap: 10px; }
+    .review__av { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #F3EEFF; color: var(--violet); font-weight: 800; font-size: .8rem; flex-shrink: 0; }
+    .review__who { flex: 1; min-width: 0; }
+    .review__top { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; }
+    .review__top span { font-size: .78rem; letter-spacing: 1px; color: #F59E0B; }
+    .review__when { font-size: .7rem; color: var(--muted); font-weight: 500; }
+    .review__ok { display: inline-flex; align-items: center; gap: 3px; margin-left: 8px; color: #059669; font-weight: 700; }
+    .review__ok svg { width: 11px; height: 11px; }
+    .review__mine { font-style: normal; font-size: .6rem; font-weight: 800; padding: 2px 6px; border-radius: 99px; background: #F3EEFF; color: var(--violet); margin-left: 4px; vertical-align: 1px; }
+    .review__svc { display: inline-block; margin-top: 8px; font-size: .68rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #F3EEFF; color: var(--violet); }
+    .review p { margin: 6px 0 0; color: #4B5563; line-height: 1.45; }
+    .review__pics { display: flex; gap: 6px; margin-top: 8px; }
+    .review__pics img { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; }
+    .rv-empty { padding: 18px 12px; border-radius: 14px; border: 1.5px dashed var(--line); text-align: center; font-size: .8rem; font-weight: 600; color: var(--muted); background: transparent; }
+
+    .sticky {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 32;
+      padding: 0 12px calc(var(--footer-above-dock, 104px) + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box; pointer-events: none;
+      background: transparent;
+    }
+    .sticky.has-cart {
+      background: linear-gradient(to top, rgba(251,247,250,.96) 35%, rgba(251,247,250,0));
+    }
+    .cartbar {
+      pointer-events: auto; display: flex; align-items: center; gap: 12px;
+      padding: 10px 10px 10px 14px; border-radius: 18px;
+      background: #1A1024; color: #fff;
+      box-shadow: 0 14px 36px rgba(26,16,36,.35), 0 0 0 1px rgba(255,255,255,.06);
+      transform: translateY(120%); opacity: 0;
+      transition: transform .38s cubic-bezier(.22,1,.36,1), opacity .28s ease;
+    }
+    .cartbar.is-on { transform: none; opacity: 1; }
+    .cartbar[hidden] { display: none; }
+    .cartbar__meta { flex: 1; min-width: 0; }
+    .cartbar__price {
+      display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px;
+      font-family: Outfit, sans-serif; font-size: .95rem; font-weight: 750; letter-spacing: -.02em;
+    }
+    .cartbar__was {
+      font-family: 'DM Sans', sans-serif; font-size: .78rem; font-weight: 600;
+      color: rgba(255,255,255,.45); text-decoration: line-through;
+    }
+    .cartbar__was[hidden] { display: none; }
+    .cartbar__meta > span { display: block; margin-top: 2px; font-size: .72rem; font-weight: 600; color: rgba(255,255,255,.62); }
+    .cartbar__go {
+      flex-shrink: 0; height: 42px; padding: 0 16px; border-radius: 13px;
+      background: var(--grad); color: #fff; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: inherit; font-weight: 800; font-size: .84rem;
+      box-shadow: 0 8px 18px rgba(139,0,232,.35);
+    }
+    .cartbar__go svg { width: 16px; height: 16px; }
+    .sheet {
+      position: absolute; inset: 0; z-index: 60; display: none; align-items: flex-end;
+      background: rgba(16, 8, 24, .45);
+    }
+    .sheet.is-open { display: flex; }
+    .sheet__panel {
+      width: 100%; background: #fff; border-radius: 22px 22px 0 0;
+      padding: 14px 16px calc(28px + 96px); box-shadow: 0 -12px 40px rgba(0,0,0,.18);
+    }
+    .sheet__handle { width: 40px; height: 4px; border-radius: 99px; background: #EDE4EC; margin: 0 auto 12px; }
+    .sheet__title { margin: 0; font-family: Outfit, sans-serif; font-size: 1.15rem; }
+    .sheet__sub { margin: 6px 0 12px; color: var(--muted); font-size: .82rem; line-height: 1.45; }
+    .sheet__actions { display: grid; grid-template-columns: 1fr 1.3fr; gap: 10px; margin-top: 14px; }
+    .sheet .btn {
+      height: 46px; border-radius: 14px; border: none; font-family: inherit; font-weight: 700; font-size: .9rem; cursor: pointer;
+    }
+    .sheet .btn--ghost { background: #fff; border: 1.5px solid var(--line); color: var(--ink); }
+    .sheet .btn--primary { background: var(--grad); color: #fff; }
+    .act-line { margin: 0 0 8px; padding: 12px; border-radius: 14px; background: #F8F4FF; font-size: .84rem; font-weight: 700; }
+    .act-line small { display: block; margin-top: 3px; font-weight: 600; color: var(--muted); }
+    .share-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+    .share-opt {
+      height: 64px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff;
+      color: var(--violet); font-family: inherit; font-weight: 700; font-size: .72rem; cursor: pointer;
+    }
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .hero__nav { top: calc(var(--app-top, 47px) + 8px); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="body" id="body">
+          <div class="hero" id="salon-hero">
+            <img id="salon-hero-img" src="assets/photos/salon-interior.jpg" alt="" style="object-position: 50% 30%;" />
+            <div class="hero__veil"></div>
+            <div class="hero__nav">
+              <a class="round" id="btn-back" href="category.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+              <a class="round" id="cart-btn" href="cart.html" title="Cart" aria-label="Cart">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 3.5h2.3l2.3 11a1.7 1.7 0 0 0 1.7 1.4h8.3a1.7 1.7 0 0 0 1.7-1.3L20.6 8H5.9"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>
+                <span class="round__n" id="cart-n" hidden>0</span>
+              </a>
+            </div>
+            <span class="hero__badge" id="hero-badge">Open</span>
+          </div>
+
+          <div class="panel">
+            <div class="title-row">
+              <div>
+                <h1 id="salon-name">Luxe Curls — Indiranagar</h1>
+                <p class="meta" id="salon-addr">12th Main, Indiranagar, Bengaluru</p>
+              </div>
+            </div>
+            <button type="button" class="rating" id="rating-line" data-goto="reviews"></button>
+            <div class="open-line" id="open-line"><strong class="is-open">Open</strong><span>Opens 10:00 AM</span><span>Closes 8:30 PM</span></div>
+            <div class="badges" id="badges">
+              <span class="badge-pill badge-pill--deal" id="deal-badge">20% OFF</span>
+            </div>
+
+            <div class="actions-row">
+              <button type="button" class="act" id="act-call"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2Z"/></svg></span>Call</button>
+              <button type="button" class="act" id="act-dir"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span>Direction</button>
+              <button type="button" class="act" id="act-share"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="m12 3 4 4M12 3 8 7M12 3v12"/></svg></span>Share</button>
+              <button type="button" class="act act--save" data-save aria-pressed="false"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.5 12.6 12 20l-7.5-7.4a5 5 0 0 1 7.1-7.1l.4.4.4-.4a5 5 0 0 1 7.1 7.1Z"/></svg></span><em>Favourite</em></button>
+            </div>
+
+            <div class="section" id="sec-services" style="margin-top:18px;">
+              <div class="sec-head"><h2>Services</h2><span>Tap a service for stylists</span></div>
+              <label class="svc-search" id="svc-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" id="svc-q" placeholder="Search services…" autocomplete="off" enterkeyhint="search" />
+                <button type="button" class="svc-search__clear" id="svc-q-clear" aria-label="Clear search">×</button>
+              </label>
+              <div id="services-list"></div>
+              <p class="svc-empty" id="svc-empty">No services match that search.</p>
+              <p class="svc-hint">Added services are booked together — pick a stylist after adding.</p>
+            </div>
+
+            <div class="section" id="sec-reviews">
+              <h2>Ratings &amp; reviews <small id="tab-rv-n" style="font-size:.72rem;color:var(--muted);font-weight:700;">214</small></h2>
+              <div class="rv-sum" id="rv-sum"></div>
+              <div class="rv-aspects" id="rv-aspects"></div>
+              <div class="rv-rate" id="rv-rate"></div>
+              <div class="rv-pick" id="rv-pick">
+                <button type="button" class="is-on" data-view="salon"><b>Salon</b><small>All reviews</small></button>
+                <button type="button" data-view="spec"><b>Specialist</b><small>By stylist</small></button>
+              </div>
+              <div class="rv-chips" id="rv-chips"></div>
+              <div id="reviews-list"></div>
+              <div class="rv-people" id="rv-people" hidden></div>
+            </div>
+
+            <div class="section" id="sec-about">
+              <h2>About salon</h2>
+              <div class="about">
+                <p class="about__text" id="about-blurb">Signature hair studio known for precision cuts and finish.</p>
+                <div class="about__facts" id="about-facts"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky">
+        <div class="cartbar" id="cartbar" hidden>
+          <div class="cartbar__meta">
+            <div class="cartbar__price">
+              <span class="cartbar__was" id="cartbar-was" hidden></span>
+              <strong id="cartbar-total">₹0</strong>
+            </div>
+            <span id="cartbar-count">0 services</span>
+          </div>
+          <a class="cartbar__go" id="cartbar-go" href="cart.html">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+      <div class="sheet" id="act-sheet" aria-hidden="true">
+        <div class="sheet__panel" role="dialog" aria-labelledby="act-title">
+          <div class="sheet__handle"></div>
+          <h2 class="sheet__title" id="act-title">Call</h2>
+          <p class="sheet__sub" id="act-copy"></p>
+          <div id="act-body"></div>
+          <div class="sheet__actions">
+            <button type="button" class="btn btn--ghost" id="act-close">Close</button>
+            <button type="button" class="btn btn--primary" id="act-go">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="assets/catalog.js"></script>
+  <script src="assets/cart.js"></script>
+  <script src="assets/fav-specs.js"></script>
+  <script>
+    (function () {
+      function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+      }
+      var C = window.GTCatalog, Cart = window.GTCart, rupees = C.rupees;
+
+      var CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+      var PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>';
+      var TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg>';
+      // Salon-level info; services and specialists come from assets/catalog.js.
+      var catalog = {
+        luxe: {
+          open: true,
+          hours: ['10:00 AM', '8:30 PM'],
+          deal: '20% OFF',
+          about: 'A bright, modern hair studio in the heart of Indiranagar. Our senior stylists specialise in precision cuts, lived-in colour and glossy blow-dries — every visit starts with a quick consultation so you leave with a look that suits you.',
+          facts: [['2016', 'Since'], ['4', 'Stylists'], ['4.2k+', 'Bookings']],
+          aboutDetail: '12th Main, Indiranagar, Bengaluru',
+          address: 'No. 482, 12th Main Rd, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038',
+          rating: 4.8, count: 214, dist: '0.8 km', split: [158, 38, 11, 4, 3],
+          aspects: [['Service', '4.9'], ['Staff', '4.8'], ['Hygiene', '4.9'], ['Value', '4.5']],
+          visit: null,
+          reviews: [
+            { who: 'Ananya', n: 5, when: '2 days ago', svc: 'Haircut & Style', spec: 'Priya S.', text: 'Priya did an amazing cut — walked out glowing. Salon was spotless.', pics: ['assets/photos/salon-color.jpg', 'assets/photos/salon-hair.jpg'] },
+            { who: 'Rahul', n: 4, when: '1 week ago', svc: 'Blow Dry', spec: 'Kavya M.', text: 'Slight wait but Kavya’s blow dry was worth it. Booking again on GlowTap.', pics: [] },
+            { who: 'Meghna', n: 5, when: '2 weeks ago', svc: 'Global Color', spec: 'Kavya M.', text: 'Exactly the shade I showed her. Colour still looks fresh after 3 washes.', pics: ['assets/photos/salon-interior.jpg'] },
+            { who: 'Karan', walkin: true, n: 3, when: '3 weeks ago', svc: 'Haircut & Style', spec: 'Rahul V.', text: 'Decent cut, but the appointment started 15 minutes late.', pics: [] },
+            { who: 'Divya', n: 5, when: '1 month ago', svc: 'Haircut & Style', spec: 'Sneha J.', text: 'Sneha listened to everything I wanted. Loved the head massage during the wash.', pics: [] }
+          ]
+        },
+        bloom: {
+          open: true,
+          hours: ['11:00 AM', '9:00 PM'],
+          deal: 'Flat ₹200 OFF',
+          about: 'A calm skin and brow boutique focused on healthy, glowing skin. Facials are tailored after a quick skin check, and our brow artists shape to your face — not a template. Soft-glam makeup is available for events.',
+          facts: [['2019', 'Since'], ['4', 'Experts'], ['1.8k+', 'Bookings']],
+          aboutDetail: '100 Feet Rd, Indiranagar, Bengaluru',
+          address: '2nd Floor, 1088, 100 Feet Rd, Indiranagar, Bengaluru, Karnataka 560038',
+          rating: 4.6, count: 132, dist: '1.4 km', split: [88, 28, 9, 4, 3],
+          aspects: [['Service', '4.7'], ['Staff', '4.6'], ['Hygiene', '4.8'], ['Value', '4.3']],
+          visit: null,
+          reviews: [
+            { who: 'Ishita', n: 5, when: '3 days ago', svc: 'Hydra Facial', spec: 'Neha R.', text: 'Neha’s Hydra Facial was gentle and glowing. Studio smelled amazing.', pics: ['assets/photos/salon-facial.jpg'] },
+            { who: 'Sana', n: 5, when: '1 week ago', svc: 'Soft Glam Makeup', spec: 'Pooja K.', text: 'Soft glam for a wedding brunch — lasted all day and looked natural in photos.', pics: ['assets/photos/salon-makeup.jpg', 'assets/photos/salon-nails.jpg'] },
+            { who: 'Ritu', n: 4, when: '2 weeks ago', svc: 'Brow Threading', spec: 'Ananya M.', text: 'Ananya shaped my brows perfectly. Quick and almost painless.', pics: [] },
+            { who: 'Neeraj', walkin: true, n: 2, when: '1 month ago', svc: 'Hydra Facial', spec: 'Tara S.', text: 'Skin felt nice but I was rushed out at the end.', pics: [] }
+          ]
+        },
+        nord: {
+          open: false,
+          hours: ['12:00 PM', '10:00 PM'],
+          about: 'A modern barber lab for men and gender-neutral styling. Expect sharp skin fades, precise beard work and keratin treatments, with express evening slots for after-work appointments.',
+          facts: [['2018', 'Since'], ['4', 'Barbers'], ['3.1k+', 'Bookings']],
+          aboutDetail: 'Koramangala 5th Block, Bengaluru',
+          address: '14, 80 Feet Rd, Koramangala 5th Block, Bengaluru, Karnataka 560095',
+          rating: 4.9, count: 308, dist: '2.1 km', split: [271, 28, 6, 2, 1],
+          aspects: [['Service', '4.9'], ['Staff', '4.9'], ['Hygiene', '4.8'], ['Value', '4.7']],
+          visit: { id: 'GT-47940', svc: 'Signature Cut', spec: 'Arjun K.', day: '15 Jul' },
+          mine: { n: 4, when: '15 Jul', svc: 'Signature Cut', spec: 'Arjun K.', text: 'Clean fade and quick service. Took a few minutes to get started.', pics: [] },
+          reviews: [
+            { who: 'Dev', n: 5, when: '1 day ago', svc: 'Signature Cut', spec: 'Arjun K.', text: 'Arjun’s fade is clean every time. Booked Signature Cut in under a minute.', pics: ['assets/photos/salon-mens.jpg'] },
+            { who: 'Nikhil', n: 4, when: '5 days ago', svc: 'Keratin Smooth', spec: 'Rohan P.', text: 'Rohan’s keratin lasted weeks. Late slot was a lifesaver after work.', pics: [] },
+            { who: 'Sameer', walkin: true, n: 5, when: '2 weeks ago', svc: 'Beard Trim', spec: 'Imran S.', text: 'Best hot-towel finish in Koramangala.', pics: [] },
+            { who: 'Aditya', n: 4, when: '3 weeks ago', svc: 'Express Trim', spec: 'Vikram D.', text: 'Vikram was quick with the line-up. Good for a last-minute slot.', pics: [] }
+          ]
+        },
+        aura: {
+          open: true,
+          hours: ['9:30 AM', '8:00 PM'],
+          deal: '30% OFF',
+          about: 'A quiet, therapist-led spa built for deep recovery. Choose from deep tissue, Swedish and hot-stone rituals, followed by steam and herbal tea. Phones stay on silent so every session feels unhurried.',
+          facts: [['2015', 'Since'], ['4', 'Therapists'], ['2.6k+', 'Bookings']],
+          aboutDetail: 'HSR Layout, Bengaluru',
+          address: '221, 27th Main Rd, HSR Layout Sector 2, Bengaluru, Karnataka 560102',
+          rating: 4.7, count: 176, dist: '2.8 km', split: [128, 33, 9, 4, 2],
+          aspects: [['Service', '4.8'], ['Staff', '4.8'], ['Hygiene', '4.7'], ['Value', '4.4']],
+          visit: null,
+          reviews: [
+            { who: 'Priya', n: 5, when: '4 days ago', svc: 'Deep Tissue', spec: 'Meera D.', text: 'Meera’s deep tissue released months of desk tension. Quiet, calm room.', pics: ['assets/photos/salon-spa.jpg'] },
+            { who: 'Kabir', n: 4, when: '1 week ago', svc: 'Hot Stone Ritual', spec: 'Divya L.', text: 'Hot stone with Divya was excellent. Wish evening slots opened earlier.', pics: [] },
+            { who: 'Lavanya', walkin: true, n: 3, when: '3 weeks ago', svc: 'Swedish Massage', spec: 'Asha N.', text: 'Relaxing, but the steam room was out of order that day.', pics: [] },
+            { who: 'Rohan', n: 5, when: '1 month ago', svc: 'Foot Reflexology', spec: 'Kiran B.', text: 'Kiran’s foot session eased a long week. Left feeling lighter.', pics: [] }
+          ]
+        }
+      };
+      catalog['bandra-glow'] = catalog.luxe;
+
+      var params = new URLSearchParams(location.search);
+      var id = params.get('id') || 'luxe';
+      var data = catalog[id] || catalog.luxe;
+      var salonKey = id === 'bandra-glow' ? 'luxe' : id;
+      if (!catalog[salonKey]) salonKey = 'luxe';
+      var base = C.SALONS[salonKey];
+
+      (function () {
+        var back = document.getElementById('btn-back');
+        var cat = '';
+        try { cat = sessionStorage.getItem('gt-home-cat') || ''; } catch (e) {}
+        var fallback = cat
+          ? 'category.html?cat=' + encodeURIComponent(cat)
+          : 'category.html?cat=salon';
+        back.setAttribute('href', fallback);
+        back.addEventListener('click', function (e) {
+          if (history.length > 1 && document.referrer) {
+            e.preventDefault();
+            history.back();
+          }
+        });
+      })();
+      document.getElementById('salon-name').textContent = base.name;
+      document.getElementById('salon-addr').textContent = data.aboutDetail;
+      var placeQuery = base.name + ', ' + (data.address || data.aboutDetail || '');
+      var phoneNo = (base.phone || data.phone || '+91 99999 99999').replace(/\s/g, '');
+      var telHref = 'tel:' + phoneNo;
+      var appleMapsUrl = 'https://maps.apple.com/?daddr=' + encodeURIComponent(placeQuery) + '&dirflg=d';
+      var googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(placeQuery);
+      (function () {
+        function isApple() {
+          var ua = navigator.userAgent || '';
+          return /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+        function flash(msg) {
+          var t = document.getElementById('toast');
+          t.textContent = msg;
+          t.classList.add('is-on');
+          setTimeout(function () { t.classList.remove('is-on'); }, 1600);
+        }
+        document.getElementById('act-call').addEventListener('click', function () {
+          // Native Phone app / dialler
+          location.href = telHref;
+        });
+        document.getElementById('act-dir').addEventListener('click', function () {
+          // Apple Maps on iOS; Google Maps elsewhere
+          location.href = isApple() ? appleMapsUrl : googleMapsUrl;
+        });
+        document.getElementById('act-share').addEventListener('click', function () {
+          var payload = {
+            title: base.name,
+            text: base.name + ' on GlowTap — ' + (data.aboutDetail || base.area || ''),
+            url: location.href.split('#')[0]
+          };
+          if (navigator.share) {
+            navigator.share(payload).catch(function () {});
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(payload.url).then(function () { flash('Link copied'); })
+              .catch(function () { flash('Couldn’t share'); });
+            return;
+          }
+          flash('Sharing isn’t available here');
+        });
+      })();
+      var hero = document.getElementById('salon-hero-img');
+      hero.src = base.photo;
+      hero.style.objectPosition = base.pos;
+      document.getElementById('rating-line').innerHTML =
+        '<span class="stars">★ ' + data.rating.toFixed(1) + '</span> <u>(' + data.count + ' reviews)</u> · ' + esc(data.dist);
+      document.getElementById('about-blurb').textContent = data.about;
+      document.getElementById('about-facts').innerHTML = data.facts.map(function (f) {
+        return '<div class="about__fact"><strong>' + esc(f[0]) + '</strong><span>' + esc(f[1]) + '</span></div>';
+      }).join('');
+      var today = data.hours;
+      document.getElementById('salon-hero').classList.toggle('is-closed', !data.open);
+      if (data.deal) document.getElementById('deal-badge').textContent = data.deal;
+      else document.getElementById('badges').remove();
+      var heroBadge = document.getElementById('hero-badge');
+      if (data.open) heroBadge.remove();
+      else { heroBadge.textContent = 'Closed'; heroBadge.classList.add('is-closed'); }
+      document.getElementById('open-line').innerHTML = CLOCK +
+        (data.open ? '' : '<strong class="is-closed">Closed</strong>') +
+        '<span>Opens ' + today[0] + '</span><span>Closes ' + today[1] + '</span>';
+
+      var SAVED_KEY = 'gt-saved-salons';
+      var saved;
+      try { saved = JSON.parse(localStorage.getItem(SAVED_KEY) || 'null'); } catch (e) { saved = null; }
+      if (!Array.isArray(saved)) saved = ['luxe'];
+      var saveBtns = document.querySelectorAll('[data-save]');
+      function paintSave(on, pop) {
+        saveBtns.forEach(function (b) {
+          b.classList.toggle('is-saved', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          var label = b.querySelector('em');
+          if (label) label.textContent = 'Favourite';
+          else b.setAttribute('aria-label', on ? 'Remove from favourites' : 'Add to favourites');
+          if (pop) { b.classList.remove('is-pop'); void b.offsetWidth; b.classList.add('is-pop'); }
+        });
+      }
+      function toast(html) {
+        var t = document.getElementById('toast');
+        t.innerHTML = html;
+        t.classList.add('is-on');
+        clearTimeout(toast.h);
+        toast.h = setTimeout(function () { t.classList.remove('is-on'); }, 2200);
+      }
+      paintSave(saved.indexOf(salonKey) !== -1, false);
+      saveBtns.forEach(function (b) {
+        b.addEventListener('click', function () {
+          var i = saved.indexOf(salonKey);
+          if (i === -1) saved.push(salonKey); else saved.splice(i, 1);
+          localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+          var on = i === -1;
+          paintSave(on, true);
+          toast(on ? 'Added to Favourites<a href="favorites.html">View</a>' : 'Removed from Favourites');
+        });
+      });
+
+      /* ---------- Services + cart ---------- */
+      var CHEV = '<svg class="svc-group__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+      function paintCart() {
+        var mine = Cart.count(salonKey);
+        var all = Cart.count();
+        var bar = document.getElementById('cartbar');
+        var svcs = mine ? Cart.services().filter(function (s) { return !!s; }) : [];
+        var sum = C.totals(svcs);
+        var sticky = bar.closest('.sticky');
+        if (mine) {
+          bar.hidden = false;
+          if (sticky) sticky.classList.add('has-cart');
+          requestAnimationFrame(function () { bar.classList.add('is-on'); });
+        } else {
+          bar.classList.remove('is-on');
+          bar.hidden = true;
+          if (sticky) sticky.classList.remove('has-cart');
+        }
+        document.getElementById('cartbar-total').textContent = rupees(sum.total || 0);
+        var wasEl = document.getElementById('cartbar-was');
+        if (sum.off) {
+          wasEl.hidden = false;
+          wasEl.textContent = rupees(sum.price || 0);
+        } else {
+          wasEl.hidden = true;
+          wasEl.textContent = '';
+        }
+        document.getElementById('cartbar-count').textContent =
+          mine + (mine === 1 ? ' service' : ' services') + (sum.dur ? ' · ' + sum.dur : '');
+        var badge = document.getElementById('cart-n');
+        badge.hidden = !all;
+        badge.textContent = String(all);
+        document.getElementById('cart-btn').setAttribute('aria-label', all ? 'Cart, ' + all + ' service' + (all > 1 ? 's' : '') : 'Cart');
+        document.querySelectorAll('.svc-block').forEach(function (block) {
+          var on = Cart.has(salonKey, block.getAttribute('data-key'));
+          var row = block.querySelector('.svc');
+          if (row) row.classList.toggle('is-added', on);
+          var btn = block.querySelector('.svc__add');
+          if (!btn) return;
+          btn.classList.toggle('is-added', on);
+          btn.setAttribute('aria-pressed', String(on));
+          btn.innerHTML = on ? TICK + 'Added' : PLUS + 'Add';
+        });
+      }
+
+      var svcList = document.getElementById('services-list');
+      var activeSvc = null;
+      var groups = [];
+      base.services.forEach(function (svc) {
+        var g = svc.group || 'Services';
+        var block = groups.filter(function (x) { return x.title === g; })[0];
+        if (!block) { block = { title: g, items: [] }; groups.push(block); }
+        block.items.push(svc);
+      });
+      function styCardsHtml(svcKey) {
+        var specs = C.specsFor(salonKey, svcKey);
+        if (!specs.length) specs = base.specs.slice();
+        var Fav = window.GTFavSpecs;
+        return specs.map(function (s) {
+          var on = Fav && Fav.has(salonKey, s.name);
+          return (
+            '<a class="sty-card" role="listitem" href="book.html?salon=' + encodeURIComponent(salonKey) +
+            '&service=' + encodeURIComponent(svcKey) +
+            '&spec=' + encodeURIComponent(s.name) + '">' +
+            '<button type="button" class="sty-card__fav' + (on ? ' is-on' : '') + '" data-spec="' + esc(s.name) + '" aria-pressed="' + (on ? 'true' : 'false') + '" aria-label="' + (on ? 'Remove from favourites' : 'Add to favourites') + '">' +
+            (Fav ? Fav.HEART : '♥') + '</button>' +
+            '<img class="sty-card__img" src="' + esc(s.photo) + '" alt="" />' +
+            '<span class="sty-card__body">' +
+            '<span class="sty-card__name">' + esc(s.name) + '</span>' +
+            '<span class="sty-card__meta">★ ' + esc(s.rate) + ' · ' + esc(s.role) + '</span>' +
+            '</span></a>'
+          );
+        }).join('');
+      }
+      function svcCard(svc) {
+        var n = C.specsFor(salonKey, svc.key).length || base.specs.length;
+        var hay = [svc.name, svc.group || '', svc.desc || '', svc.dur || '', String(svc.price || '')].join(' ').toLowerCase();
+        return (
+          '<div class="svc-block" data-key="' + esc(svc.key) + '" data-q="' + esc(hay) + '">' +
+            '<div class="svc" role="button" tabindex="0" aria-expanded="false">' +
+              '<div class="svc__thumb"><img src="' + esc(svc.thumb) + '" alt="" /></div>' +
+              '<div class="svc__info">' +
+                '<p class="svc__name">' + esc(svc.name) + '</p>' +
+                '<p class="svc__dur">' + esc(svc.dur) + '</p>' +
+                (svc.off ? '<span class="svc__off">' + esc(svc.offTag) + '</span>' : '') +
+              '</div>' +
+              '<div class="svc__side">' +
+                '<div class="svc__price">' + (svc.off ? '<s>' + rupees(svc.price) + '</s>' : '') + rupees(svc.price - svc.off) + '</div>' +
+                '<button type="button" class="svc__add" data-key="' + esc(svc.key) + '"></button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="svc-specs">' +
+              '<div class="svc-specs__clip">' +
+                '<div class="svc-specs__panel">' +
+                  '<div class="svc-specs__head"><b>Choose a stylist</b><span>' + n + ' available</span></div>' +
+                  '<div class="svc-specs__rail" role="list">' + styCardsHtml(svc.key) + '</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }
+      svcList.innerHTML = groups.map(function (g) {
+        return (
+          '<div class="svc-group is-open" data-group="' + esc(g.title) + '">' +
+            '<button type="button" class="svc-group__toggle" aria-expanded="true">' +
+              '<h3 class="svc-group__title">' + esc(g.title) + '</h3>' +
+              '<span class="svc-group__n">' + g.items.length + '</span>' + CHEV +
+            '</button>' +
+            '<div class="svc-group__body"><div class="svc-group__clip"><div class="svc-group__list">' +
+              g.items.map(svcCard).join('') +
+            '</div></div></div>' +
+          '</div>'
+        );
+      }).join('');
+
+      function selectService(key, forceOpen) {
+        var block = svcList.querySelector('.svc-block[data-key="' + key + '"]');
+        var wasOpen = block && block.classList.contains('is-open');
+        var open = forceOpen ? true : !(wasOpen && activeSvc === key);
+        activeSvc = open ? key : null;
+        svcList.querySelectorAll('.svc-block').forEach(function (el) {
+          var on = open && el.getAttribute('data-key') === key;
+          el.classList.toggle('is-open', on);
+          var row = el.querySelector('.svc');
+          if (row) row.setAttribute('aria-expanded', String(on));
+        });
+        if (open && block) {
+          var group = block.closest('.svc-group');
+          if (group && !group.classList.contains('is-open') && !group.classList.contains('is-filtering')) {
+            group.classList.add('is-open');
+            var tog = group.querySelector('.svc-group__toggle');
+            if (tog) tog.setAttribute('aria-expanded', 'true');
+          }
+          requestAnimationFrame(function () {
+            block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          });
+        }
+      }
+
+      function wildcardMatch(hay, raw) {
+        var q = String(raw || '').trim().toLowerCase();
+        if (!q) return true;
+        hay = String(hay || '').toLowerCase();
+        if (q.indexOf('*') === -1) return hay.indexOf(q) !== -1;
+        var parts = q.split('*').map(function (p) {
+          return p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        });
+        try { return new RegExp(parts.join('.*')).test(hay); }
+        catch (e) { return hay.indexOf(q.replace(/\*/g, '')) !== -1; }
+      }
+
+      function applySvcSearch() {
+        var q = document.getElementById('svc-q').value;
+        var filtering = !!String(q || '').trim();
+        document.getElementById('svc-search').classList.toggle('has-q', filtering);
+        var shown = 0;
+        svcList.querySelectorAll('.svc-group').forEach(function (group) {
+          var any = 0;
+          group.querySelectorAll('.svc-block').forEach(function (block) {
+            var ok = wildcardMatch(block.getAttribute('data-q'), q);
+            block.hidden = !ok;
+            if (ok) any += 1;
+          });
+          group.hidden = !any;
+          group.classList.toggle('is-filtering', filtering && !!any);
+          if (filtering && any) {
+            group.classList.add('is-open');
+            var tog = group.querySelector('.svc-group__toggle');
+            if (tog) tog.setAttribute('aria-expanded', 'true');
+          }
+          shown += any;
+        });
+        document.getElementById('svc-empty').classList.toggle('is-on', filtering && !shown);
+      }
+
+      svcList.querySelectorAll('.svc-group__toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var group = btn.closest('.svc-group');
+          if (!group || group.classList.contains('is-filtering')) return;
+          var open = !group.classList.contains('is-open');
+          group.classList.toggle('is-open', open);
+          btn.setAttribute('aria-expanded', String(open));
+        });
+      });
+      document.getElementById('svc-q').addEventListener('input', applySvcSearch);
+      document.getElementById('svc-q-clear').addEventListener('click', function () {
+        document.getElementById('svc-q').value = '';
+        applySvcSearch();
+        document.getElementById('svc-q').focus();
+      });
+
+      svcList.addEventListener('click', function (e) {
+        var favBtn = e.target.closest('.sty-card__fav');
+        if (!favBtn || !window.GTFavSpecs) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var name = favBtn.getAttribute('data-spec');
+        var on = GTFavSpecs.toggle(salonKey, name);
+        favBtn.classList.toggle('is-on', on);
+        favBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        favBtn.setAttribute('aria-label', on ? 'Remove from favourites' : 'Add to favourites');
+        toast(on
+          ? 'Added ' + esc(name) + ' to Favourites<a href="favorites.html">View</a>'
+          : 'Removed ' + esc(name) + ' from Favourites');
+      });
+
+      svcList.querySelectorAll('.svc__add').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var key = btn.getAttribute('data-key');
+          if (Cart.has(salonKey, key)) {
+            Cart.remove(salonKey, key);
+            toast('Removed from cart');
+          } else {
+            var r = Cart.add(salonKey, key);
+            toast(r.replaced
+              ? 'New cart started for ' + esc(base.short) + '<a href="cart.html">View</a>'
+              : 'Added to cart<a href="cart.html">View</a>');
+          }
+          paintCart();
+        });
+      });
+      svcList.querySelectorAll('.svc-block').forEach(function (block) {
+        var row = block.querySelector('.svc');
+        row.addEventListener('click', function () {
+          selectService(block.getAttribute('data-key'));
+        });
+        row.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectService(block.getAttribute('data-key'));
+          }
+        });
+      });
+      paintCart();
+
+      /* ---------- Ratings & reviews ---------- */
+      var TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg>';
+      var STARS = function (n) { return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); };
+      var BANDS = ['#DC2626', '#EA580C', '#F59E0B', '#65A30D', '#059669'];
+      var mine = data.mine || null;
+      try {
+        var posted = JSON.parse(localStorage.getItem('gt-reviews') || '[]').filter(function (r) { return r.salon === salonKey; }).pop();
+        if (posted) mine = posted;
+      } catch (e) { /* ignore */ }
+
+      var total = data.split.reduce(function (a, b) { return a + b; }, 0);
+      document.getElementById('tab-rv-n').textContent = String(data.count);
+      document.getElementById('rv-sum').innerHTML =
+        '<div class="rv-score"><strong>' + data.rating.toFixed(1) + '</strong><span class="stars">' + STARS(Math.round(data.rating)) + '</span><small>' + data.count + ' ratings</small></div>' +
+        '<div>' + data.split.map(function (c, i) {
+          var star = 5 - i, pct = Math.round(c / total * 100);
+          return '<div class="rv-bar"><span>' + star + '★</span><i><b style="width:' + pct + '%;background:' + BANDS[star - 1] + ';"></b></i><em>' + pct + '%</em></div>';
+        }).join('') + '</div>';
+      document.getElementById('rv-aspects').innerHTML = data.aspects.map(function (a) {
+        return '<div class="rv-aspect"><span class="rate">★ ' + a[1] + '</span><span>' + a[0] + '</span></div>';
+      }).join('');
+
+      var rate = document.getElementById('rv-rate');
+      if (mine) {
+        rate.hidden = false;
+        rate.classList.add('is-muted');
+        rate.innerHTML = '<span class="rv-rate__icon">★</span><span class="rv-rate__text"><strong>Thanks for your review</strong>It’s shown first below for you.</span>';
+      } else if (data.visit) {
+        rate.hidden = false;
+        var v = data.visit;
+        rate.innerHTML = '<span class="rv-rate__icon">★</span><span class="rv-rate__text"><strong>How was your visit?</strong>' + esc(v.svc) + ' with ' + esc(v.spec) + ' · ' + esc(v.day) + '</span>' +
+          '<a class="rv-rate__btn" id="rate-visit" href="rate.html?' + new URLSearchParams({ id: v.id, stylist: v.spec, svc: v.svc, salon: salonKey, from: 'salon' }).toString() + '">Rate &amp; review</a>';
+      } else {
+        rate.hidden = true;
+        rate.innerHTML = '';
+      }
+
+      var reviews = (mine ? [Object.assign({ who: 'You', mine: true }, mine)] : []).concat(data.reviews);
+      var FILTERS = [['all', 'All'], ['5', '5★'], ['4', '4★'], ['low', '3★ & below'], ['pics', 'With photos']];
+      var filter = 'all';
+      var view = 'salon';
+      function specNames() {
+        return base.specs.slice(0, 3);
+      }
+      function chipsForView() {
+        if (view !== 'spec') return FILTERS;
+        var names = specNames().map(function (s) { return ['spec:' + s.name, s.name]; });
+        return [FILTERS[0]].concat(names, FILTERS.slice(1));
+      }
+      function matches(r) {
+        if (filter.indexOf('spec:') === 0) return r.spec === filter.slice(5);
+        if (filter === 'all') return true;
+        if (filter === 'pics') return r.pics && r.pics.length;
+        if (filter === 'low') return r.n <= 3;
+        return r.n === Number(filter);
+      }
+      function reviewCard(r, hideSpec) {
+        return (
+          '<div class="review' + (r.mine ? ' is-mine' : '') + '">' +
+            '<div class="review__head"><span class="review__av">' + esc(r.who.charAt(0)) + '</span>' +
+              '<div class="review__who"><div class="review__top"><strong>' + esc(r.who) + (r.mine ? '<em class="review__mine">Your review</em>' : '') + '</strong><span class="st">' + STARS(r.n) + '</span></div>' +
+              '<div class="review__when">' + esc(r.when) + ((r.verified !== undefined ? r.verified : !r.walkin) ? '<span class="review__ok">' + TICK + 'Verified visit</span>' : '') + '</div></div></div>' +
+            '<span class="review__svc">' + esc(r.svc) + (!hideSpec && r.spec ? ' · with ' + esc(r.spec) : '') + '</span>' +
+            (r.text ? '<p>' + esc(r.text) + '</p>' : '') +
+            (r.pics && r.pics.length ? '<div class="review__pics">' + r.pics.map(function (p) { return '<img src="' + esc(p) + '" alt="" />'; }).join('') + '</div>' : '') +
+          '</div>'
+        );
+      }
+      function renderReviews() {
+        var scroller = document.getElementById('body');
+        var keep = scroller ? scroller.scrollTop : 0;
+        document.getElementById('rv-pick').classList.toggle('is-spec', view === 'spec');
+        document.querySelectorAll('#rv-pick button').forEach(function (b) {
+          b.classList.toggle('is-on', b.getAttribute('data-view') === view);
+        });
+        document.getElementById('rv-chips').innerHTML = chipsForView().map(function (f) {
+          return '<button type="button" class="rv-chip' + (f[0] === filter ? ' is-on' : '') + '" data-f="' + esc(f[0]) + '">' + esc(f[1]) + '</button>';
+        }).join('');
+        var list = reviews.filter(matches);
+        var salonEl = document.getElementById('reviews-list');
+        var peopleEl = document.getElementById('rv-people');
+        salonEl.hidden = view !== 'salon';
+        peopleEl.hidden = view !== 'spec';
+        if (view === 'salon') {
+          salonEl.innerHTML = list.length
+            ? list.map(function (r) { return reviewCard(r, false); }).join('')
+            : '<p class="rv-empty">No salon reviews match this filter yet.</p>';
+          peopleEl.innerHTML = '';
+        } else {
+          salonEl.innerHTML = '';
+          var people = filter.indexOf('spec:') === 0
+            ? base.specs.filter(function (s) { return s.name === filter.slice(5); })
+            : base.specs;
+          peopleEl.innerHTML = people.map(function (s) {
+            var theirs = list.filter(function (r) { return r.spec === s.name; });
+            var avg = theirs.length
+              ? (theirs.reduce(function (a, r) { return a + r.n; }, 0) / theirs.length).toFixed(1)
+              : s.rate;
+            return '<article class="rv-person" data-person="' + esc(s.name) + '">' +
+              '<div class="rv-person__head"><img src="' + esc(s.photo) + '" alt="" />' +
+              '<span><b>' + esc(s.name) + '</b><small>' + esc(s.role) + ' · ★ ' + avg + ' · ' +
+              (theirs.length ? theirs.length + (theirs.length === 1 ? ' review' : ' reviews') : 'No reviews yet') +
+              '</small></span></div>' +
+              (theirs.length ? theirs.map(function (r) { return reviewCard(r, true); }).join('') : '<p class="rv-empty">No reviews for ' + esc(s.name) + ' yet.</p>') +
+              '</article>';
+          }).join('');
+        }
+        document.querySelectorAll('.rv-chip').forEach(function (chip) {
+          chip.addEventListener('click', function () { filter = chip.getAttribute('data-f'); renderReviews(); });
+        });
+        if (scroller) scroller.scrollTop = keep;
+      }
+      document.getElementById('rv-pick').addEventListener('mousedown', function (e) {
+        e.preventDefault();
+      });
+      document.getElementById('rv-pick').addEventListener('click', function (e) {
+        e.preventDefault();
+        var btn = e.target.closest('button');
+        if (!btn) return;
+        var scroller = document.getElementById('body');
+        var keep = scroller ? scroller.scrollTop : 0;
+        view = btn.getAttribute('data-view');
+        if (view !== 'spec' && filter.indexOf('spec:') === 0) filter = 'all';
+        renderReviews();
+        function hold() { if (scroller) scroller.scrollTop = keep; }
+        hold();
+        requestAnimationFrame(function () {
+          hold();
+          requestAnimationFrame(hold);
+        });
+      });
+      renderReviews();
+
+      /* ---------- Section jumps ---------- */
+      function scrollToSec(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      document.querySelectorAll('[data-goto]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var target = el.getAttribute('data-goto');
+          if (target === 'reviews') scrollToSec('sec-reviews');
+          else if (target === 'about') scrollToSec('sec-about');
+          else if (target === 'services') scrollToSec('sec-services');
+        });
+      });
+      if (params.get('tab') === 'reviews') scrollToSec('sec-reviews');
+    })();
+  </script>
+  <script src="assets/rating.js"></script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

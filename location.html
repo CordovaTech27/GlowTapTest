@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Select location</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); }
+    .phone { background: #EEF0EA; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; }
+
+    /* Full-bleed map */
+    .map {
+      position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; background: #EEF0EA;
+    }
+    .map__canvas {
+      position: absolute; left: 0; top: 0; width: 900px; height: 900px;
+      transition: transform .5s cubic-bezier(.22, 1, .36, 1);
+    }
+    .map__pin {
+      position: absolute; left: 50%; top: 46%; transform: translate(-50%, -100%);
+      z-index: 5; pointer-events: none; filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .28));
+    }
+    .map__pin svg { width: 44px; height: 52px; display: block; }
+    .map__pin.is-drop { animation: drop .45s cubic-bezier(.22, 1, .36, 1); }
+    @keyframes drop { from { transform: translate(-50%, -150%); } to { transform: translate(-50%, -100%); } }
+    .map__shadow {
+      position: absolute; left: 50%; top: 46%; width: 16px; height: 6px; margin: -2px 0 0 -8px;
+      border-radius: 50%; background: rgba(0, 0, 0, .22); z-index: 4;
+    }
+    .map__tip {
+      position: absolute; left: 50%; top: 46%; transform: translate(-50%, -92px); z-index: 6;
+      padding: 7px 12px; border-radius: 999px; background: rgba(36, 24, 40, .92); color: #fff;
+      font-size: .72rem; font-weight: 600; white-space: nowrap; backdrop-filter: blur(8px);
+    }
+    .map__tip::after {
+      content: ''; position: absolute; left: 50%; bottom: -5px; margin-left: -5px;
+      border: 5px solid transparent; border-bottom: 0; border-top-color: rgba(36, 24, 40, .92);
+    }
+    .map__locate {
+      position: absolute; right: 14px; bottom: 14px; z-index: 6;
+      width: 44px; height: 44px; border-radius: 50%; border: 0; background: #fff; color: var(--violet);
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(36, 24, 40, .16);
+    }
+    .map__locate svg { width: 20px; height: 20px; }
+
+    /* Floating chrome on the map — top inset comes from layout.css (--app-top) */
+    .chrome {
+      position: absolute; left: 0; right: 0; top: 0; z-index: 20;
+      pointer-events: none;
+    }
+    .chrome > * { pointer-events: auto; }
+    .chrome__row { display: flex; align-items: center; gap: 10px; }
+    .back {
+      width: 42px; height: 42px; border-radius: 50%; border: 0; background: #fff; color: var(--ink);
+      display: grid; place-items: center; text-decoration: none; flex-shrink: 0;
+      box-shadow: 0 8px 20px rgba(36, 24, 40, .14);
+    }
+    .back svg { width: 18px; height: 18px; }
+    .search {
+      flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 42px;
+      padding: 0 12px; border-radius: 999px; background: #fff; border: 0;
+      box-shadow: 0 8px 20px rgba(36, 24, 40, .14);
+    }
+    .search:focus-within { box-shadow: 0 0 0 3px rgba(139, 0, 232, .16), 0 8px 20px rgba(36, 24, 40, .14); }
+    .search svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
+    .search input {
+      flex: 1; min-width: 0; border: 0; background: transparent; outline: none;
+      font: inherit; font-size: .9rem; color: var(--ink);
+    }
+    .search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+    .search__clear {
+      border: 0; background: #EDE4EC; width: 22px; height: 22px; border-radius: 50%;
+      display: grid; place-items: center; cursor: pointer; padding: 0;
+    }
+    .search__clear svg { width: 12px; height: 12px; color: var(--ink); }
+    .search__clear[hidden] { display: none; }
+
+    .gps {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 10px;
+      height: 36px; padding: 0 12px 0 8px; border: 0; border-radius: 999px;
+      background: #fff; color: var(--violet); font: inherit; font-size: .78rem; font-weight: 700;
+      cursor: pointer; box-shadow: 0 8px 18px rgba(36, 24, 40, .12);
+    }
+    .gps svg { width: 16px; height: 16px; }
+    .gps small { color: var(--muted); font-weight: 600; }
+
+    .results {
+      margin-top: 8px; max-height: 240px; overflow-y: auto; border-radius: 18px;
+      background: #fff; box-shadow: 0 14px 32px rgba(36, 24, 40, .16);
+    }
+    .results[hidden] { display: none; }
+    .result {
+      display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px;
+      border: 0; border-bottom: 1px solid #F1ECF7; background: #fff; font: inherit;
+      text-align: left; cursor: pointer;
+    }
+    .result:last-child { border-bottom: 0; }
+    .result:hover { background: #FAF7FD; }
+    .result svg { width: 18px; height: 18px; color: var(--violet); flex-shrink: 0; }
+    .result strong { display: block; font-size: .88rem; }
+    .result small { display: block; color: var(--muted); font-size: .74rem; margin-top: 1px; }
+    .results__empty { margin: 0; padding: 16px; font-size: .84rem; color: var(--muted); text-align: center; }
+
+    /* Bottom sheet — no dock on this screen */
+    .sheet {
+      position: relative; z-index: 12; flex-shrink: 0;
+      margin-top: -18px; padding: 10px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+      background: #fff; border-radius: 24px 24px 0 0;
+      box-shadow: 0 -12px 36px rgba(36, 24, 40, .12);
+    }
+    .sheet__handle {
+      width: 36px; height: 4px; margin: 0 auto 12px; border-radius: 99px; background: #E5DAF5;
+    }
+    .sheet__eyebrow {
+      margin: 0 0 8px; font-size: .68rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .sheet__place { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+    .sheet__icon {
+      width: 42px; height: 42px; border-radius: 14px; background: var(--grad); color: #fff;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .sheet__icon svg { width: 18px; height: 18px; }
+    .sheet__name {
+      margin: 0; font-family: Outfit, sans-serif; font-size: 1.12rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; letter-spacing: -0.02em;
+    }
+    .sheet__tag {
+      font-family: 'DM Sans', sans-serif; font-size: .64rem; font-weight: 700;
+      padding: 3px 8px; border-radius: 999px; background: #ECFDF5; color: #047857;
+    }
+    .sheet__tag[hidden] { display: none; }
+    .sheet__addr { margin: 4px 0 0; font-size: .8rem; color: var(--muted); line-height: 1.45; }
+    .sheet.is-loading .sheet__name,
+    .sheet.is-loading .sheet__addr { color: transparent; background: #EEF1F5; border-radius: 6px; }
+    .confirm {
+      display: grid; place-items: center; width: 100%; height: 52px; border: 0; border-radius: 16px;
+      background-image: var(--grad); color: #fff; font: inherit; font-weight: 700; font-size: .95rem;
+      cursor: pointer; box-shadow: 0 10px 24px rgba(139, 0, 232, .28);
+    }
+    .confirm:disabled { opacity: .6; cursor: default; }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="stage">
+    <div class="phone" aria-label="Select location">
+      <div class="screen">
+        <div class="map" id="map">
+          <svg class="map__canvas" id="canvas" viewBox="0 0 900 900" aria-hidden="true">
+            <rect width="900" height="900" fill="#EEF0EA"/>
+            <path d="M60 120h160v110H60z M640 560h150v120H640z M140 760h120v90H140z" fill="#D7EBCF"/>
+            <ellipse cx="610" cy="200" rx="70" ry="44" fill="#CDE3F3"/>
+            <ellipse cx="300" cy="500" rx="50" ry="34" fill="#CDE3F3"/>
+            <g stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" fill="none">
+              <path d="M0 330H900"/><path d="M0 640C200 620 360 600 900 610"/><path d="M330 0V900"/>
+              <path d="M520 0C510 260 540 520 520 900"/><path d="M100 900L820 120"/>
+            </g>
+            <g stroke="#FFFFFF" stroke-width="7" fill="none">
+              <path d="M0 210H900M0 450H900M0 760H900M200 0V900M430 0V900M700 0V900M800 0V900"/>
+            </g>
+            <g stroke="#F6D58E" stroke-width="5" fill="none" stroke-linecap="round">
+              <path d="M0 330H900"/><path d="M520 0C510 260 540 520 520 900"/>
+            </g>
+            <g font-family="DM Sans, sans-serif" font-size="15" font-weight="700" fill="#8A97A5" text-anchor="middle">
+              <text x="520" y="410">INDIRANAGAR</text>
+              <text x="330" y="305">MG ROAD</text>
+              <text x="430" y="585">KORAMANGALA</text>
+              <text x="520" y="740">HSR LAYOUT</text>
+              <text x="815" y="305">WHITEFIELD</text>
+              <text x="240" y="625">JAYANAGAR</text>
+            </g>
+            <circle id="me" cx="520" cy="380" r="9" fill="#2563EB" stroke="#fff" stroke-width="4"/>
+          </svg>
+          <span class="map__shadow" aria-hidden="true"></span>
+          <span class="map__pin is-drop" id="pin" aria-hidden="true">
+            <svg viewBox="0 0 40 48"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#8B00E8"/><stop offset="1" stop-color="#FF03C8"/></linearGradient></defs><path d="M20 47S4 30 4 18a16 16 0 1 1 32 0c0 12-16 29-16 29Z" fill="url(#g)"/><circle cx="20" cy="18" r="6" fill="#fff"/></svg>
+          </span>
+          <span class="map__tip" id="tip">Salons near here</span>
+          <button type="button" class="map__locate" id="locate" aria-label="Go to current location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          </button>
+
+          <div class="chrome">
+            <div class="chrome__row">
+              <a class="back" id="loc-back" href="home.html" aria-label="Back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg>
+              </a>
+              <label class="search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input id="q" type="search" placeholder="Search area or landmark" autocomplete="off" aria-label="Search location" />
+                <button type="button" class="search__clear" id="clear" aria-label="Clear" hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                </button>
+              </label>
+            </div>
+            <button type="button" class="gps" id="use-current">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+              Use current <small>· GPS</small>
+            </button>
+            <div class="results" id="results" hidden></div>
+          </div>
+        </div>
+
+        <div class="sheet" id="card">
+          <div class="sheet__handle" aria-hidden="true"></div>
+          <p class="sheet__eyebrow">Selected location</p>
+          <div class="sheet__place">
+            <span class="sheet__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+            </span>
+            <div>
+              <h1 class="sheet__name">
+                <span id="sel-name">Indiranagar</span>
+                <span class="sheet__tag" id="sel-tag">Current</span>
+              </h1>
+              <p class="sheet__addr" id="sel-addr">12th Main Rd, HAL 2nd Stage, Indiranagar, Bengaluru 560038</p>
+            </div>
+          </div>
+          <button type="button" class="confirm" id="confirm">Confirm location</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var CURRENT = { id: 'indiranagar', name: 'Indiranagar', street: '12th Main Rd', full: '12th Main Rd, HAL 2nd Stage, Indiranagar, Bengaluru 560038', x: 520, y: 380 };
+      var PLACES = [
+        CURRENT,
+        { id: 'indira-100ft', name: '100 Feet Road', street: '100 Feet Rd', full: '100 Feet Rd, Indiranagar, Bengaluru 560038', x: 545, y: 430 },
+        { id: 'mg-road', name: 'MG Road', street: 'MG Road', full: 'MG Road, Shanthala Nagar, Bengaluru 560001', x: 330, y: 330 },
+        { id: 'koramangala', name: 'Koramangala 5th Block', street: '80 Feet Rd', full: '80 Feet Rd, Koramangala 5th Block, Bengaluru 560095', x: 430, y: 610 },
+        { id: 'hsr', name: 'HSR Layout', street: '27th Main Rd', full: '27th Main Rd, HSR Layout Sector 2, Bengaluru 560102', x: 520, y: 760 },
+        { id: 'whitefield', name: 'Whitefield', street: 'ITPL Main Rd', full: 'ITPL Main Rd, Whitefield, Bengaluru 560066', x: 815, y: 330 },
+        { id: 'jayanagar', name: 'Jayanagar 4th Block', street: '11th Main Rd', full: '11th Main Rd, Jayanagar 4th Block, Bengaluru 560011', x: 240, y: 640 },
+        { id: 'phoenix', name: 'Phoenix Marketcity', street: 'Whitefield Main Rd', full: 'Whitefield Main Rd, Mahadevapura, Bengaluru 560048', x: 700, y: 300 }
+      ];
+      var sel = CURRENT, mode = 'current';
+
+      function shortAddr(p) {
+        var parts = p.full.replace(/\s\d{6}$/, '').split(', ');
+        return parts[0] + ', ' + parts[parts.length - 2] + ', ' + parts[parts.length - 1];
+      }
+      function moveMap(p) {
+        var map = $('map');
+        var dx = map.clientWidth / 2 - p.x, dy = map.clientHeight * 0.46 - p.y;
+        $('canvas').style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        var pin = $('pin');
+        pin.classList.remove('is-drop'); void pin.offsetWidth; pin.classList.add('is-drop');
+      }
+      function select(p, m) {
+        sel = p; mode = m;
+        $('sel-name').textContent = p.name;
+        $('sel-addr').textContent = p.full;
+        $('sel-tag').hidden = m !== 'current';
+        moveMap(p);
+      }
+
+      function useCurrent() {
+        var card = $('card');
+        card.classList.add('is-loading');
+        $('sel-name').textContent = 'Detecting…';
+        $('confirm').disabled = true;
+        $('confirm').textContent = 'Detecting…';
+        setTimeout(function () {
+          card.classList.remove('is-loading');
+          $('confirm').disabled = false;
+          $('confirm').textContent = 'Confirm location';
+          select(CURRENT, 'current');
+        }, 700);
+        closeResults();
+      }
+      $('use-current').addEventListener('click', useCurrent);
+      $('locate').addEventListener('click', useCurrent);
+
+      function closeResults() { $('results').hidden = true; }
+      function render(q) {
+        var box = $('results');
+        q = q.trim().toLowerCase();
+        $('clear').hidden = !q;
+        if (!q) { box.hidden = true; return; }
+        var hits = PLACES.filter(function (p) { return (p.name + ' ' + p.full).toLowerCase().indexOf(q) !== -1; });
+        box.innerHTML = hits.length ? hits.map(function (p) {
+          return '<button type="button" class="result" data-id="' + p.id + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg><span><strong>' + p.name + '</strong><small>' + p.full + '</small></span></button>';
+        }).join('') : '<p class="results__empty">No places found for “' + q.replace(/</g, '&lt;') + '”</p>';
+        box.hidden = false;
+      }
+      $('q').addEventListener('input', function (e) { render(e.target.value); });
+      $('q').addEventListener('focus', function (e) { render(e.target.value); });
+      $('clear').addEventListener('click', function () { $('q').value = ''; render(''); $('q').focus(); });
+      $('results').addEventListener('click', function (e) {
+        var btn = e.target.closest('.result');
+        if (!btn) return;
+        var p = PLACES.filter(function (x) { return x.id === btn.getAttribute('data-id'); })[0];
+        $('q').value = '';
+        render('');
+        $('q').blur();
+        select(p, p === CURRENT ? 'current' : 'search');
+      });
+
+      function safeReturn(raw) {
+        if (!raw) return 'home.html';
+        try { raw = decodeURIComponent(raw); } catch (e) {}
+        if (!/^[a-z0-9._-]+\.html(\?[-a-z0-9._=&%]*)?$/i.test(raw)) return 'home.html';
+        return raw;
+      }
+      var retTo = safeReturn(new URLSearchParams(location.search).get('from'));
+      $('loc-back').href = retTo;
+
+      $('confirm').addEventListener('click', function () {
+        localStorage.setItem('gt-location', JSON.stringify({
+          mode: mode, id: sel.id, name: sel.name, address: shortAddr(sel), full: sel.full
+        }));
+        location.href = retTo;
+      });
+
+      var saved = null;
+      try { saved = JSON.parse(localStorage.getItem('gt-location') || 'null'); } catch (e) {}
+      var start = saved && PLACES.filter(function (p) { return p.id === saved.id; })[0];
+      select(start || CURRENT, start ? saved.mode : 'current');
+      window.addEventListener('resize', function () { moveMap(sel); });
+    })();
+  </script>
+  <script src="assets/app-shell.js"></script>
+  <script>
+    // Focused picker — hide the primary dock so it never covers Confirm.
+    (function () {
+      var phone = document.querySelector('.phone');
+      if (phone) phone.classList.add('is-dock-hidden');
+    })();
+  </script>
+</body>
+</html>

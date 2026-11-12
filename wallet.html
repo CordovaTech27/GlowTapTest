@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — My Wallet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8; --pink: #FF03C8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+      background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: #ffffff; }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); flex-shrink: 0; }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 4px 14px 10px; background: #fff; flex-shrink: 0; }
+    .back { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; display: grid; place-items: center; color: var(--ink); text-decoration: none; }
+    .back svg { width: 18px; height: 18px; }
+    .nav h1 { margin: 0; font-family: Outfit, sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: -.02em; }
+    .body { flex: 1; overflow-y: auto; padding: 12px 16px 28px; scrollbar-width: none; }
+    .body::-webkit-scrollbar { display: none; }
+
+    .balance {
+      border-radius: 22px; padding: 18px 16px 16px; color: #fff; background: var(--grad);
+      box-shadow: 0 14px 32px rgba(139,0,232,.28); margin-bottom: 16px; position: relative; overflow: hidden;
+    }
+    .balance::after { content: ""; position: absolute; right: -24px; top: -34px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,.12); }
+    .balance__eyebrow { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+    .balance__amt { margin: 4px 0 2px; font-family: Outfit, sans-serif; font-size: 2.1rem; font-weight: 700; letter-spacing: -.02em; position: relative; z-index: 1; }
+    .balance__sub { margin: 0 0 14px; font-size: .78rem; opacity: .9; position: relative; z-index: 1; }
+    .balance__add {
+      position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px;
+      height: 42px; padding: 0 18px; border-radius: 12px; border: none; cursor: pointer;
+      background: #fff; color: var(--violet); font-family: inherit; font-size: .88rem; font-weight: 700;
+    }
+    .balance__add svg { width: 16px; height: 16px; }
+
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin: 0 0 10px; }
+    .section-head h2 { margin: 0; font-family: Outfit, sans-serif; font-size: .95rem; font-weight: 700; }
+    .chips { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
+    .chip {
+      flex: 0 0 auto; padding: 7px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff;
+      font-family: inherit; font-size: .76rem; font-weight: 700; color: var(--muted); cursor: pointer;
+    }
+    .chip.is-on { border-color: rgba(139,0,232,.45); background: #F3EEFF; color: var(--violet); }
+
+    .txns { background: #fff; border-radius: 18px; padding: 4px 14px; border: 1px solid rgba(139,0,232,.06); box-shadow: 0 6px 18px rgba(30,42,50,.04); }
+    .txn { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F1F5F9; }
+    .txn:last-child { border-bottom: 0; }
+    .txn[hidden] { display: none; }
+    .txn__icon { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; }
+    .txn__icon svg { width: 18px; height: 18px; }
+    .txn--add .txn__icon { background: #ECFDF5; color: #047857; }
+    .txn--spend .txn__icon { background: #FEF2F2; color: #B91C1C; }
+    .txn--refund .txn__icon { background: #ECFEFF; color: #0E7490; }
+    .txn__text { flex: 1; min-width: 0; }
+    .txn__title { font-size: .86rem; font-weight: 700; }
+    .txn__sub { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+    .txn__amt { font-family: Outfit, sans-serif; font-weight: 700; font-size: .95rem; white-space: nowrap; }
+    .txn--add .txn__amt { color: #047857; }
+    .txn--spend .txn__amt { color: #B91C1C; }
+    .txn--refund .txn__amt { color: #0E7490; }
+    .empty { padding: 18px 0; text-align: center; font-size: .8rem; color: var(--muted); }
+    .note { margin-top: 12px; font-size: .74rem; color: var(--muted); text-align: center; line-height: 1.4; }
+
+    .toast {
+      position: absolute; left: 50%; bottom: 28px; transform: translate(-50%, 20px); z-index: 60;
+      padding: 10px 16px; border-radius: 12px; background: #047857; color: #fff; font-size: .82rem; font-weight: 700;
+      opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; white-space: nowrap;
+    }
+    .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="nav">
+          <a class="back" href="profile.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+          <div class="nav__meta">
+            <p class="eyebrow">Payments</p>
+            <h1>My wallet</h1>
+          </div>
+        </div>
+        <div class="body">
+          <div class="balance">
+            <div class="balance__eyebrow">GlowTap wallet</div>
+            <div class="balance__amt" id="balance">₹500</div>
+            <p class="balance__sub">Use it to pay for bookings · Refunds land here instantly</p>
+            <button type="button" class="balance__add" id="add-open">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+              Add money
+            </button>
+          </div>
+
+          <div class="section-head"><h2>Transactions</h2></div>
+          <div class="chips" id="filters">
+            <button type="button" class="chip is-on" data-f="all">All</button>
+            <button type="button" class="chip" data-f="add">Added</button>
+            <button type="button" class="chip" data-f="spend">Spent</button>
+            <button type="button" class="chip" data-f="refund">Refunds</button>
+          </div>
+
+          <div class="txns" id="txns">
+            <div class="txn txn--refund" data-kind="refund">
+              <span class="txn__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></span>
+              <div class="txn__text"><div class="txn__title">Refund credited</div><div class="txn__sub">Cancelled by salon · 18 Aug</div></div>
+              <div class="txn__amt">+₹399</div>
+            </div>
+            <div class="txn txn--spend" data-kind="spend">
+              <span class="txn__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7 7 7-7"/></svg></span>
+              <div class="txn__text"><div class="txn__title">Paid for booking</div><div class="txn__sub">Luxe Curls · 24 Jul</div></div>
+              <div class="txn__amt">−₹899</div>
+            </div>
+            <div class="txn txn--add" data-kind="add">
+              <span class="txn__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
+              <div class="txn__text"><div class="txn__title">Money added</div><div class="txn__sub">UPI · 20 Jul</div></div>
+              <div class="txn__amt">+₹1,000</div>
+            </div>
+          </div>
+          <div class="empty" id="txn-empty" hidden>No transactions in this filter.</div>
+          <p class="note">Wallet balance can be used at checkout. It can’t be withdrawn to a bank account.</p>
+        </div>
+      </div>
+
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+  </div>
+  <script src="assets/topup.js"></script>
+  <script>
+    (function () {
+      var balanceEl = document.getElementById('balance');
+      function inr(n) { return '₹' + n.toLocaleString('en-IN'); }
+      function renderBalance() { balanceEl.textContent = inr(GTTopup.balance()); }
+      function toast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('is-on');
+        setTimeout(function () { t.classList.remove('is-on'); }, 2200);
+      }
+      function added(v, info) {
+        renderBalance();
+        var row = document.createElement('div');
+        row.className = 'txn txn--add';
+        row.setAttribute('data-kind', 'add');
+        row.innerHTML = '<span class="txn__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>' +
+          '<div class="txn__text"><div class="txn__title">Money added</div><div class="txn__sub">' + info.method + ' · Just now</div></div>' +
+          '<div class="txn__amt">+' + inr(v) + '</div>';
+        var list = document.getElementById('txns');
+        list.insertBefore(row, list.firstChild);
+        applyFilter();
+        toast(inr(v) + ' added to your wallet');
+      }
+      function openTopup(view) { GTTopup.open({ view: view, historyLink: false, onSuccess: added }); }
+
+      document.getElementById('add-open').addEventListener('click', function () { openTopup(); });
+
+      var filter = 'all';
+      function applyFilter() {
+        var shown = 0;
+        document.querySelectorAll('#txns .txn').forEach(function (t) {
+          var on = filter === 'all' || t.getAttribute('data-kind') === filter;
+          t.hidden = !on;
+          if (on) shown++;
+        });
+        document.getElementById('txn-empty').hidden = shown > 0;
+      }
+      document.querySelectorAll('#filters .chip').forEach(function (c) {
+        c.addEventListener('click', function () {
+          document.querySelectorAll('#filters .chip').forEach(function (x) { x.classList.toggle('is-on', x === c); });
+          filter = c.getAttribute('data-f');
+          applyFilter();
+        });
+      });
+
+      renderBalance();
+      var q = new URLSearchParams(location.search);
+      if (q.get('add') === '1') openTopup();
+      else if (q.get('add')) openTopup(q.get('add'));
+    })();
+  </script>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>

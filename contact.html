@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GlowTap Customer — Contact Support</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" />
+  <style>
+    :root {
+      --ink: #241828; --muted: #7A6E78; --line: #EDE4EC; --violet: #8B00E8;
+      --grad: linear-gradient(100deg, #8B00E8 0%, #C026D3 48%, #FF03C8 100%);
+      --surface: #FBF7FA; --phone-w: 390px; --phone-h: 844px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif; background: #ffffff; color: var(--ink);
+      display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px;
+    }
+    .studio { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: #ffffff; }
+    .stage { position: relative; z-index: 1; width: var(--phone-w); height: var(--phone-h); }
+    .phone {
+      width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: var(--surface);
+      box-shadow: 0 0 0 9px #171022, 0 0 0 11px #2c1a42, 0 36px 70px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; position: relative;
+    }
+    .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; background: #050308; border-radius: 20px; z-index: 40; pointer-events: none; }
+    .status { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 35; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 10px; font-size: .72rem; font-weight: 600; pointer-events: none; }
+    .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 52px; }
+    .nav { display: flex; align-items: center; gap: 10px; padding: 4px 14px 10px; background: #fff; }
+    .back { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; color: var(--ink); text-decoration: none; }
+    .back svg { width: 18px; height: 18px; }
+    .nav h1 { margin: 0; font-family: Outfit, sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .body { flex: 1; overflow-y: auto; padding: 12px 16px 28px; scrollbar-width: none; }
+    .body::-webkit-scrollbar { display: none; }
+    .sec { margin: 4px 2px 10px; font-size: .7rem; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .hours {
+      display: flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 10px 12px; border-radius: 12px;
+      background: #ECFDF5; color: #047857; font-size: .78rem; font-weight: 600;
+    }
+    .hours__dot { width: 8px; height: 8px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 3px rgba(16,185,129,.18); flex-shrink: 0; }
+    .way {
+      display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 8px; background: #fff;
+      border-radius: 16px; text-decoration: none; color: inherit;
+      border: 1px solid rgba(139,0,232,.06); box-shadow: 0 6px 18px rgba(30,42,50,.04);
+    }
+    .way__icon { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; flex-shrink: 0; color: #fff; }
+    .way__icon svg { width: 19px; height: 19px; }
+    .way__icon--call { background: linear-gradient(135deg, #8B00E8, #A855F7); }
+    .way__icon--mail { background: linear-gradient(135deg, #2563EB, #60A5FA); }
+    .way__icon--wa { background: linear-gradient(135deg, #059669, #34D399); }
+    .way__text { flex: 1; min-width: 0; }
+    .way__name { display: block; font-size: .9rem; font-weight: 700; }
+    .way__value { display: block; font-size: .82rem; font-weight: 600; color: var(--ink); margin-top: 1px; }
+    .way__meta { display: block; font-size: .72rem; color: var(--muted); margin-top: 2px; }
+    .way__cta { padding: 7px 12px; border-radius: 999px; background: #F3EEFF; color: var(--violet); font-size: .76rem; font-weight: 700; flex-shrink: 0; }
+    .salon-tip { margin: 4px 2px 0; font-size: .74rem; color: var(--muted); line-height: 1.45; }
+    @media (max-width: 430px) {
+      body { padding: 0; align-items: stretch; }
+      .studio, .island, .status { display: none; }
+      .stage, .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+      .screen { padding-top: max(12px, env(safe-area-inset-top)); }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/layout.css" />
+  <link rel="stylesheet" href="assets/app-shell.css" />
+</head>
+<body>
+  <div class="studio" aria-hidden="true"></div>
+  <div class="stage">
+    <div class="phone">
+      <div class="island" aria-hidden="true"></div>
+      <div class="status" aria-hidden="true"><span>9:41</span><span></span></div>
+      <div class="screen">
+        <div class="nav">
+          <a class="back" href="support.html" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 6-6 6 6 6"/></svg></a>
+          <div class="nav__meta">
+            <p class="eyebrow">Help</p>
+            <h1>Contact support</h1>
+          </div>
+        </div>
+        <div class="body">
+          <p class="sec">Talk to us</p>
+          <p class="hours"><span class="hours__dot" aria-hidden="true"></span>Customer care is open · 9 AM – 9 PM, all days</p>
+
+          <a class="way" href="tel:18001234569" id="way-call">
+            <span class="way__icon way__icon--call" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg></span>
+            <span class="way__text"><span class="way__name">Customer care</span><span class="way__value">1800 123 4569</span><span class="way__meta">Toll-free · avg. wait under 2 min</span></span>
+            <span class="way__cta">Call</span>
+          </a>
+          <a class="way" href="mailto:support@glowtap.in?subject=GlowTap%20support" id="way-mail">
+            <span class="way__icon way__icon--mail" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg></span>
+            <span class="way__text"><span class="way__name">Email</span><span class="way__value">support@glowtap.in</span><span class="way__meta">We reply within 24 hours</span></span>
+            <span class="way__cta">Email</span>
+          </a>
+          <a class="way" href="https://wa.me/919876543210" id="way-wa">
+            <span class="way__icon way__icon--wa" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19l-4 1Z"/><path d="M9 9.5c.3 2 2.2 4 4.5 4.6l1.2-1.1 1.8.9"/></svg></span>
+            <span class="way__text"><span class="way__name">WhatsApp</span><span class="way__value">+91 98765 43210</span><span class="way__meta">Chat with us · 9 AM – 9 PM</span></span>
+            <span class="way__cta">Chat</span>
+          </a>
+          <p class="salon-tip">At the salon right now? For timing or service questions, call the salon directly from your booking.</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="assets/app-shell.js"></script>
+</body>
+</html>
