@@ -109,12 +109,17 @@
     .result small { display: block; color: var(--muted); font-size: .74rem; margin-top: 1px; }
     .results__empty { margin: 0; padding: 16px; font-size: .84rem; color: var(--muted); text-align: center; }
 
-    /* Bottom sheet — no dock on this screen */
+    /* Bottom sheet — clear floating dock so Confirm stays tappable */
     .sheet {
       position: relative; z-index: 12; flex-shrink: 0;
-      margin-top: -18px; padding: 10px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+      margin-top: -18px;
+      padding: 10px 16px calc(var(--footer-above-dock, 80px) + 18px);
+      box-sizing: border-box;
       background: #fff; border-radius: 24px 24px 0 0;
       box-shadow: 0 -12px 36px rgba(36, 24, 40, .12);
+    }
+    .phone.has-dock .sheet {
+      padding-bottom: calc(var(--footer-above-dock, 80px) + 18px) !important;
     }
     .sheet__handle {
       width: 36px; height: 4px; margin: 0 auto 12px; border-radius: 99px; background: #E5DAF5;

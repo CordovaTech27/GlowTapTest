@@ -237,6 +237,12 @@
   padding-bottom: calc(var(--footer-above-dock) + 28px) !important;
   box-sizing: border-box;
 }
+/* Location picker sheet (class is .sheet, not .sheet__panel) */
+.phone.has-dock.location-pick .sheet,
+.phone.has-dock:has(#confirm) .sheet {
+  padding-bottom: calc(var(--footer-above-dock) + 18px) !important;
+  box-sizing: border-box;
+}
 .phone.has-dock .sticky,
 .phone.has-dock .footer {
   left: 0 !important;
