@@ -20,7 +20,7 @@
     '.tu{position:absolute;inset:0;z-index:60;display:none;align-items:flex-end;background:rgba(16,8,24,.38);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-family:inherit;color:#1A2330}' +
     '.tu.is-open{display:flex}' +
     '.tu [hidden]{display:none!important}' +
-    '.tu__panel{width:100%;max-height:92%;overflow-y:auto;background:#fff;border-radius:22px 22px 0 0;padding:14px 16px max(20px,env(safe-area-inset-bottom));box-shadow:0 -12px 40px rgba(0,0,0,.18);animation:tuUp .28s ease;scrollbar-width:none}' +
+    '.tu__panel{width:100%;max-height:92%;overflow-y:auto;background:#fff;border-radius:22px 22px 0 0;padding:14px 16px calc(var(--footer-above-dock, 80px) + 28px);box-sizing:border-box;box-shadow:0 -12px 40px rgba(0,0,0,.18);animation:tuUp .28s ease;scrollbar-width:none}' +
     '.tu__panel::-webkit-scrollbar{display:none}' +
     '@keyframes tuUp{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}' +
     '.tu__handle{width:40px;height:4px;border-radius:99px;background:#E5EAF0;margin:0 auto 12px}' +

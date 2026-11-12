@@ -232,7 +232,8 @@
 }
 /* Bottom sheets: leave room so Yes/Keep (etc.) sit above the always-visible dock */
 .phone.has-dock .sheet__panel,
-.phone.has-dock .ba__panel {
+.phone.has-dock .ba__panel,
+.phone.has-dock .tu__panel {
   padding-bottom: calc(var(--footer-above-dock) + 28px) !important;
   box-sizing: border-box;
 }
